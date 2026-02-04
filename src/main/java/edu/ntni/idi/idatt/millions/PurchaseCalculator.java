@@ -6,9 +6,9 @@ public class PurchaseCalculator implements TransactionCalculator{
   private BigDecimal purchasePrice;
   private BigDecimal quantity;
 
-  public PurchaseCalculator(BigDecimal purchasePrice, BigDecimal quantity) {
-    this.purchasePrice = purchasePrice;
-    this.quantity = quantity;
+  public PurchaseCalculator(Share share) {
+    this.purchasePrice = share.getPurchasePrice();
+    this.quantity = share.getQuantity();
   }
 
   @Override
@@ -18,16 +18,16 @@ public class PurchaseCalculator implements TransactionCalculator{
 
   @Override
   public BigDecimal calculateComission() {
-    return purchasePrice;
+    return calculateGross().multiply(BigDecimal.valueOf(0.005));
   }
 
   @Override
   public BigDecimal calculateTax() {
-    return purchasePrice;
+    return BigDecimal.ZERO;
   }
 
   @Override
   public BigDecimal calculateTotal() {
-    return purchasePrice;
+    return calculateComission().subtract(calculateComission()).subtract(calculateTax());
   }
 }

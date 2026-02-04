@@ -26,6 +26,10 @@ public class Stock {
     return prices;
   }
 
+  public BigDecimal getSalePrice() {
+    return prices.get(0);
+  }
+
   public void addNewSalesPrice(BigDecimal price) {
     prices.add(price);
   }

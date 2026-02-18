@@ -1,4 +1,6 @@
-package edu.ntni.idi.idatt.millions;
+package edu.ntni.idi.idatt.millions.calculator;
+
+import edu.ntni.idi.idatt.millions.Share;
 
 import java.math.BigDecimal;
 
@@ -10,7 +12,7 @@ public class SaleCalculator implements TransactionCalculator {
   public SaleCalculator(Share share) {
     this.purchasePrice = share.getPurchasePrice();
     this.quantity = share.getQuantity();
-    this.salesPrice = share.getStock().getSalePrice();
+    this.salesPrice = share.getStock().getSalesPrice();
   }
 
   @Override

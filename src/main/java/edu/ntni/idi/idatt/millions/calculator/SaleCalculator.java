@@ -1,4 +1,6 @@
-package edu.ntni.idi.idatt.millions;
+package edu.ntni.idi.idatt.millions.calculator;
+
+import edu.ntni.idi.idatt.millions.Share;
 
 import java.math.BigDecimal;
 

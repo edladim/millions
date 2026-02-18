@@ -1,8 +1,10 @@
-package edu.ntni.idi.idatt.millions;
+package edu.ntni.idi.idatt.millions.calculator;
+
+import edu.ntni.idi.idatt.millions.Share;
 
 import java.math.BigDecimal;
 
-public class PurchaseCalculator implements TransactionCalculator{
+public class PurchaseCalculator implements TransactionCalculator {
   private BigDecimal purchasePrice;
   private BigDecimal quantity;
 

@@ -1,0 +1,10 @@
+package edu.ntni.idi.idatt.millions;
+
+import java.math.BigDecimal;
+
+public interface TransactionCalculator {
+  BigDecimal calculateGross();
+  BigDecimal calculateComission();
+  BigDecimal calculateTax();
+  BigDecimal calculateTotal();
+}

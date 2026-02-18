@@ -1,12 +1,13 @@
 package edu.ntni.idi.idatt.millions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Portfolio {
   private List<Share> shares;
 
-  public Portfolio(List<Share> shares) {
-    this.shares = shares;
+  public Portfolio() {
+    this.shares = new ArrayList<>();
   }
 
   public boolean addShare(Share share) {

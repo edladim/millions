@@ -12,6 +12,7 @@ public class Player {
   public Player(String name, BigDecimal stratingMoney) {
     this.name = name;
     this.stratingMoney = stratingMoney;
+    this.money = stratingMoney;
     this.portfolio = new Portfolio();
     this.transactionArchive = new TransactionArchive();
   }
@@ -24,12 +25,12 @@ public class Player {
     return money;
   }
 
-  public void addMoney(BigDecimal money) {
-    this.money = this.money.add(money);
+  public void addMoney(BigDecimal amount) {
+    money = money.add(amount);
   }
 
   public void withdrawMoney(BigDecimal amount) {
-
+    money = money.subtract(amount);
   }
 
 

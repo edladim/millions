@@ -12,6 +12,12 @@ public class Sale extends Transaction {
 
   @Override
   public void commit(Player player) {
-
+    if (!player.getPortfolio().getShares().contains(this.getShare()) || isCommitted()) {
+      throw new IllegalArgumentException("Player does not own enough shares, or transaction already committed");
+    }
+    player.addMoney(getCalculator().calculateTotal());
+    player.getPortfolio().removeShare(this.getShare());
+    player.getTransactionArchive().addTransaction(this);
+    setCommitted(true);
   }
 }

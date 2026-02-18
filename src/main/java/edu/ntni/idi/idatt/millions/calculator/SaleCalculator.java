@@ -12,7 +12,7 @@ public class SaleCalculator implements TransactionCalculator {
   public SaleCalculator(Share share) {
     this.purchasePrice = share.getPurchasePrice();
     this.quantity = share.getQuantity();
-    this.salesPrice = share.getStock().getSalePrice();
+    this.salesPrice = share.getStock().getSalesPrice();
   }
 
   @Override

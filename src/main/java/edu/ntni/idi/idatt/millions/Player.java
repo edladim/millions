@@ -12,6 +12,8 @@ public class Player {
   public Player(String name, BigDecimal stratingMoney) {
     this.name = name;
     this.stratingMoney = stratingMoney;
+    this.portfolio = new Portfolio();
+    this.transactionArchive = new TransactionArchive();
   }
 
   public String getName() {

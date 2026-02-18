@@ -2,7 +2,7 @@ package edu.ntni.idi.idatt.millions.transaction;
 
 import edu.ntni.idi.idatt.millions.Player;
 import edu.ntni.idi.idatt.millions.Share;
-import edu.ntni.idi.idatt.millions.TransactionCalculator;
+import edu.ntni.idi.idatt.millions.calculator.TransactionCalculator;
 
 public abstract class Transaction {
   private Share share;
@@ -24,7 +24,7 @@ public abstract class Transaction {
     return week;
   }
 
-  public edu.ntni.idi.idatt.millions.TransactionCalculator getCalculator() {
+  public TransactionCalculator getCalculator() {
     return calculator;
   }
 

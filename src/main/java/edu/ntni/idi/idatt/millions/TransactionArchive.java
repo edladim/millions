@@ -1,6 +1,7 @@
 package edu.ntni.idi.idatt.millions;
 
 import edu.ntni.idi.idatt.millions.transaction.Purchase;
+import edu.ntni.idi.idatt.millions.transaction.Sale;
 import edu.ntni.idi.idatt.millions.transaction.Transaction;
 
 import java.util.List;
@@ -29,15 +30,18 @@ public class TransactionArchive {
 
   public List<Transaction> getPurchases(int week) {
     return transactions.stream()
-            .filter(transaction -> transaction.getWeek() == week && transactions instanceof Purchase)
+            .filter(transaction -> transaction.getWeek() == week && transaction instanceof Purchase)
             .toList();
   }
 
-  /*
-  public List<Transaction> getSales(int week) {
 
+  public List<Transaction> getSales(int week) {
+    return transactions.stream()
+            .filter(transaction -> transaction.getWeek() == week && transaction instanceof Sale)
+            .toList();
   }
 
+/*
   public int countDistictWeeks() {
 
   }

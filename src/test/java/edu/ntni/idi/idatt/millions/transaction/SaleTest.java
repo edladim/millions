@@ -65,4 +65,9 @@ public class SaleTest {
     assertTrue(sale.isCommitted());
   }
 
+  @Test
+  void testCommitAddsTransactionToArchive() {
+    sale.commit(player);
+    assertTrue(player.getTransactionArchive().getSales(5).contains(sale));
+  }
 }

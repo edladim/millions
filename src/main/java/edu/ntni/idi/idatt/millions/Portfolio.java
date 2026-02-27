@@ -22,7 +22,7 @@ public class Portfolio {
     return shares;
   }
 
-  public List<Share> getShares(String symbol) {
+  public List<Share> getSharesBySymbol(String symbol) {
     return shares.stream().filter(share -> share.getStock().getSymbol().equals(symbol)).toList();
   }
 

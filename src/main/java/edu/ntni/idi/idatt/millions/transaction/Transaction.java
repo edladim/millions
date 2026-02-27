@@ -28,10 +28,6 @@ public abstract class Transaction {
     return calculator;
   }
 
-  public void setCommitted(boolean committed) {
-    this.committed = committed;
-  }
-
   public boolean isCommitted() {
     return committed;
   }

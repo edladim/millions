@@ -1,9 +1,11 @@
 package edu.ntni.idi.idatt.millions;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,23 +28,75 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testAddShare() {
+  void testContainsShare() {
+    portfolio.addShare(share1);
+    assertTrue(portfolio.contains(share1));
+    assertFalse(portfolio.contains(share2));
+  }
+
+  @Test
+  void testAddShare() {
     portfolio.addShare(share1);
     assertEquals(1, portfolio.getShares().size());
     assertTrue(portfolio.contains(share1));
   }
 
   @Test
-  public void testRemoveShare() {
+  void testAddMultipleShares() {
     portfolio.addShare(share1);
-    portfolio.removeShare(share1);
-    assertEquals(0, portfolio.getShares().size());
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+    assertEquals(3, portfolio.getShares().size());
+  }
+
+  @Test
+  void testRemoveShare() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    assertTrue(portfolio.removeShare(share1));
+    assertEquals(1, portfolio.getShares().size());
     assertFalse(portfolio.contains(share1));
   }
 
   @Test
-  public void testGetShare() {
+  void testRemoveNonExistingShare() {
+    portfolio.addShare(share1);
+    assertFalse(portfolio.removeShare(share2));
+    assertEquals(1, portfolio.getShares().size());
+  }
+
+  @Test
+  void testGetShare() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
+    List<Share> shares = portfolio.getShares();
+    assertEquals(2, shares.size());
   }
+
+  @Test
+  void testGetShareBySymbol() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+
+    List<Share> appleShares = portfolio.getSharesBySymbol("AAPL");
+    assertEquals(2, appleShares.size());
+
+    List<Share> googleShares = portfolio.getSharesBySymbol("GOOGL");
+    assertEquals(1, googleShares.size());
+  }
+
+  @Test
+  void testGetSharesByNonExistentSymbol() {
+    portfolio.addShare(share1);
+    List<Share> shares = portfolio.getSharesBySymbol("MSFT");
+    assertTrue(shares.isEmpty());
+  }
+
+  @Test
+  void testEmptyPortfolio() {
+    assertTrue(portfolio.getShares().isEmpty());
+    assertFalse(portfolio.contains(share1));
+  }
+
 }

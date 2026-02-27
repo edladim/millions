@@ -70,4 +70,12 @@ public class SaleTest {
     sale.commit(player);
     assertTrue(player.getTransactionArchive().getSales(5).contains(sale));
   }
+
+  @Test
+  void testCommitedThrowsIfShareNotOwned() {
+    player.getPortfolio().removeShare(share);
+    assertThrows(IllegalArgumentException.class, () -> sale.commit(player));
+  }
+
+
 }

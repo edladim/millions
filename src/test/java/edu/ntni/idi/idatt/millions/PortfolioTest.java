@@ -27,6 +27,13 @@ public class PortfolioTest {
   }
 
   @Test
+  public void testContainsShare() {
+    portfolio.addShare(share1);
+    assertTrue(portfolio.contains(share1));
+    assertFalse(portfolio.contains(share2));
+  }
+
+  @Test
   public void testAddShare() {
     portfolio.addShare(share1);
     assertEquals(1, portfolio.getShares().size());
@@ -84,4 +91,11 @@ public class PortfolioTest {
     List<Share> shares = portfolio.getSharesBySymbol("MSFT");
     assertTrue(shares.isEmpty());
   }
+
+  @Test
+  public void testEmptyPortfolio() {
+    assertTrue(portfolio.getShares().isEmpty());
+    assertFalse(portfolio.contains(share1));
+  }
+
 }

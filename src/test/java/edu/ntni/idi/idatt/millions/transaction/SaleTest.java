@@ -44,4 +44,11 @@ public class SaleTest {
   void testIsCommittedInitiallyFalse() {
     assertFalse(sale.isCommitted());
   }
+
+  @Test
+  void testCommitRemovesShareFromPortfolio() {
+    assertTrue(player.getPortfolio().getShares().contains(share));
+    sale.commit(player);
+    assertFalse(player.getPortfolio().getShares().contains(share));
+  }
 }

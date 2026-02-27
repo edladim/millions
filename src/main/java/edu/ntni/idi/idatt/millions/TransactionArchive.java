@@ -4,13 +4,14 @@ import edu.ntni.idi.idatt.millions.transaction.Purchase;
 import edu.ntni.idi.idatt.millions.transaction.Sale;
 import edu.ntni.idi.idatt.millions.transaction.Transaction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionArchive {
   private List<Transaction> transactions;
 
   public TransactionArchive() {
-
+    this.transactions = new ArrayList<>();
   }
 
   public boolean addTransaction(Transaction transaction) {

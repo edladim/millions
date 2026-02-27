@@ -51,4 +51,11 @@ public class SaleTest {
     sale.commit(player);
     assertFalse(player.getPortfolio().getShares().contains(share));
   }
+
+  @Test
+  void testCommitAddsMoneyToPlayer() {
+    BigDecimal moneyBefore = player.getMoney();
+    sale.commit(player);
+    assertTrue(player.getMoney().compareTo(moneyBefore) > 0);
+  }
 }

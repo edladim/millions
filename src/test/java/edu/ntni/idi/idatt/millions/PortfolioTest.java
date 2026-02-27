@@ -1,6 +1,7 @@
 package edu.ntni.idi.idatt.millions;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -27,21 +28,21 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testContainsShare() {
+  void testContainsShare() {
     portfolio.addShare(share1);
     assertTrue(portfolio.contains(share1));
     assertFalse(portfolio.contains(share2));
   }
 
   @Test
-  public void testAddShare() {
+  void testAddShare() {
     portfolio.addShare(share1);
     assertEquals(1, portfolio.getShares().size());
     assertTrue(portfolio.contains(share1));
   }
 
   @Test
-  public void testAddMultipleShares() {
+  void testAddMultipleShares() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
     portfolio.addShare(share3);
@@ -49,7 +50,7 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testRemoveShare() {
+  void testRemoveShare() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
     assertTrue(portfolio.removeShare(share1));
@@ -58,14 +59,14 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testRemoveNonExistingShare() {
+  void testRemoveNonExistingShare() {
     portfolio.addShare(share1);
     assertFalse(portfolio.removeShare(share2));
     assertEquals(1, portfolio.getShares().size());
   }
 
   @Test
-  public void testGetShare() {
+  void testGetShare() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
     List<Share> shares = portfolio.getShares();
@@ -73,7 +74,7 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testGetShareBySymbol() {
+  void testGetShareBySymbol() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
     portfolio.addShare(share3);
@@ -86,14 +87,14 @@ public class PortfolioTest {
   }
 
   @Test
-  public void testGetSharesByNonExistentSymbol() {
+  void testGetSharesByNonExistentSymbol() {
     portfolio.addShare(share1);
     List<Share> shares = portfolio.getSharesBySymbol("MSFT");
     assertTrue(shares.isEmpty());
   }
 
   @Test
-  public void testEmptyPortfolio() {
+  void testEmptyPortfolio() {
     assertTrue(portfolio.getShares().isEmpty());
     assertFalse(portfolio.contains(share1));
   }

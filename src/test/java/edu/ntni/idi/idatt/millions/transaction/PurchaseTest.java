@@ -58,6 +58,29 @@ public class PurchaseTest {
     assertTrue(player.getMoney().compareTo(moneyBefore) < 0);
   }
 
+  @Test
+  public void testCommitChangesCommittedStatus() {
+    purchase.commit(player);
+    assertTrue(purchase.isCommitted());
+  }
+
+  @Test
+  public void testCommitAddsTransactionToArchive() {
+    purchase.commit(player);
+    assertTrue(player.getTransactionArchive().getTransactions(5).contains(purchase));
+  }
+
+  @Test
+  public void testCommitThrowsIfInsufficientFunds() {
+    player.withdrawMoney(new BigDecimal("9999"));
+    assertThrows(IllegalArgumentException.class, () -> purchase.commit(player));
+  }
+
+  @Test
+  public void testCommitThrowsIfAlreadyCommitted() {
+    purchase.commit(player);
+    assertThrows(IllegalArgumentException.class, () -> purchase.commit(player));
+  }
 
 }
 

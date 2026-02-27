@@ -71,6 +71,17 @@ public class PortfolioTest {
     portfolio.addShare(share2);
     portfolio.addShare(share3);
 
-    List<Share> appleShares = portfolio.getShares("APPL")
+    List<Share> appleShares = portfolio.getSharesBySymbol("AAPL");
+    assertEquals(2, appleShares.size());
+
+    List<Share> googleShares = portfolio.getSharesBySymbol("GOOGL");
+    assertEquals(1, googleShares.size());
+  }
+
+  @Test
+  public void testGetSharesByNonExistentSymbol() {
+    portfolio.addShare(share1);
+    List<Share> shares = portfolio.getSharesBySymbol("MSFT");
+    assertTrue(shares.isEmpty());
   }
 }

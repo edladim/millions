@@ -77,5 +77,10 @@ public class SaleTest {
     assertThrows(IllegalArgumentException.class, () -> sale.commit(player));
   }
 
-
+  @Test
+  void testCommitThrowsIfAlreadyCommited() {
+    sale.commit(player);
+    player.getPortfolio().addShare(share);
+    assertThrows(IllegalArgumentException.class, () -> sale.commit(player));
+  }
 }

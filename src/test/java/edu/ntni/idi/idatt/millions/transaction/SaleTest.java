@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SaleTest {
   private Share share;
@@ -27,14 +26,22 @@ public class SaleTest {
   }
 
   @Test
-  public void testGetShare() {
+  void testGetShare() {
     assertEquals(share, sale.getShare());
   }
 
   @Test
-  public void testGetCalculator() {
+  void testGetCalculator() {
     assertNotNull(sale.getCalculator());
   }
 
+  @Test
+  void testGetWeek() {
+    assertEquals(5, sale.getWeek());
+  }
 
+  @Test
+  void testIsCommittedInitiallyFalse() {
+    assertFalse(sale.isCommitted());
+  }
 }

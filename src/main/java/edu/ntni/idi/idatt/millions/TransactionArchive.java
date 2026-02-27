@@ -34,17 +34,16 @@ public class TransactionArchive {
             .toList();
   }
 
-
   public List<Transaction> getSales(int week) {
     return transactions.stream()
             .filter(transaction -> transaction.getWeek() == week && transaction instanceof Sale)
             .toList();
   }
 
-/*
   public int countDistictWeeks() {
-
+    return (int) transactions.stream() //Caster int siden count returnerer long
+            .map(Transaction::getWeek)
+            .distinct()
+            .count();
   }
-
-*/
 }

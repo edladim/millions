@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,16 +34,43 @@ public class PortfolioTest {
   }
 
   @Test
+  public void testAddMultipleShares() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+    assertEquals(3, portfolio.getShares().size());
+  }
+
+  @Test
   public void testRemoveShare() {
     portfolio.addShare(share1);
-    portfolio.removeShare(share1);
-    assertEquals(0, portfolio.getShares().size());
+    portfolio.addShare(share2);
+    assertTrue(portfolio.removeShare(share1));
+    assertEquals(1, portfolio.getShares().size());
     assertFalse(portfolio.contains(share1));
+  }
+
+  @Test
+  public void testRemoveNonExistingShare() {
+    portfolio.addShare(share1);
+    assertFalse(portfolio.removeShare(share2));
+    assertEquals(1, portfolio.getShares().size());
   }
 
   @Test
   public void testGetShare() {
     portfolio.addShare(share1);
     portfolio.addShare(share2);
+    List<Share> shares = portfolio.getShares();
+    assertEquals(2, shares.size());
+  }
+
+  @Test
+  public void testGetShareBySymbol() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+
+    List<Share> appleShares = portfolio.getShares("APPL")
   }
 }

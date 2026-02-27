@@ -14,7 +14,7 @@ public class PurchaseCalculatorTest {
   @BeforeEach
   public void setup() {
     List<BigDecimal> prices = List.of(BigDecimal.valueOf(263), BigDecimal.valueOf(253), BigDecimal.valueOf(273));
-    Stock stock = new Stock("AAPL", "Apple", prices);
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.valueOf(263));
     Share share = new Share(stock, BigDecimal.valueOf(10), BigDecimal.valueOf(263));
 
     PurchaseCalculator purchaseCalculator = new PurchaseCalculator(share);

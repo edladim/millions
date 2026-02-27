@@ -22,7 +22,7 @@ public class TransactionArchive {
   public List<Transaction> getTransactions(int week) {
     return transactions.stream().filter(transaction -> transaction.getWeek() == week).toList();
   }
-
+/*
   public List<Transaction> getPurchases(int week) {
 
   }
@@ -34,4 +34,6 @@ public class TransactionArchive {
   public int countDistictWeeks() {
 
   }
+
+ */
 }

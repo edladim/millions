@@ -12,7 +12,8 @@ public class TransactionArchive {
   }
 
   public boolean addTransaction(Transaction transaction) {
-    return transactions.add(transaction);
+    transactions.add(transaction);
+    return true;
   }
 
   public boolean isEmpty() {
@@ -35,5 +36,5 @@ public class TransactionArchive {
 
   }
 
- */
+*/
 }

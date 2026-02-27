@@ -4,8 +4,12 @@ import edu.ntni.idi.idatt.millions.Player;
 import edu.ntni.idi.idatt.millions.Share;
 import edu.ntni.idi.idatt.millions.Stock;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SaleTest {
   private Share share;
@@ -21,4 +25,16 @@ public class SaleTest {
     player.getPortfolio().addShare(share);
     sale = new Sale(share, 5);
   }
+
+  @Test
+  public void testGetShare() {
+    assertEquals(share, sale.getShare());
+  }
+
+  @Test
+  public void testGetCalculator() {
+    assertNotNull(sale.getCalculator());
+  }
+
+
 }

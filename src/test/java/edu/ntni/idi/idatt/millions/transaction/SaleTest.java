@@ -58,4 +58,11 @@ public class SaleTest {
     sale.commit(player);
     assertTrue(player.getMoney().compareTo(moneyBefore) > 0);
   }
+
+  @Test
+  void testCommitChangesCommittedStatus() {
+    sale.commit(player);
+    assertTrue(sale.isCommitted());
+  }
+
 }

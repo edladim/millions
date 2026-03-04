@@ -28,4 +28,17 @@ public class PlayerTest {
   void testGetMoneyInitial() {
     assertEquals(0, startingMoney.compareTo(player.getMoney()));
   }
+
+  @Test
+  void testAddMoney() {
+    player.addMoney(BigDecimal.valueOf(500));
+    assertEquals(0, BigDecimal.valueOf(10500).compareTo(player.getMoney()));
+  }
+
+  @Test
+  void testWithdrawMoney() {
+    player.withdrawMoney(BigDecimal.valueOf(2000));
+    assertEquals(0, BigDecimal.valueOf(8000).compareTo(player.getMoney()));
+  }
+
 }

@@ -2,9 +2,9 @@ name: CI/CD Workflow
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, DEV]
   pull_request:
-    branches: [main]
+    branches: [main, DEV]
   workflow_dispatch:
 
 permissions:
@@ -12,12 +12,7 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
-
   build_test:
     name: Build, Checkstyle and Test
     runs-on: ubuntu-latest
@@ -46,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/jacoco/
+          path: target/site/jacoco/
 
       - name: Upload Packaged Application
         uses: actions/upload-artifact@v4
@@ -57,6 +52,9 @@ jobs:
 
   deployPages:
     name: Deploy Pages
+    concurrency:
+      group: pages
+      cancel-in-progress: true
     needs: build_test
     if: github.ref == 'refs/heads/main'
 

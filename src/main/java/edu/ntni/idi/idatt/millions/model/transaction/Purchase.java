@@ -1,8 +1,7 @@
-package edu.ntni.idi.idatt.millions.transaction;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Player;
-import edu.ntni.idi.idatt.millions.calculator.PurchaseCalculator;
-import edu.ntni.idi.idatt.millions.Share;
+import edu.ntni.idi.idatt.millions.model.Player;
+import edu.ntni.idi.idatt.millions.model.Share;
 
 import java.math.BigDecimal;
 

@@ -32,7 +32,7 @@ public class PurchaseCalculatorTest {
 
   @Test
   void testCalculateCommision() {
-    BigDecimal expected = BigDecimal.valueOf(5.0);
+    BigDecimal expected = new  BigDecimal("5.000");
     assertEquals(expected, purchaseCalculator.calculateComission());
   }
 
@@ -43,7 +43,7 @@ public class PurchaseCalculatorTest {
 
   @Test
   void testCalculateTotal() {
-    BigDecimal expected = BigDecimal.valueOf(1005);
+    BigDecimal expected = new BigDecimal("1005.000");
     assertEquals(expected, purchaseCalculator.calculateTotal());
   }
 

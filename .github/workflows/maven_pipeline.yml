@@ -49,7 +49,6 @@ jobs:
           name: packaged-app
           path: target/*jar-with-dependencies.jar
 
-
   deployPages:
     name: Deploy Pages
     concurrency:
@@ -84,9 +83,8 @@ jobs:
       - name: Generate Javadoc
         run: |
           mvn -B javadoc:javadoc
+          find target -name "index.html"
           mkdir -p page
-          cp -r target/site/apidocs/* page/
-          cp -r jacoco/ page/jacoco/
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5

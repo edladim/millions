@@ -31,7 +31,6 @@ public class SaleCalculator implements TransactionCalculator {
     BigDecimal purchaseCost = purchasePrice.multiply(quantity);
     BigDecimal earning = calculateGross().subtract(purchaseCost);
 
-    // Kun skatt på positiv gevinst
     if (earning.compareTo(BigDecimal.ZERO) > 0) {
       return earning.multiply(BigDecimal.valueOf(0.3));
     }

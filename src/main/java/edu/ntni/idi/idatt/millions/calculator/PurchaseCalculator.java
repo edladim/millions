@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 public class PurchaseCalculator implements TransactionCalculator {
   private BigDecimal purchasePrice;
   private BigDecimal quantity;
-  private BigDecimal commisionRate =  BigDecimal.valueOf(0.005);
 
   public PurchaseCalculator(Share share) {
     this.purchasePrice = share.getPurchasePrice();
@@ -21,6 +20,7 @@ public class PurchaseCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateComission() {
+    BigDecimal commisionRate =  BigDecimal.valueOf(0.005);
     return calculateGross().multiply(commisionRate);
   }
 

@@ -10,19 +10,41 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class PurchaseCalculatorTest {
-  @BeforeEach
-  public void setup() {
-    List<BigDecimal> prices = List.of(BigDecimal.valueOf(263), BigDecimal.valueOf(253), BigDecimal.valueOf(273));
-    Stock stock = new Stock("AAPL", "Apple", BigDecimal.valueOf(263));
-    Share share = new Share(stock, BigDecimal.valueOf(10), BigDecimal.valueOf(263));
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    PurchaseCalculator purchaseCalculator = new PurchaseCalculator(share);
-    SaleCalculator saleCalculator = new SaleCalculator(share);
+public class PurchaseCalculatorTest {
+
+  private PurchaseCalculator purchaseCalculator;
+  private Share share;
+
+  @BeforeEach
+  void setup() {
+    Stock stock = new Stock("AAPL", "Apple Inc.", BigDecimal.valueOf(150));
+    share = new Share(stock, BigDecimal.valueOf(100), BigDecimal.valueOf(10));
+    purchaseCalculator = new PurchaseCalculator(share);
   }
 
   @Test
-  public void calculateGrossTest() {
-
+  void testCalculateGross() {
+    BigDecimal expected = BigDecimal.valueOf(1000);
+    assertEquals(expected, purchaseCalculator.calculateGross());
   }
+
+  @Test
+  void testCalculateCommision() {
+    BigDecimal expected = new  BigDecimal("5.000");
+    assertEquals(expected, purchaseCalculator.calculateComission());
+  }
+
+  @Test
+  void testCalculateTax() {
+    assertEquals(BigDecimal.ZERO,  purchaseCalculator.calculateTax());
+  }
+
+  @Test
+  void testCalculateTotal() {
+    BigDecimal expected = new BigDecimal("1005.000");
+    assertEquals(expected, purchaseCalculator.calculateTotal());
+  }
+
 }

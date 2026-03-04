@@ -83,10 +83,10 @@ jobs:
 
       - name: Generate Javadoc
         run: |
-          mvn -B site -DskipTests
-          mkdir page
-          cp -r target/site/* page/
-          cp -r jacoco/* page/jacoco/
+          mvn -B javadoc:javadoc
+          mkdir -p page
+          cp -r target/site/apidocs/* page/
+          cp -r jacoco/ page/jacoco/
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5

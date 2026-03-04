@@ -83,8 +83,9 @@ jobs:
       - name: Generate Javadoc
         run: |
           mvn -B javadoc:javadoc
-          find target -name "index.html"
-          mkdir -p page
+          mkdir -p page/jacoco
+          cp -r target/reports/apidocs/* page/
+          cp -r jacoco/ page/jacoco/
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5

@@ -1,8 +1,7 @@
-package edu.ntni.idi.idatt.millions.transaction;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Player;
-import edu.ntni.idi.idatt.millions.Share;
-import edu.ntni.idi.idatt.millions.calculator.SaleCalculator;
+import edu.ntni.idi.idatt.millions.model.Player;
+import edu.ntni.idi.idatt.millions.model.Share;
 
 public class Sale extends Transaction {
 
@@ -18,6 +17,6 @@ public class Sale extends Transaction {
     player.addMoney(getCalculator().calculateTotal());
     player.getPortfolio().removeShare(this.getShare());
     player.getTransactionArchive().addTransaction(this);
-    setCommitted(true);
+    committed = true;
   }
 }

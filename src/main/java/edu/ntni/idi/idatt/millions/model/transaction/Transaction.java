@@ -1,8 +1,7 @@
-package edu.ntni.idi.idatt.millions.transaction;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Player;
-import edu.ntni.idi.idatt.millions.Share;
-import edu.ntni.idi.idatt.millions.calculator.TransactionCalculator;
+import edu.ntni.idi.idatt.millions.model.Player;
+import edu.ntni.idi.idatt.millions.model.Share;
 
 public abstract class Transaction {
   private Share share;
@@ -26,10 +25,6 @@ public abstract class Transaction {
 
   public TransactionCalculator getCalculator() {
     return calculator;
-  }
-
-  public void setCommitted(boolean committed) {
-    this.committed = committed;
   }
 
   public boolean isCommitted() {

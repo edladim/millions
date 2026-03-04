@@ -76,4 +76,18 @@ public class TransactionArchiveTest {
     assertInstanceOf(Sale.class, sales.get(0));
   }
 
+  @Test
+  void testCountDistinctWeeks() {
+    Purchase purchase1 = new Purchase(share, 1);
+    Purchase purchase2 = new Purchase(share, 1);
+    Sale sale1 = new Sale(share, 2);
+    Sale sale2 = new Sale(share, 3);
+
+    archive.addTransaction(purchase1);
+    archive.addTransaction(purchase2);
+    archive.addTransaction(sale1);
+    archive.addTransaction(sale2);
+
+    assertEquals(3, archive.countDistictWeeks());
+  }
 }

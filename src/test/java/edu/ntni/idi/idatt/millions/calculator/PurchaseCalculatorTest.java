@@ -36,4 +36,9 @@ public class PurchaseCalculatorTest {
     assertEquals(expected, purchaseCalculator.calculateComission());
   }
 
+  @Test
+  void testCalculateTax() {
+    assertEquals(BigDecimal.ZERO,  purchaseCalculator.calculateTax());
+  }
+
 }

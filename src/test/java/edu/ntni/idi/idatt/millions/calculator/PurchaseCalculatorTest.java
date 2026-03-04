@@ -11,18 +11,17 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class PurchaseCalculatorTest {
+
+  private PurchaseCalculator purchaseCalculator;
+  private Share share;
+
   @BeforeEach
-  public void setup() {
-    List<BigDecimal> prices = List.of(BigDecimal.valueOf(263), BigDecimal.valueOf(253), BigDecimal.valueOf(273));
-    Stock stock = new Stock("AAPL", "Apple", BigDecimal.valueOf(263));
-    Share share = new Share(stock, BigDecimal.valueOf(10), BigDecimal.valueOf(263));
-
-    PurchaseCalculator purchaseCalculator = new PurchaseCalculator(share);
-    SaleCalculator saleCalculator = new SaleCalculator(share);
+  void setup() {
+    Stock stock = new Stock("AAPL", "Apple Inc.", BigDecimal.valueOf(150));
+    share = new Share(stock, BigDecimal.valueOf(10), BigDecimal.valueOf(100));
+    purchaseCalculator = new PurchaseCalculator(share);
   }
 
-  @Test
-  public void calculateGrossTest() {
 
-  }
+
 }

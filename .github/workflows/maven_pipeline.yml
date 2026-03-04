@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, DEV]
   pull_request:
-    branches: [main]
+    branches: [main, DEV]
   workflow_dispatch:
 
 permissions:
@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jacoco-report
-          path: target/jacoco/
+          path: target/site/jacoco/
 
       - name: Upload Packaged Application
         uses: actions/upload-artifact@v4

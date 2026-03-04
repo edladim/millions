@@ -1,6 +1,6 @@
-package edu.ntni.idi.idatt.millions.calculator;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Share;
+import edu.ntni.idi.idatt.millions.model.Share;
 
 import java.math.BigDecimal;
 
@@ -20,7 +20,8 @@ public class PurchaseCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateComission() {
-    return calculateGross().multiply(BigDecimal.valueOf(0.005));
+    BigDecimal commisionRate =  BigDecimal.valueOf(0.005);
+    return calculateGross().multiply(commisionRate);
   }
 
   @Override
@@ -30,6 +31,6 @@ public class PurchaseCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateTotal() {
-    return calculateGross().subtract(calculateComission()).subtract(calculateTax());
+    return calculateGross().add(calculateComission()).add(calculateTax());
   }
 }

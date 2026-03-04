@@ -1,8 +1,4 @@
-package edu.ntni.idi.idatt.millions;
-
-import edu.ntni.idi.idatt.millions.transaction.Purchase;
-import edu.ntni.idi.idatt.millions.transaction.Sale;
-import edu.ntni.idi.idatt.millions.transaction.Transaction;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
 import java.util.ArrayList;
 import java.util.List;

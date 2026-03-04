@@ -72,7 +72,7 @@
                    <!--
                    Add if build shoud fail on checkstyle warning:
                    <violationSeverity>warning</violationSeverity>
-                   test -->
+                   test 2-->
                 </configuration>
 
                 <executions>

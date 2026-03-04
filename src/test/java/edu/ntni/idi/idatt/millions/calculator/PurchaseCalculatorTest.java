@@ -41,4 +41,10 @@ public class PurchaseCalculatorTest {
     assertEquals(BigDecimal.ZERO,  purchaseCalculator.calculateTax());
   }
 
+  @Test
+  void testCalculateTotal() {
+    BigDecimal expected = BigDecimal.valueOf(1005);
+    assertEquals(expected, purchaseCalculator.calculateTotal());
+  }
+
 }

@@ -1,14 +1,12 @@
-package edu.ntni.idi.idatt.millions.calculator;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Share;
-import edu.ntni.idi.idatt.millions.Stock;
-import edu.ntni.idi.idatt.millions.calculator.PurchaseCalculator;
-import edu.ntni.idi.idatt.millions.calculator.SaleCalculator;
+import edu.ntni.idi.idatt.millions.model.Share;
+import edu.ntni.idi.idatt.millions.model.Stock;
+import edu.ntni.idi.idatt.millions.model.transaction.PurchaseCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

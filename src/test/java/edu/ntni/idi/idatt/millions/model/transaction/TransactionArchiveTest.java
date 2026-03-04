@@ -49,4 +49,18 @@ public class TransactionArchiveTest {
     List<Transaction> week1 = archive.getTransactions(1);
     assertEquals(2, week1.size());
   }
+
+  @Test
+  void testGetPurchaseByWeek() {
+    Purchase purchase1 = new Purchase(share, 1);
+    Sale sale1 = new Sale(share, 1);
+
+    archive.addTransaction(purchase1);
+    archive.addTransaction(sale1);
+
+    List<Transaction> purchases = archive.getPurchases(1);
+    assertEquals(1, purchases.size());
+    assertInstanceOf(Purchase.class, purchases.get(0));
+  }
+
 }

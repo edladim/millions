@@ -1,7 +1,8 @@
-package edu.ntni.idi.idatt.millions.calculator;
+package edu.ntni.idi.idatt.millions.model.transaction;
 
-import edu.ntni.idi.idatt.millions.Share;
-import edu.ntni.idi.idatt.millions.Stock;
+import edu.ntni.idi.idatt.millions.model.Share;
+import edu.ntni.idi.idatt.millions.model.Stock;
+import edu.ntni.idi.idatt.millions.model.transaction.SaleCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

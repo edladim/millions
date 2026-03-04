@@ -1,4 +1,4 @@
-package edu.ntni.idi.idatt.millions;
+package edu.ntni.idi.idatt.millions.model;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,5 @@
-package edu.ntni.idi.idatt.millions;
+package edu.ntni.idi.idatt.millions.model;
 
-import edu.ntni.idi.idatt.millions.model.Player;
-import edu.ntni.idi.idatt.millions.model.Portfolio;
 import edu.ntni.idi.idatt.millions.model.transaction.TransactionArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

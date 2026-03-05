@@ -1,14 +1,28 @@
 package edu.ntni.idi.idatt.millions.model.transaction;
-
 import edu.ntni.idi.idatt.millions.model.Share;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
+/**
+ * Performs financial calculations for purchase transactions.
+ */
 public class PurchaseCalculator implements TransactionCalculator {
-  private BigDecimal purchasePrice;
-  private BigDecimal quantity;
 
+  private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.005");
+
+  private final BigDecimal purchasePrice;
+  private final BigDecimal quantity;
+
+  /**
+   * Creates a calculator based on a share.
+   *
+   * @param share the share involved in the transaction
+   * @throws NullPointerException if share is null
+   */
   public PurchaseCalculator(Share share) {
+    Objects.requireNonNull(share, "Share cannot be null");
+
     this.purchasePrice = share.getPurchasePrice();
     this.quantity = share.getQuantity();
   }
@@ -20,8 +34,7 @@ public class PurchaseCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateCommission() {
-    BigDecimal commisionRate =  BigDecimal.valueOf(0.005);
-    return calculateGross().multiply(commisionRate);
+    return calculateGross().multiply(COMMISSION_RATE);
   }
 
   @Override
@@ -31,6 +44,8 @@ public class PurchaseCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateTotal() {
-    return calculateGross().add(calculateCommission()).add(calculateTax());
+    return calculateGross()
+        .add(calculateCommission())
+        .add(calculateTax());
   }
 }

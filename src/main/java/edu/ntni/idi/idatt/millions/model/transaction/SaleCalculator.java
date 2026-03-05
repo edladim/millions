@@ -7,8 +7,32 @@ import java.util.Objects;
 /**
  * Performs financial calculations for sale transactions.
  *
- * <p>The calculator determines the gross value, commission,
- * tax, and final total received from selling a share.</p>
+ * <p>This calculator determines the financial values associated with
+ * selling shares, including:</p>
+ *
+ * <ul>
+ *   <li>Gross sale value</li>
+ *   <li>Broker commission</li>
+ *   <li>Tax on profit</li>
+ *   <li>Total amount received from the transaction</li>
+ * </ul>
+ *
+ * <p>The calculations follow these rules:</p>
+ *
+ * <ul>
+ *   <li>Gross = salesPrice × quantity</li>
+ *   <li>Commission = 1% of gross</li>
+ *   <li>Tax = 30% of profit (only if the transaction results in a profit)</li>
+ *   <li>Total = gross − commission − tax</li>
+ * </ul>
+ *
+ * <p>The profit used for tax calculation is determined as:</p>
+ *
+ * <ul>
+ *   <li>Profit = gross − (purchasePrice × quantity)</li>
+ * </ul>
+ *
+ * <p>If the calculated profit is zero or negative, no tax is applied.</p>
  */
 public final class SaleCalculator implements TransactionCalculator {
 

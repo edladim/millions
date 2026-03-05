@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Performs financial calculations for purchase transactions.
  */
-public class PurchaseCalculator implements TransactionCalculator {
+public final class PurchaseCalculator implements TransactionCalculator {
 
   private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.005");
 

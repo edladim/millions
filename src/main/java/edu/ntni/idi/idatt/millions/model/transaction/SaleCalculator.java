@@ -21,7 +21,7 @@ public class SaleCalculator implements TransactionCalculator {
   }
 
   @Override
-  public BigDecimal calculateComission() {
+  public BigDecimal calculateCommission() {
     BigDecimal rate = BigDecimal.valueOf(0.01);
     return calculateGross().multiply(rate);
   }
@@ -39,6 +39,6 @@ public class SaleCalculator implements TransactionCalculator {
 
   @Override
   public BigDecimal calculateTotal() {
-    return calculateGross().subtract(calculateComission()).subtract(calculateTax());
+    return calculateGross().subtract(calculateCommission()).subtract(calculateTax());
   }
 }

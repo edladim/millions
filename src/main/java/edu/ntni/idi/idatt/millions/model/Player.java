@@ -19,7 +19,6 @@ public final class Player {
   private final String name;
   private final BigDecimal startingMoney;
   private BigDecimal money;
-
   private final Portfolio portfolio;
   private final TransactionArchive transactionArchive;
 
@@ -36,11 +35,9 @@ public final class Player {
    * @throws IllegalArgumentException if name is blank or startingMoney is negative
    */
   public Player(String name, BigDecimal startingMoney) {
-
     this.name = validateName(name);
     this.startingMoney = validateAmount(startingMoney);
     this.money = startingMoney;
-
     this.portfolio = new Portfolio();
     this.transactionArchive = new TransactionArchive();
   }
@@ -72,9 +69,7 @@ public final class Player {
    * @throws IllegalArgumentException if amount is negative
    */
   public void addMoney(BigDecimal amount) {
-
     amount = validateAmount(amount);
-
     money = money.add(amount);
   }
 
@@ -88,13 +83,10 @@ public final class Player {
    * @throws IllegalStateException if the player has insufficient funds
    */
   public void withdrawMoney(BigDecimal amount) {
-
     amount = validateAmount(amount);
-
     if (money.compareTo(amount) < 0) {
       throw new IllegalStateException("Insufficient funds");
     }
-
     money = money.subtract(amount);
   }
 
@@ -117,24 +109,18 @@ public final class Player {
   }
 
   private static String validateName(String name) {
-
     name = Objects.requireNonNull(name, "Name cannot be null").trim();
-
     if (name.isEmpty()) {
       throw new IllegalArgumentException("Name cannot be blank");
     }
-
     return name;
   }
 
   private static BigDecimal validateAmount(BigDecimal amount) {
-
     Objects.requireNonNull(amount, "Amount cannot be null");
-
     if (amount.compareTo(BigDecimal.ZERO) < 0) {
       throw new IllegalArgumentException("Amount cannot be negative");
     }
-
     return amount;
   }
 }

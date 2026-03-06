@@ -29,9 +29,9 @@ public class TransactionArchiveTest {
   }
 
   @Test
-  void testAddTransaction() {
+  void testAdd() {
     Purchase purchase = new Purchase(share, 1);
-    assertTrue(archive.addTransaction(purchase));
+    assertTrue(archive.add(purchase));
     assertFalse(archive.isEmpty());
   }
 
@@ -42,9 +42,9 @@ public class TransactionArchiveTest {
     Purchase purchase2 = new Purchase(share, 2);
     Sale sale1 = new Sale(share, 1);
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(purchase2);
-    archive.addTransaction(sale1);
+    archive.add(purchase1);
+    archive.add(purchase2);
+    archive.add(sale1);
 
     List<Transaction> week1 = archive.getTransactions(1);
     assertEquals(2, week1.size());
@@ -55,8 +55,8 @@ public class TransactionArchiveTest {
     Purchase purchase1 = new Purchase(share, 1);
     Sale sale1 = new Sale(share, 1);
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(sale1);
+    archive.add(purchase1);
+    archive.add(sale1);
 
     List<Transaction> purchases = archive.getPurchases(1);
     assertEquals(1, purchases.size());
@@ -68,8 +68,8 @@ public class TransactionArchiveTest {
     Purchase purchase1 = new Purchase(share, 1);
     Sale sale1 = new Sale(share, 1);
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(sale1);
+    archive.add(purchase1);
+    archive.add(sale1);
 
     List<Transaction> sales = archive.getSales(1);
     assertEquals(1, sales.size());
@@ -83,11 +83,11 @@ public class TransactionArchiveTest {
     Sale sale1 = new Sale(share, 2);
     Sale sale2 = new Sale(share, 3);
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(purchase2);
-    archive.addTransaction(sale1);
-    archive.addTransaction(sale2);
+    archive.add(purchase1);
+    archive.add(purchase2);
+    archive.add(sale1);
+    archive.add(sale2);
 
-    assertEquals(3, archive.countDistictWeeks());
+    assertEquals(3, archive.countDistinctWeeks());
   }
 }

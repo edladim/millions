@@ -10,84 +10,125 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test class for {@link TransactionArchive}.
+ * Verifies that transactions are stored, filtered and counted correctly.
+ * The tests cover:
+ * <ul>
+ *   <li>Adding transactions</li>
+ *   <li>Checking if the archive is empty</li>
+ *   <li>Filtering transactions by week</li>
+ *   <li>Filtering purchases and sales</li>
+ *   <li>Counting distinct transaction weeks</li>
+ * </ul>
+ */
 public class TransactionArchiveTest {
 
   private TransactionArchive archive;
-  private Stock stock;
   private Share share;
 
+  /**
+   * Initializes a fresh archive and sample share before each test.
+   */
   @BeforeEach
   void setup() {
     archive = new TransactionArchive();
-    stock = new Stock("AAPL", "Apple Inc.", BigDecimal.valueOf(150));
+
+    Stock stock = new Stock("AAPL", "Apple Inc.", BigDecimal.valueOf(150));
     share = new Share(stock, BigDecimal.valueOf(100), BigDecimal.valueOf(10));
   }
 
+  /**
+   * Verifies that a new archive is empty.
+   */
   @Test
-  void testIsEmptyInitially() {
+  void archiveShouldBeEmptyInitially() {
     assertTrue(archive.isEmpty());
   }
 
+  /**
+   * Verifies that adding a transaction returns true
+   * and makes the archive non-empty.
+   */
   @Test
-  void testAddTransaction() {
+  void addShouldStoreTransaction() {
     Purchase purchase = new Purchase(share, 1);
-    assertTrue(archive.addTransaction(purchase));
+
+    assertTrue(archive.add(purchase));
     assertFalse(archive.isEmpty());
   }
 
+  /**
+   * Verifies that transactions are correctly filtered by week.
+   */
   @Test
-  void testGetTransactionByWeek() {
-    Purchase purchase = new Purchase(share, 1);
-    Purchase purchase1 = new Purchase(share, 1);
-    Purchase purchase2 = new Purchase(share, 2);
-    Sale sale1 = new Sale(share, 1);
-
-    archive.addTransaction(purchase1);
-    archive.addTransaction(purchase2);
-    archive.addTransaction(sale1);
+  void shouldReturnTransactionsForSpecificWeek() {
+    archive.add(new Purchase(share, 1));
+    archive.add(new Purchase(share, 2));
+    archive.add(new Sale(share, 1));
 
     List<Transaction> week1 = archive.getTransactions(1);
     assertEquals(2, week1.size());
   }
 
+  /**
+   * Verifies that an empty list is returned when no transactions exist for a week.
+   */
   @Test
-  void testGetPurchaseByWeek() {
-    Purchase purchase1 = new Purchase(share, 1);
-    Sale sale1 = new Sale(share, 1);
+  void shouldReturnEmptyListForWeekWithoutTransactions() {
+    archive.add(new Purchase(share, 1));
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(sale1);
+    List<Transaction> week5 = archive.getTransactions(5);
 
-    List<Transaction> purchases = archive.getPurchases(1);
+    assertTrue(week5.isEmpty());
+  }
+
+  /**
+   * Verifies that only purchases are returned for a given week.
+   */
+  @Test
+  void shouldReturnOnlyPurchasesForWeek() {
+    archive.add(new Purchase(share, 1));
+    archive.add(new Sale(share, 1));
+
+    List<Purchase> purchases = archive.getPurchases(1);
+
     assertEquals(1, purchases.size());
-    assertInstanceOf(Purchase.class, purchases.get(0));
+    assertInstanceOf(Purchase.class, purchases.getFirst());
   }
 
+  /**
+   * Verifies that only sales are returned for a given week.
+   */
   @Test
-  void testGetSalesByWeek() {
-    Purchase purchase1 = new Purchase(share, 1);
-    Sale sale1 = new Sale(share, 1);
+  void shouldReturnOnlySalesForWeek() {
+    archive.add(new Purchase(share, 1));
+    archive.add(new Sale(share, 1));
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(sale1);
+    List<Sale> sales = archive.getSales(1);
 
-    List<Transaction> sales = archive.getSales(1);
     assertEquals(1, sales.size());
-    assertInstanceOf(Sale.class, sales.get(0));
+    assertInstanceOf(Sale.class, sales.getFirst());
   }
 
+  /**
+   * Verifies that distinct weeks are counted correctly.
+   */
   @Test
-  void testCountDistinctWeeks() {
-    Purchase purchase1 = new Purchase(share, 1);
-    Purchase purchase2 = new Purchase(share, 1);
-    Sale sale1 = new Sale(share, 2);
-    Sale sale2 = new Sale(share, 3);
+  void shouldCountDistinctWeeks() {
+    archive.add(new Purchase(share, 1));
+    archive.add(new Purchase(share, 1));
+    archive.add(new Sale(share, 2));
+    archive.add(new Sale(share, 3));
 
-    archive.addTransaction(purchase1);
-    archive.addTransaction(purchase2);
-    archive.addTransaction(sale1);
-    archive.addTransaction(sale2);
+    assertEquals(3, archive.countDistinctWeeks());
+  }
 
-    assertEquals(3, archive.countDistictWeeks());
+  /**
+   * Verifies that the distinct week count is zero when the archive is empty.
+   */
+  @Test
+  void distinctWeeksShouldBeZeroWhenArchiveIsEmpty() {
+    assertEquals(0, archive.countDistinctWeeks());
   }
 }

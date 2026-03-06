@@ -2,45 +2,127 @@ package edu.ntni.idi.idatt.millions.model.transaction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class TransactionArchive {
-  private List<Transaction> transactions;
+/**
+ * Stores completed financial transactions.
+ *
+ * <p>The transaction archive keeps track of all executed transactions
+ * in the system. Transactions may represent purchases or sales and are
+ * associated with a specific week.</p>
+ *
+ * <p>The archive allows querying transactions by week and transaction
+ * type, as well as determining how many weeks contain trading activity.</p>
+ */
+public final class TransactionArchive {
 
-  public TransactionArchive() {
-    this.transactions = new ArrayList<>();
+  private final List<Transaction> transactions = new ArrayList<>();
+
+  /**
+   * Creates an empty transaction archive.
+   */
+  public TransactionArchive() {}
+
+  /**
+   * Adds a transaction to the archive.
+   *
+   * @param transaction the transaction to add
+   *
+   * @return {@code true} if the transaction was added
+   *
+   * @throws NullPointerException if {@code transaction} is null
+   */
+  public boolean add(Transaction transaction) {
+    Objects.requireNonNull(transaction, "Transaction cannot be null");
+
+    return transactions.add(transaction);
   }
 
-  public boolean addTransaction(Transaction transaction) {
-    transactions.add(transaction);
-    return true;
-  }
-
+  /**
+   * Checks whether the archive contains no transactions.
+   *
+   * @return {@code true} if the archive is empty
+   */
   public boolean isEmpty() {
     return transactions.isEmpty();
   }
 
+  /**
+   * Returns all transactions performed in a given week.
+   *
+   * @param week the week number
+   *
+   * @return a list of transactions from that week
+   *
+   * @throws IllegalArgumentException if {@code week} is negative
+   */
   public List<Transaction> getTransactions(int week) {
+
+    if (week < 0) {
+      throw new IllegalArgumentException("Week cannot be negative");
+    }
+
     return transactions.stream()
-            .filter(transaction -> transaction.getWeek() == week)
-            .toList();
+        .filter(t -> t.getWeek() == week)
+        .toList();
   }
 
-  public List<Transaction> getPurchases(int week) {
+  /**
+   * Returns all purchase transactions performed in a given week.
+   *
+   * @param week the week number
+   *
+   * @return a list of purchase transactions
+   *
+   * @throws IllegalArgumentException if {@code week} is negative
+   */
+  public List<Purchase> getPurchases(int week) {
+
+    if (week < 0) {
+      throw new IllegalArgumentException("Week cannot be negative");
+    }
+
     return transactions.stream()
-            .filter(transaction -> transaction.getWeek() == week && transaction instanceof Purchase)
-            .toList();
+        .filter(t -> t.getWeek() == week)
+        .filter(t -> t instanceof Purchase)
+        .map(t -> (Purchase) t)
+        .toList();
   }
 
-  public List<Transaction> getSales(int week) {
+  /**
+   * Returns all sale transactions performed in a given week.
+   *
+   * @param week the week number
+   *
+   * @return a list of sale transactions
+   *
+   * @throws IllegalArgumentException if {@code week} is negative
+   */
+  public List<Sale> getSales(int week) {
+
+    if (week < 0) {
+      throw new IllegalArgumentException("Week cannot be negative");
+    }
+
     return transactions.stream()
-            .filter(transaction -> transaction.getWeek() == week && transaction instanceof Sale)
-            .toList();
+        .filter(t -> t.getWeek() == week)
+        .filter(t -> t instanceof Sale)
+        .map(t -> (Sale) t)
+        .toList();
   }
 
-  public int countDistictWeeks() {
-    return (int) transactions.stream() //Caster int siden count returnerer long
-            .map(Transaction::getWeek)
-            .distinct()
-            .count();
+  /**
+   * Counts the number of distinct weeks with trading activity.
+   *
+   * <p>A week is counted if at least one transaction occurred in that week.</p>
+   *
+   * @return number of distinct weeks containing transactions
+   */
+  public int countDistinctWeeks() {
+
+    return (int) transactions.stream()
+        .map(Transaction::getWeek)
+        .distinct()
+        .count();
   }
 }

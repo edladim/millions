@@ -16,7 +16,7 @@ public class Sale extends Transaction {
     }
     player.addMoney(getCalculator().calculateTotal());
     player.getPortfolio().removeShare(this.getShare());
-    player.getTransactionArchive().addTransaction(this);
+    player.getTransactionArchive().add(this);
     committed = true;
   }
 }

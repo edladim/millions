@@ -126,6 +126,11 @@ public final class Stock {
     return Objects.hash(symbol);
   }
 
+  @Override
+  public String toString() {
+    return symbol + " " + company + " " + getPrices();
+  }
+
   /**
    * Validates that a string field is non-null and non-blank.
    *

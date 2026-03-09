@@ -3,7 +3,6 @@ package edu.ntni.idi.idatt.millions.model.transaction;
 import edu.ntni.idi.idatt.millions.model.Player;
 import edu.ntni.idi.idatt.millions.model.Share;
 import edu.ntni.idi.idatt.millions.model.Stock;
-import edu.ntni.idi.idatt.millions.model.transaction.Purchase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,77 +10,111 @@ import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PurchaseTest {
+/**
+ * Unit tests for {@link Purchase}.
+ *
+ * <p>The tests verify that purchase transactions correctly:</p>
+ * <ul>
+ *   <li>Expose transaction information</li>
+ *   <li>Execute the commit operation</li>
+ *   <li>Change the player's money and portfolio</li>
+ *   <li>Store the transaction in the archive</li>
+ *   <li>Reject invalid commit scenarios</li>
+ * </ul>
+ */
+class PurchaseTest {
+
   private Share share;
-  private Stock stock;
   private Player player;
   private Purchase purchase;
 
+  /**
+   * Creates a fresh purchase transaction before each test.
+   */
   @BeforeEach
-  public void setUp() {
-    stock = new Stock("AAPL", "Apple Inc.", BigDecimal.valueOf(150.0));
-    share = new Share(stock, BigDecimal.valueOf(10), BigDecimal.valueOf(150.0));
+  void setUp() {
+
+    Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("150"));
+    share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
     player = new Player("Test Player", new BigDecimal("10000"));
     purchase = new Purchase(share, 5);
   }
 
+  /** Verifies that the correct share is stored in the transaction. */
   @Test
-  public void testGetShare() {
+  void getShare_returnsCorrectShare() {
     assertEquals(share, purchase.getShare());
   }
 
+  /** Verifies that the week value is stored correctly. */
   @Test
-  public void testGetWeek() {
+  void getWeek_returnsCorrectWeek() {
     assertEquals(5, purchase.getWeek());
   }
 
+  /** Verifies that a purchase calculator is created automatically. */
   @Test
-  public void testGetCalculator() {
-    assertNotNull(purchase.getCalculator());
+  void getCalculator_returnsPurchaseCalculator() {
+    assertInstanceOf(PurchaseCalculator.class, purchase.getCalculator());
   }
 
+  /** Verifies that a transaction is not committed initially. */
   @Test
-  public void testIsCommittedInitiallyFalse() {
+  void isCommitted_initiallyFalse() {
     assertFalse(purchase.isCommitted());
   }
 
+  /** Verifies that committing the purchase adds the share to the portfolio. */
   @Test
-  public void testCommitAddsShareToPortfolio() {
-    assertFalse(player.getPortfolio().getShares().contains(share));
+  void commit_addsShareToPortfolio() {
     purchase.commit(player);
-    assertTrue(player.getPortfolio().getShares().contains(share));
+    assertTrue(player.getPortfolio().contains(share));
   }
 
+  /** Verifies that committing the purchase deducts money from the player. */
   @Test
-  public void testCommitDeductsMoneyFromPlayer() {
-    BigDecimal moneyBefore = player.getMoney();
+  void commit_deductsMoneyFromPlayer() {
+    BigDecimal before = player.getMoney();
     purchase.commit(player);
-    assertTrue(player.getMoney().compareTo(moneyBefore) < 0);
+    assertTrue(player.getMoney().compareTo(before) < 0);
   }
 
+  /** Verifies that the transaction is stored in the archive after commit. */
   @Test
-  public void testCommitChangesCommittedStatus() {
+  void commit_addsTransactionToArchive() {
+    purchase.commit(player);
+    assertTrue(player.getTransactionArchive()
+        .getTransactions(5)
+        .contains(purchase));
+  }
+
+  /** Verifies that the committed flag is set after commit. */
+  @Test
+  void commit_setsCommittedFlag() {
     purchase.commit(player);
     assertTrue(purchase.isCommitted());
   }
 
+  /** Verifies that committing twice is not allowed. */
   @Test
-  public void testCommitAddsTransactionToArchive() {
+  void commit_twice_throwsException() {
     purchase.commit(player);
-    assertTrue(player.getTransactionArchive().getTransactions(5).contains(purchase));
+    assertThrows(IllegalStateException.class,
+        () -> purchase.commit(player));
   }
 
+  /** Verifies that committing with insufficient funds fails. */
   @Test
-  public void testCommitThrowsIfInsufficientFunds() {
+  void commit_insufficientFunds_throwsException() {
     player.withdrawMoney(new BigDecimal("9999"));
-    assertThrows(IllegalArgumentException.class, () -> purchase.commit(player));
+    assertThrows(IllegalStateException.class,
+        () -> purchase.commit(player));
   }
 
+  /** Verifies that null player input is rejected. */
   @Test
-  public void testCommitThrowsIfAlreadyCommitted() {
-    purchase.commit(player);
-    assertThrows(IllegalArgumentException.class, () -> purchase.commit(player));
+  void commit_nullPlayer_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> purchase.commit(null));
   }
-
 }
-

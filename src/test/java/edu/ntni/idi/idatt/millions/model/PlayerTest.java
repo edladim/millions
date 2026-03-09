@@ -7,52 +7,152 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class PlayerTest {
+/**
+ * Unit tests for {@link Player}.
+ *
+ * <p>The tests verify correct behavior of the player model including:</p>
+ *
+ * <ul>
+ *   <li>Initialization of player state</li>
+ *   <li>Money balance operations</li>
+ *   <li>Validation of constructor arguments</li>
+ *   <li>Validation of money operations</li>
+ *   <li>Correct creation of portfolio and transaction archive</li>
+ * </ul>
+ *
+ * <p>All tests use {@link BigDecimal#compareTo(BigDecimal)} to avoid
+ * scale issues when comparing monetary values.</p>
+ */
+class PlayerTest {
 
   private Player player;
   private BigDecimal startingMoney;
 
+  /**
+   * Creates a fresh player instance before each test.
+   */
   @BeforeEach
   void setup() {
-    startingMoney = BigDecimal.valueOf(10000);
+    startingMoney = new BigDecimal("10000");
     player = new Player("Test Player", startingMoney);
   }
 
+  /**
+   * Verifies that the player name is stored correctly.
+   */
   @Test
-  void testGetName() {
+  void getName_returnsCorrectName() {
     assertEquals("Test Player", player.getName());
   }
 
+  /**
+   * Verifies that the player starts with the correct balance.
+   */
   @Test
-  void testGetMoneyInitial() {
+  void getMoney_initialBalanceIsStartingMoney() {
     assertEquals(0, startingMoney.compareTo(player.getMoney()));
   }
 
+  /**
+   * Verifies that money can be added to the player's balance.
+   */
   @Test
-  void testAddMoney() {
-    player.addMoney(BigDecimal.valueOf(500));
-    assertEquals(0, BigDecimal.valueOf(10500).compareTo(player.getMoney()));
+  void addMoney_increasesBalance() {
+    player.addMoney(new BigDecimal("500"));
+    BigDecimal expected = new BigDecimal("10500");
+    assertEquals(0, expected.compareTo(player.getMoney()));
   }
 
+  /**
+   * Verifies that money can be withdrawn from the player's balance.
+   */
   @Test
-  void testWithdrawMoney() {
-    player.withdrawMoney(BigDecimal.valueOf(2000));
-    assertEquals(0, BigDecimal.valueOf(8000).compareTo(player.getMoney()));
+  void withdrawMoney_decreasesBalance() {
+    player.withdrawMoney(new BigDecimal("2000"));
+    BigDecimal expected = new BigDecimal("8000");
+    assertEquals(0, expected.compareTo(player.getMoney()));
   }
 
+  /**
+   * Verifies that withdrawing more money than available throws an exception.
+   */
   @Test
-  void testGetPortfolio() {
+  void withdrawMoney_insufficientFunds_throwsException() {
+    assertThrows(IllegalStateException.class,
+        () -> player.withdrawMoney(new BigDecimal("20000")));
+  }
+
+  /**
+   * Verifies that adding a negative amount is not allowed.
+   */
+  @Test
+  void addMoney_negativeAmount_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> player.addMoney(new BigDecimal("-10")));
+  }
+
+  /**
+   * Verifies that withdrawing a negative amount is not allowed.
+   */
+  @Test
+  void withdrawMoney_negativeAmount_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> player.withdrawMoney(new BigDecimal("-10")));
+  }
+
+  /**
+   * Verifies that the player's portfolio is created automatically.
+   */
+  @Test
+  void getPortfolio_returnsPortfolioInstance() {
     assertNotNull(player.getPortfolio());
     assertInstanceOf(Portfolio.class, player.getPortfolio());
   }
 
+  /**
+   * Verifies that the transaction archive is created automatically.
+   */
   @Test
-  void testGetTransactionArchive() {
+  void getTransactionArchive_returnsArchiveInstance() {
     assertNotNull(player.getTransactionArchive());
     assertInstanceOf(TransactionArchive.class, player.getTransactionArchive());
+  }
+
+  /**
+   * Verifies that the constructor rejects null names.
+   */
+  @Test
+  void constructor_nullName_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> new Player(null, startingMoney));
+  }
+
+  /**
+   * Verifies that the constructor rejects blank names.
+   */
+  @Test
+  void constructor_blankName_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> new Player("   ", startingMoney));
+  }
+
+  /**
+   * Verifies that the constructor rejects null starting money.
+   */
+  @Test
+  void constructor_nullStartingMoney_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> new Player("Test", null));
+  }
+
+  /**
+   * Verifies that the constructor rejects negative starting money.
+   */
+  @Test
+  void constructor_negativeStartingMoney_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> new Player("Test", new BigDecimal("-100")));
   }
 
 }

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReadCSV {
-  private String stockDataFilePath = "src/main/resources/StockData.csv";
 
   public List<Stock> readStockData() {
     List<Stock> stocks = new ArrayList<>();

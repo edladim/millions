@@ -6,7 +6,6 @@ import edu.ntni.idi.idatt.millions.model.transaction.Transaction;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents a stock exchange where players can buy and sell stocks.

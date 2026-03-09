@@ -57,6 +57,27 @@ class ExchangeTest {
     assertEquals(1, exchange.getWeek());
   }
 
+  /**
+   * Verifies that getStocks returns all registered stocks.
+   */
+  @Test
+  void getStocks_returnsAllStocks() {
+    List<Stock> stocks = exchange.getStocks();
+    assertEquals(2, stocks.size());
+    assertTrue(stocks.contains(apple));
+    assertTrue(stocks.contains(google));
+  }
+
+  /**
+   * Verifies that the returned stock list is unmodifiable.
+   */
+  @Test
+  void getStocks_returnsUnmodifiableList() {
+    List<Stock> stocks = exchange.getStocks();
+    assertThrows(UnsupportedOperationException.class,
+        () -> stocks.add(new Stock("MSFT", "Microsoft", new BigDecimal("100"))));
+  }
+
   /** Verifies that existing stocks are detected. */
   @Test
   void hasStock_existingSymbol_returnsTrue() {

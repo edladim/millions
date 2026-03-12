@@ -17,12 +17,12 @@ import java.util.List;
  * raw CSV content into domain objects that the rest of the application can work with.
  * It is the counterpart to {@link WriteCSV}, which handles persistence.</p>
  *
- * <p>The expected resource file is {@code /StockData.csv}, located on the classpath
- * under {@code src/main/resources}.</p>
+ * <p>The resource file must be located on the classpath, typically under
+ * {@code src/main/resources}. The file path is provided at construction time.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
- * ReadCSV reader = new ReadCSV();
+ * ReadCSV reader = new ReadCSV("/StockData.csv");
  * List<Stock> stocks = reader.readStockData();
  * }</pre>
  *
@@ -33,9 +33,16 @@ public class ReadCSV {
 
   private String fileName;
 
+  /**
+   * Constructs a new {@code ReadCSV} instance targeting the given classpath resource.
+   *
+   * @param fileName the classpath-relative path to the CSV file (e.g. {@code "/StockData.csv"}),
+   *                 cannot be null or blank
+   */
   public ReadCSV(String fileName) {
     this.fileName = fileName;
   }
+
   /**
    * Reads stock data from the CSV resource file and returns a list of {@link Stock} objects.
    *
@@ -49,13 +56,6 @@ public class ReadCSV {
    * <p>Each valid line must contain exactly three comma-separated fields:
    * ticker symbol, company name, and sale price. Lines that are blank
    * or start with {@code #} are skipped.</p>
-   *
-   * <p>Example usage:</p>
-   * <pre>{@code
-   * ReadCSV reader = new ReadCSV();
-   * List<Stock> stocks = reader.readStockData();
-   * stocks.forEach(System.out::println);
-   * }</pre>
    *
    * @return a list of {@link Stock} objects parsed from the CSV file,
    *         never null but may be empty if the file contains no valid entries

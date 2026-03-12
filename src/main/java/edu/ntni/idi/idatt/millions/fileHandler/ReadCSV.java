@@ -31,6 +31,11 @@ import java.util.List;
  */
 public class ReadCSV {
 
+  private String fileName;
+
+  public ReadCSV(String fileName) {
+    this.fileName = fileName;
+  }
   /**
    * Reads stock data from the CSV resource file and returns a list of {@link Stock} objects.
    *
@@ -58,7 +63,7 @@ public class ReadCSV {
   public List<Stock> readStockData() {
     List<Stock> stocks = new ArrayList<>();
 
-    try (InputStream is = getClass().getResourceAsStream("/StockData.csv");
+    try (InputStream is = getClass().getResourceAsStream(fileName);
           BufferedReader bf = new BufferedReader(new InputStreamReader(is))) {
 
       String line;

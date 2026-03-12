@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Responsible for reading and parsing data from a CSV resource file
@@ -34,13 +35,14 @@ public class ReadCSV {
   private String fileName;
 
   /**
-   * Constructs a new {@code ReadCSV} instance targeting the given classpath resource.
+   * Constructs a new {@code WriteCSV} instance targeting the given classpath resource.
    *
    * @param fileName the classpath-relative path to the CSV file (e.g. {@code "/StockData.csv"}),
-   *                 cannot be null or blank
+   *                 cannot be null
+   * @throws NullPointerException if {@code fileName} is null
    */
   public ReadCSV(String fileName) {
-    this.fileName = fileName;
+    this.fileName = Objects.requireNonNull(fileName, "fileName cannot be null");
   }
 
   /**

@@ -14,12 +14,12 @@ import java.util.Objects;
  * domain objects into raw CSV content that can be stored for later retrieval.
  * It is the counterpart to {@link ReadCSV}, which handles parsing.</p>
  *
- * <p>The target file is {@code /StockData.csv}, located on the classpath
- * under {@code src/main/resources}.</p>
+ * <p>The resource file must be located on the classpath, typically under
+ * {@code src/main/resources}. The file path is provided at construction time.</p>
  *
  * <p>Example usage:</p>
  * <pre>{@code
- * WriteCSV writer = new WriteCSV();
+ * WriteCSV writer = new WriteCSV("/StockData.csv");
  * writer.writeStockData(new Stock("AAPL", "Apple Inc.", new BigDecimal("276.43")));
  * }</pre>
  *
@@ -27,6 +27,19 @@ import java.util.Objects;
  * @see Stock
  */
 public class WriteCSV {
+
+  private String fileName;
+
+  /**
+   * Constructs a new {@code WriteCSV} instance targeting the given classpath resource.
+   *
+   * @param fileName the classpath-relative path to the CSV file (e.g. {@code "/StockData.csv"}),
+   *                 cannot be null
+   * @throws NullPointerException if {@code fileName} is null
+   */
+  public WriteCSV(String fileName) {
+    this.fileName = Objects.requireNonNull(fileName, "fileName cannot be null");
+  }
 
   /**
    * Appends a single {@link Stock} entry to the CSV file.
@@ -42,8 +55,8 @@ public class WriteCSV {
    * @throws RuntimeException if an I/O error occurs while writing to the file
    */
   public void writeStockData(Stock stock) {
-    String fileName = Objects.requireNonNull(getClass().getResource("/StockData.csv")).getPath();
-    try (FileWriter fileWriter = new FileWriter(fileName, true);
+    String path = Objects.requireNonNull(getClass().getResource(this.fileName)).getPath();
+    try (FileWriter fileWriter = new FileWriter(path, true);
          BufferedWriter writer = new BufferedWriter(fileWriter)) {
       String line = stock.getSymbol() + "," +
               stock.getCompany() + "," +

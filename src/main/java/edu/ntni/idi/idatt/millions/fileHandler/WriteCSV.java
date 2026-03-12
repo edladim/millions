@@ -15,8 +15,8 @@ public class WriteCSV {
       String line = stock.getSymbol() + "," +
               stock.getCompany() + "," +
               stock.getPrices().getFirst();
-      writer.write(line);
       writer.newLine();
+      writer.write(line);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

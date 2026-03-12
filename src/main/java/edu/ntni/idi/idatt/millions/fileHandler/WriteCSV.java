@@ -7,9 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class WriteCSV {
-  private final String fileName = "src/main/resources/StockData.csv";
 
   public void writeStockData(Stock stock) {
+    String fileName = "src/main/resources/StockData.csv";
     try (FileWriter fileWriter = new FileWriter(fileName, true);
          BufferedWriter writer = new BufferedWriter(fileWriter)) {
       String line = stock.getSymbol() + "," +

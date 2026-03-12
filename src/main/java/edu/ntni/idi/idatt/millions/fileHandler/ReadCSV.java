@@ -9,6 +9,26 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for reading and parsing data from a CSV resource file
+ * on the classpath.
+ *
+ * <p>This class acts as the read-side of the file handler layer, translating
+ * raw CSV content into domain objects that the rest of the application can work with.
+ * It is the counterpart to {@link WriteCSV}, which handles persistence.</p>
+ *
+ * <p>The expected resource file is {@code /StockData.csv}, located on the classpath
+ * under {@code src/main/resources}.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * ReadCSV reader = new ReadCSV();
+ * List<Stock> stocks = reader.readStockData();
+ * }</pre>
+ *
+ * @see WriteCSV
+ * @see Stock
+ */
 public class ReadCSV {
 
   /**

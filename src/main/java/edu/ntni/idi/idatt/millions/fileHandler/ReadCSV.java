@@ -9,8 +9,52 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Responsible for reading and parsing data from a CSV resource file
+ * on the classpath.
+ *
+ * <p>This class acts as the read-side of the file handler layer, translating
+ * raw CSV content into domain objects that the rest of the application can work with.
+ * It is the counterpart to {@link WriteCSV}, which handles persistence.</p>
+ *
+ * <p>The expected resource file is {@code /StockData.csv}, located on the classpath
+ * under {@code src/main/resources}.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>{@code
+ * ReadCSV reader = new ReadCSV();
+ * List<Stock> stocks = reader.readStockData();
+ * }</pre>
+ *
+ * @see WriteCSV
+ * @see Stock
+ */
 public class ReadCSV {
 
+  /**
+   * Reads stock data from the CSV resource file and returns a list of {@link Stock} objects.
+   *
+   * <p>The CSV file is expected to follow this format:</p>
+   * <pre>{@code
+   * # Comment lines starting with '#' are ignored
+   * AAPL,Apple Inc.,276.43
+   * MSFT,Microsoft,404.68
+   * }</pre>
+   *
+   * <p>Each valid line must contain exactly three comma-separated fields:
+   * ticker symbol, company name, and sale price. Lines that are blank
+   * or start with {@code #} are skipped.</p>
+   *
+   * <p>Example usage:</p>
+   * <pre>{@code
+   * ReadCSV reader = new ReadCSV();
+   * List<Stock> stocks = reader.readStockData();
+   * stocks.forEach(System.out::println);
+   * }</pre>
+   *
+   * @return a list of {@link Stock} objects parsed from the CSV file,
+   *         never null but may be empty if the file contains no valid entries
+   */
   public List<Stock> readStockData() {
     List<Stock> stocks = new ArrayList<>();
 

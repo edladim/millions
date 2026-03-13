@@ -248,13 +248,8 @@ class PortfolioTest {
     portfolio.addShare(share2);
     portfolio.addShare(share3);
 
-    BigDecimal expectedNetWorth = BigDecimal.ZERO;
+    BigDecimal expectedNetWorth = new BigDecimal("3009.00");
 
-    for (Share share : portfolio.getShares()) {
-      expectedNetWorth = expectedNetWorth.add(
-              new SaleCalculator(share).calculateTotal()
-      );
-    }
 
     assertEquals(expectedNetWorth, portfolio.getNetWorth());
   }

@@ -1,5 +1,6 @@
 package edu.ntni.idi.idatt.millions.model;
 
+import edu.ntni.idi.idatt.millions.model.transaction.SaleCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -236,6 +237,23 @@ class PortfolioTest {
     BigDecimal gain = portfolio.getTotalGainOrLoss();
 
     assertEquals(new BigDecimal("560"), gain);
+  }
+
+  @Test
+  void testGetNetWorth_returnsCorrectValue() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+
+    BigDecimal expectedNetWorth = BigDecimal.ZERO;
+
+    for (Share share : portfolio.getShares()) {
+      expectedNetWorth = expectedNetWorth.add(
+              new SaleCalculator(share).calculateTotal()
+      );
+    }
+
+    assertEquals(expectedNetWorth, portfolio.getnetWorth());
   }
 
 }

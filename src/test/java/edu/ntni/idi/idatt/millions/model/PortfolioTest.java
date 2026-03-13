@@ -239,6 +239,9 @@ class PortfolioTest {
     assertEquals(new BigDecimal("560"), gain);
   }
 
+  /**
+   * Verifies correct net worth calculation
+   */
   @Test
   void testGetNetWorth_returnsCorrectValue() {
     portfolio.addShare(share1);
@@ -253,7 +256,7 @@ class PortfolioTest {
       );
     }
 
-    assertEquals(expectedNetWorth, portfolio.getnetWorth());
+    assertEquals(expectedNetWorth, portfolio.getNetWorth());
   }
 
 }

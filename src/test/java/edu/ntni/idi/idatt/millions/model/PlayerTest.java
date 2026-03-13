@@ -155,6 +155,9 @@ class PlayerTest {
         () -> new Player("Test", new BigDecimal("-100")));
   }
 
+  /**
+   * Verifies correct net worth calculation
+   */
   @Test
   void testGetNetWorth_returnsCorrectAmount() {
     Stock apple = new Stock("AAPL", "Apple", new BigDecimal("200"));

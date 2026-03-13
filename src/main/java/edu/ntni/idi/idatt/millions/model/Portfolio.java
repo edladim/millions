@@ -1,5 +1,7 @@
 package edu.ntni.idi.idatt.millions.model;
 
+import edu.ntni.idi.idatt.millions.model.transaction.SaleCalculator;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -173,4 +175,12 @@ public final class Portfolio {
 
     return symbol;
   }
+
+  public BigDecimal getnetWorth() {
+    return shares.stream()
+            .map(SaleCalculator::new)
+            .map(SaleCalculator::calculateTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
 }

@@ -123,4 +123,16 @@ public final class Player {
     }
     return amount;
   }
+
+  /**
+   * Calculates the player's total net worth.
+   *
+   * <p>The net worth is the sum of the portfolio net worth
+   * (amount received after selling all shares) and current cash balance.</p>
+   *
+   * @return the total net worth, never null
+   */
+  public BigDecimal getNetWorth() {
+    return portfolio.getNetWorth().add(money);
+  }
 }

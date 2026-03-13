@@ -123,4 +123,8 @@ public final class Player {
     }
     return amount;
   }
+
+  public BigDecimal getNetWorth() {
+    return portfolio.getNetWorth().add(money);
+  }
 }

@@ -155,4 +155,21 @@ class PlayerTest {
         () -> new Player("Test", new BigDecimal("-100")));
   }
 
+  @Test
+  void testGetNetWorth_returnsCorrectAmount() {
+    Stock apple = new Stock("AAPL", "Apple", new BigDecimal("200"));
+    Stock google = new Stock("GOOGL", "Google", new BigDecimal("100"));
+    Share share1 = new Share(apple, new BigDecimal("10"), new BigDecimal("150"));
+    Share share2 = new Share(apple, new BigDecimal("5"), new BigDecimal("140"));
+    Share share3 = new Share(google, new BigDecimal("3"), new BigDecimal("80"));
+
+    player.getPortfolio().addShare(share1);
+    player.getPortfolio().addShare(share2);
+    player.getPortfolio().addShare(share3);
+
+    BigDecimal expectedNetWorth = new BigDecimal("13009.00");
+
+    assertEquals(expectedNetWorth, player.getNetWorth());
+  }
+
 }

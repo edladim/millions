@@ -1,5 +1,7 @@
 package edu.ntni.idi.idatt.millions.model;
 
+import edu.ntni.idi.idatt.millions.model.transaction.SaleCalculator;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -173,4 +175,21 @@ public final class Portfolio {
 
     return symbol;
   }
+
+  /**
+   * Calculates the net worth from selling all shares in the portfolio.
+   *
+   * <p>The net worth is calculated by determining what amount would be
+   * received after selling each share, accounting for broker commissions
+   * and taxes on profit.</p>
+   *
+   * @return the total net worth after all deductions, never null
+   */
+  public BigDecimal getNetWorth() {
+    return shares.stream()
+            .map(SaleCalculator::new)
+            .map(SaleCalculator::calculateTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
 }

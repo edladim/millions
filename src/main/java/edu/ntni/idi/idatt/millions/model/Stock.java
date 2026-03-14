@@ -112,6 +112,17 @@ public final class Stock {
   }
 
   /**
+   * Returns the lowest recorded sale price in the price history.
+   *
+   * @return the lowest price ever recorded, never null
+   */
+  public BigDecimal getLowestPrice() {
+    return prices.stream()
+        .min(BigDecimal::compareTo)
+        .orElseThrow();
+  }
+
+  /**
    * Indicates whether some other object is equal to this stock.
    * Two stocks are considered equal if they share the same ticker symbol,
    * regardless of company name or price history.

@@ -32,7 +32,7 @@ class StockTest {
     assertEquals("AAPL", stock.getSymbol());
     assertEquals("Apple Inc.", stock.getCompany());
     assertEquals(new BigDecimal("100"), stock.getSalesPrice());
-    assertEquals(1, stock.getPrices().size());
+    assertEquals(1, stock.getHistoricalPrices().size());
   }
 
   /**
@@ -91,7 +91,7 @@ class StockTest {
     stock.addNewSalesPrice(new BigDecimal("20"));
 
     assertEquals(new BigDecimal("20"), stock.getSalesPrice());
-    assertEquals(2, stock.getPrices().size());
+    assertEquals(2, stock.getHistoricalPrices().size());
   }
 
   /**
@@ -117,16 +117,94 @@ class StockTest {
   }
 
   /**
-   * Verifies that {@link Stock#getPrices()} returns an unmodifiable snapshot/view.
+   * Verifies that {@link Stock#getHistoricalPrices()} returns an unmodifiable snapshot/view.
    * This prevents external callers from mutating internal state.
    */
   @Test
-  void getPrices_returnsUnmodifiableList() {
+  void getHistoricalPrices_returnsUnmodifiableList() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    List<BigDecimal> prices = stock.getPrices();
+    List<BigDecimal> prices = stock.getHistoricalPrices();
 
     assertThrows(UnsupportedOperationException.class,
         () -> prices.add(BigDecimal.ONE));
+  }
+
+  /**
+   * Verifies that the highest price is correctly identified from the price history.
+   */
+  @Test
+  void getHighestPrice_multiplePrices_returnsMax() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("250"));
+    stock.addNewSalesPrice(new BigDecimal("75"));
+
+    assertEquals(new BigDecimal("250"), stock.getHighestPrice());
+  }
+
+  /**
+   * Verifies that a single recorded price is returned as the highest.
+   */
+  @Test
+  void getHighestPrice_singlePrice_returnsThatPrice() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(new BigDecimal("100"), stock.getHighestPrice());
+  }
+
+  /**
+   * Verifies that the lowest price is correctly identified from the price history.
+   */
+  @Test
+  void getLowestPrice_multiplePrices_returnsMin() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("250"));
+    stock.addNewSalesPrice(new BigDecimal("75"));
+
+    assertEquals(new BigDecimal("75"), stock.getLowestPrice());
+  }
+
+  /**
+   * Verifies that a single recorded price is returned as the lowest.
+   */
+  @Test
+  void getLowestPrice_singlePrice_returnsThatPrice() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(new BigDecimal("100"), stock.getLowestPrice());
+  }
+
+  /**
+   * Verifies that the latest price change is the difference between
+   * the last and second-to-last recorded price.
+   */
+  @Test
+  void getLatestPriceChange_multiplePrices_returnsDifference() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("130"));
+
+    assertEquals(new BigDecimal("30"), stock.getLatestPriceChange());
+  }
+
+  /**
+   * Verifies that a price decrease is returned as a negative value.
+   */
+  @Test
+  void getLatestPriceChange_priceDecreased_returnsNegative() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("80"));
+
+    assertEquals(new BigDecimal("-20"), stock.getLatestPriceChange());
+  }
+
+  /**
+   * Verifies that a single recorded price results in zero change,
+   * as there is no previous price to compare against.
+   */
+  @Test
+  void getLatestPriceChange_singlePrice_returnsZero() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(BigDecimal.ZERO, stock.getLatestPriceChange());
   }
 
   /**

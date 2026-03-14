@@ -123,6 +123,25 @@ public final class Stock {
   }
 
   /**
+   * Returns the change between the two most recent sale prices.
+   *
+   * <p>The change is calculated as the latest price minus the second-to-last price.
+   * A positive value indicates a price increase and a negative value indicates a decrease.</p>
+   *
+   * <p>If only one price has been recorded, this is interpreted as no change
+   * and {@link BigDecimal#ZERO} is returned.</p>
+   *
+   * @return the difference between the last and second-to-last price,
+   *         or {@code BigDecimal.ZERO} if fewer than two prices exist
+   */
+  public BigDecimal getLatestPriceChange() {
+    if (prices.size() < 2) {
+      return BigDecimal.ZERO;
+    }
+    return prices.getLast().subtract(prices.get(prices.size() - 2));
+  }
+
+  /**
    * Indicates whether some other object is equal to this stock.
    * Two stocks are considered equal if they share the same ticker symbol,
    * regardless of company name or price history.

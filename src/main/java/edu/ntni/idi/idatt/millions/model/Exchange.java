@@ -117,6 +117,50 @@ public final class Exchange {
   }
 
   /**
+   * Returns the top gaining stocks since last week, sorted by price change descending.
+   *
+   * <p>Only stocks with a positive latest price change are included.
+   * The result is limited to at most {@code limit} entries.</p>
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of top gainers, never null, may be empty
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  public List<Stock> getGainers(int limit) {
+    if (limit <= 0) {
+      throw new IllegalArgumentException("Limit must be positive");
+    }
+
+    return stockMap.values().stream()
+        .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) > 0)
+        .sorted(Comparator.comparing(Stock::getLatestPriceChange).reversed())
+        .limit(limit)
+        .toList();
+  }
+
+  /**
+   * Returns the worst performing stocks since last week, sorted by price change ascending.
+   *
+   * <p>Only stocks with a negative latest price change are included.
+   * The result is limited to at most {@code limit} entries.</p>
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of top losers, never null, may be empty
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  public List<Stock> getLosers(int limit) {
+    if (limit <= 0) {
+      throw new IllegalArgumentException("Limit must be positive");
+    }
+
+    return stockMap.values().stream()
+        .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) < 0)
+        .sorted(Comparator.comparing(Stock::getLatestPriceChange))
+        .limit(limit)
+        .toList();
+  }
+
+  /**
    * Finds all stocks matching a search term.
    *
    * <p>The search checks both the symbol and company name and is

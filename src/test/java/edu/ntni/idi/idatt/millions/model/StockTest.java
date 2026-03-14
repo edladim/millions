@@ -32,7 +32,7 @@ class StockTest {
     assertEquals("AAPL", stock.getSymbol());
     assertEquals("Apple Inc.", stock.getCompany());
     assertEquals(new BigDecimal("100"), stock.getSalesPrice());
-    assertEquals(1, stock.getPrices().size());
+    assertEquals(1, stock.getHistoricalPrices().size());
   }
 
   /**
@@ -91,7 +91,7 @@ class StockTest {
     stock.addNewSalesPrice(new BigDecimal("20"));
 
     assertEquals(new BigDecimal("20"), stock.getSalesPrice());
-    assertEquals(2, stock.getPrices().size());
+    assertEquals(2, stock.getHistoricalPrices().size());
   }
 
   /**
@@ -117,13 +117,13 @@ class StockTest {
   }
 
   /**
-   * Verifies that {@link Stock#getPrices()} returns an unmodifiable snapshot/view.
+   * Verifies that {@link Stock#getHistoricalPrices()} returns an unmodifiable snapshot/view.
    * This prevents external callers from mutating internal state.
    */
   @Test
-  void getPrices_returnsUnmodifiableList() {
+  void getHistoricalPrices_returnsUnmodifiableList() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    List<BigDecimal> prices = stock.getPrices();
+    List<BigDecimal> prices = stock.getHistoricalPrices();
 
     assertThrows(UnsupportedOperationException.class,
         () -> prices.add(BigDecimal.ONE));

@@ -67,7 +67,7 @@ public final class Stock {
    *
    * @return an unmodifiable list of prices, never null or empty
    */
-  public List<BigDecimal> getPrices() {
+  public List<BigDecimal> getHistoricalPrices() {
     return List.copyOf(prices);
   }
 
@@ -128,7 +128,7 @@ public final class Stock {
 
   @Override
   public String toString() {
-    return symbol + " " + company + " " + getPrices();
+    return symbol + " " + company + " " + getHistoricalPrices();
   }
 
   /**

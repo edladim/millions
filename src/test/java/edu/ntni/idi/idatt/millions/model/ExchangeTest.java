@@ -104,6 +104,136 @@ class ExchangeTest {
         () -> exchange.getStock("MSFT"));
   }
 
+  /**
+   * Verifies that getGainers returns stocks with positive price change,
+   * sorted descending by change, and respects the limit.
+   */
+  @Test
+  void getGainers_returnsTopGainersSortedDescending() {
+    apple.addNewSalesPrice(new BigDecimal("200"));
+    google.addNewSalesPrice(new BigDecimal("210"));
+
+    List<Stock> gainers = exchange.getGainers(2);
+
+    assertEquals(2, gainers.size());
+    assertEquals(apple, gainers.getFirst());
+    assertEquals(google, gainers.getLast());
+  }
+
+  /**
+   * Verifies that getGainers respects the limit parameter.
+   */
+  @Test
+  void getGainers_limitIsRespected() {
+    apple.addNewSalesPrice(new BigDecimal("200"));
+    google.addNewSalesPrice(new BigDecimal("210"));
+
+    List<Stock> gainers = exchange.getGainers(1);
+
+    assertEquals(1, gainers.size());
+    assertEquals(apple, gainers.getFirst());
+  }
+
+  /**
+   * Verifies that getGainers excludes stocks with no positive price change.
+   */
+  @Test
+  void getGainers_excludesNonGainers() {
+    apple.addNewSalesPrice(new BigDecimal("200"));
+    google.addNewSalesPrice(new BigDecimal("180"));
+
+    List<Stock> gainers = exchange.getGainers(2);
+
+    assertEquals(1, gainers.size());
+    assertTrue(gainers.contains(apple));
+    assertFalse(gainers.contains(google));
+  }
+
+  /**
+   * Verifies that getGainers returns an empty list when no stocks have gained.
+   */
+  @Test
+  void getGainers_noGainers_returnsEmptyList() {
+    apple.addNewSalesPrice(new BigDecimal("100"));
+    google.addNewSalesPrice(new BigDecimal("180"));
+
+    assertTrue(exchange.getGainers(2).isEmpty());
+  }
+
+  /**
+   * Verifies that an invalid limit throws an exception.
+   */
+  @Test
+  void getGainers_invalidLimit_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.getGainers(0));
+  }
+
+  /**
+   * Verifies that getLosers returns stocks with negative price change,
+   * sorted ascending by change, and respects the limit.
+   */
+  @Test
+  void getLosers_returnsTopLosersSortedAscending() {
+    apple.addNewSalesPrice(new BigDecimal("100"));
+    google.addNewSalesPrice(new BigDecimal("190"));
+
+    List<Stock> losers = exchange.getLosers(2);
+
+    assertEquals(2, losers.size());
+    assertEquals(apple, losers.getFirst());
+    assertEquals(google, losers.getLast());
+  }
+
+  /**
+   * Verifies that getLosers respects the limit parameter.
+   */
+  @Test
+  void getLosers_limitIsRespected() {
+    apple.addNewSalesPrice(new BigDecimal("100"));
+    google.addNewSalesPrice(new BigDecimal("190"));
+
+    List<Stock> losers = exchange.getLosers(1);
+
+    assertEquals(1, losers.size());
+    assertEquals(apple, losers.getFirst());
+  }
+
+  /**
+   * Verifies that getLosers excludes stocks with no negative price change.
+   */
+  @Test
+  void getLosers_excludesNonLosers() {
+    apple.addNewSalesPrice(new BigDecimal("200"));
+    google.addNewSalesPrice(new BigDecimal("190"));
+
+    List<Stock> losers = exchange.getLosers(2);
+
+    assertEquals(1, losers.size());
+    assertTrue(losers.contains(google));
+    assertFalse(losers.contains(apple));
+  }
+
+  /**
+   * Verifies that getLosers returns an empty list when no stocks have lost value.
+   */
+  @Test
+  void getLosers_noLosers_returnsEmptyList() {
+    apple.addNewSalesPrice(new BigDecimal("200"));
+    google.addNewSalesPrice(new BigDecimal("200"));
+
+    assertTrue(exchange.getLosers(2).isEmpty());
+  }
+
+  /**
+   * Verifies that an invalid limit throws an exception.
+   */
+  @Test
+  void getLosers_invalidLimit_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.getLosers(0));
+  }
+
   /** Verifies that searching by symbol returns matching stocks. */
   @Test
   void findStocks_symbolSearch_returnsMatchingStocks() {

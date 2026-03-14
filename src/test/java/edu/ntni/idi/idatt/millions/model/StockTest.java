@@ -130,6 +130,84 @@ class StockTest {
   }
 
   /**
+   * Verifies that the highest price is correctly identified from the price history.
+   */
+  @Test
+  void getHighestPrice_multiplePrices_returnsMax() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("250"));
+    stock.addNewSalesPrice(new BigDecimal("75"));
+
+    assertEquals(new BigDecimal("250"), stock.getHighestPrice());
+  }
+
+  /**
+   * Verifies that a single recorded price is returned as the highest.
+   */
+  @Test
+  void getHighestPrice_singlePrice_returnsThatPrice() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(new BigDecimal("100"), stock.getHighestPrice());
+  }
+
+  /**
+   * Verifies that the lowest price is correctly identified from the price history.
+   */
+  @Test
+  void getLowestPrice_multiplePrices_returnsMin() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("250"));
+    stock.addNewSalesPrice(new BigDecimal("75"));
+
+    assertEquals(new BigDecimal("75"), stock.getLowestPrice());
+  }
+
+  /**
+   * Verifies that a single recorded price is returned as the lowest.
+   */
+  @Test
+  void getLowestPrice_singlePrice_returnsThatPrice() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(new BigDecimal("100"), stock.getLowestPrice());
+  }
+
+  /**
+   * Verifies that the latest price change is the difference between
+   * the last and second-to-last recorded price.
+   */
+  @Test
+  void getLatestPriceChange_multiplePrices_returnsDifference() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("130"));
+
+    assertEquals(new BigDecimal("30"), stock.getLatestPriceChange());
+  }
+
+  /**
+   * Verifies that a price decrease is returned as a negative value.
+   */
+  @Test
+  void getLatestPriceChange_priceDecreased_returnsNegative() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    stock.addNewSalesPrice(new BigDecimal("80"));
+
+    assertEquals(new BigDecimal("-20"), stock.getLatestPriceChange());
+  }
+
+  /**
+   * Verifies that a single recorded price results in zero change,
+   * as there is no previous price to compare against.
+   */
+  @Test
+  void getLatestPriceChange_singlePrice_returnsZero() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+
+    assertEquals(BigDecimal.ZERO, stock.getLatestPriceChange());
+  }
+
+  /**
    * Verifies that equality is based exclusively on ticker symbol, independent of
    * company name and price history, and that the hash code contract holds.
    */

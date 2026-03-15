@@ -83,7 +83,7 @@ public class ReadCSV {
         }
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new IllegalStateException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;
   }

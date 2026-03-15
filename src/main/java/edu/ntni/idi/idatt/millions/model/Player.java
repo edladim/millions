@@ -111,22 +111,6 @@ public final class Player {
     return transactionArchive;
   }
 
-  private static String validateName(String name) {
-    name = Objects.requireNonNull(name, "Name cannot be null").trim();
-    if (name.isEmpty()) {
-      throw new IllegalArgumentException("Name cannot be blank");
-    }
-    return name;
-  }
-
-  private static BigDecimal validateAmount(BigDecimal amount) {
-    Objects.requireNonNull(amount, "Amount cannot be null");
-    if (amount.compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalArgumentException("Amount cannot be negative");
-    }
-    return amount;
-  }
-
   /**
    * Calculates the player's total net worth.
    *
@@ -178,5 +162,53 @@ public final class Player {
    */
   public int getActiveWeeks() {
     return transactionArchive.countDistinctWeeks();
+  }
+
+  /**
+   * Returns the player's current progression status.
+   *
+   * <p>Status is determined by comparing the player's current net worth
+   * with the starting capital, together with the number of weeks in which
+   * the player has been active in the market.</p>
+   *
+   * <ul>
+   *   <li>{@link PlayerStatus#NOVICE} is the default starting status</li>
+   *   <li>{@link PlayerStatus#INVESTOR} requires at least 10 active trading
+   *       weeks and at least 20% growth</li>
+   *   <li>{@link PlayerStatus#SPECULATOR} requires at least 20 active trading
+   *       weeks and at least 100% growth</li>
+   * </ul>
+   *
+   * @return the player's current status, never null
+   */
+  public PlayerStatus getStatus() {
+    BigDecimal returnRate = getReturnRate();
+    int activeWeeks = getActiveWeeks();
+
+    if (activeWeeks >= 20 && returnRate.compareTo(SPECULATOR_GROWTH_REQUIREMENT) >= 0) {
+      return PlayerStatus.SPECULATOR;
+    }
+
+    if (activeWeeks >= 10 && returnRate.compareTo(INVESTOR_GROWTH_REQUIREMENT) >= 0) {
+      return PlayerStatus.INVESTOR;
+    }
+
+    return PlayerStatus.NOVICE;
+  }
+
+  private static String validateName(String name) {
+    name = Objects.requireNonNull(name, "Name cannot be null").trim();
+    if (name.isEmpty()) {
+      throw new IllegalArgumentException("Name cannot be blank");
+    }
+    return name;
+  }
+
+  private static BigDecimal validateAmount(BigDecimal amount) {
+    Objects.requireNonNull(amount, "Amount cannot be null");
+    if (amount.compareTo(BigDecimal.ZERO) < 0) {
+      throw new IllegalArgumentException("Amount cannot be negative");
+    }
+    return amount;
   }
 }

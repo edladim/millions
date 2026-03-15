@@ -16,6 +16,9 @@ import java.util.Objects;
  */
 public final class Player {
 
+  private static final BigDecimal INVESTOR_GROWTH_REQUIREMENT = new BigDecimal("0.20");
+  private static final BigDecimal SPECULATOR_GROWTH_REQUIREMENT = BigDecimal.ONE;
+
   private final String name;
   private final BigDecimal startingMoney;
   private BigDecimal money;
@@ -134,5 +137,18 @@ public final class Player {
    */
   public BigDecimal getNetWorth() {
     return portfolio.getNetWorth().add(money);
+  }
+
+
+  /**
+   * Calculates the player's profit relative to the starting capital.
+   *
+   * <p>A positive value means the player has increased net worth,
+   * while a negative value means the player has lost value overall.</p>
+   *
+   * @return the profit compared to starting capital, never null
+   */
+  public BigDecimal getProfit() {
+    return getNetWorth().subtract(startingMoney);
   }
 }

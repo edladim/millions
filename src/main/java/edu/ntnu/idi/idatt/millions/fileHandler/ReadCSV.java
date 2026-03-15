@@ -35,7 +35,7 @@ public class ReadCSV {
   private String fileName;
 
   /**
-   * Constructs a new {@code WriteCSV} instance targeting the given classpath resource.
+   * Constructs a new {@code ReadCSV} instance targeting the given classpath resource.
    *
    * @param fileName the classpath-relative path to the CSV file (e.g. {@code "/StockData.csv"}),
    *                 cannot be null

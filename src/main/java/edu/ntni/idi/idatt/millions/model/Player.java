@@ -151,4 +151,32 @@ public final class Player {
   public BigDecimal getProfit() {
     return getNetWorth().subtract(startingMoney);
   }
+
+  /**
+   * Calculates the player's growth rate relative to the starting capital.
+   *
+   * <p>The growth rate is expressed as a decimal value where
+   * {@code 0.20} means 20% growth and {@code 1.00} means 100% growth.</p>
+   *
+   * @return the growth rate, never null
+   */
+  public BigDecimal getReturnRate() {
+    if (startingMoney.compareTo(BigDecimal.ZERO) == 0) {
+      return BigDecimal.ZERO;
+    }
+
+    return getProfit().divide(startingMoney, 10, java.math.RoundingMode.HALF_UP);
+  }
+
+  /**
+   * Returns the number of distinct weeks in which the player has traded.
+   *
+   * <p>A week is counted if the player has completed at least one
+   * transaction during that week.</p>
+   *
+   * @return the number of active trading weeks
+   */
+  public int getActiveWeeks() {
+    return transactionArchive.countDistinctWeeks();
+  }
 }

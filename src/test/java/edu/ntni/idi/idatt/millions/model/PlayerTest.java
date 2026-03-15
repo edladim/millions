@@ -1,5 +1,6 @@
 package edu.ntni.idi.idatt.millions.model;
 
+import edu.ntni.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntni.idi.idatt.millions.model.transaction.TransactionArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -175,4 +176,162 @@ class PlayerTest {
     assertEquals(expectedNetWorth, player.getNetWorth());
   }
 
+  /**
+   * Verifies that profit is zero when net worth equals starting capital.
+   */
+  @Test
+  void getProfit_noChange_returnsZero() {
+    assertEquals(0, BigDecimal.ZERO.compareTo(player.getProfit()));
+  }
+
+  /**
+   * Verifies that profit is positive when net worth exceeds starting capital.
+   */
+  @Test
+  void getProfit_moneyAdded_returnsPositiveProfit() {
+    player.addMoney(new BigDecimal("500"));
+    assertEquals(0, new BigDecimal("500").compareTo(player.getProfit()));
+  }
+
+  /**
+   * Verifies that profit is negative when net worth is below starting capital.
+   */
+  @Test
+  void getProfit_moneyWithdrawn_returnsNegativeProfit() {
+    player.withdrawMoney(new BigDecimal("2000"));
+    assertEquals(0, new BigDecimal("-2000").compareTo(player.getProfit()));
+  }
+
+  /**
+   * Verifies that the return rate is zero when net worth equals starting capital.
+   */
+  @Test
+  void getReturnRate_noChange_returnsZero() {
+    assertEquals(0, BigDecimal.ZERO.compareTo(player.getReturnRate()));
+  }
+
+  /**
+   * Verifies that the return rate is calculated correctly for a known gain.
+   * A gain of 2000 on 10000 starting capital should yield a 20% return rate (0.20).
+   */
+  @Test
+  void getReturnRate_twentyPercentGain_returnsCorrectRate() {
+    player.addMoney(new BigDecimal("2000"));
+    assertEquals(0, new BigDecimal("0.20").compareTo(player.getReturnRate()));
+  }
+
+  /**
+   * Verifies that the return rate is negative when the player has lost value.
+   */
+  @Test
+  void getReturnRate_loss_returnsNegativeRate() {
+    player.withdrawMoney(new BigDecimal("5000"));
+    assertTrue(player.getReturnRate().compareTo(BigDecimal.ZERO) < 0);
+  }
+
+  /**
+   * Verifies that the return rate is zero when starting money is zero,
+   * guarding against division by zero.
+   */
+  @Test
+  void getReturnRate_zeroStartingMoney_returnsZero() {
+    Player broke = new Player("Broke", BigDecimal.ZERO);
+    assertEquals(0, BigDecimal.ZERO.compareTo(broke.getReturnRate()));
+  }
+
+  /**
+   * Verifies that a player with no transactions has zero active weeks.
+   */
+  @Test
+  void getActiveWeeks_noTransactions_returnsZero() {
+    assertEquals(0, player.getActiveWeeks());
+  }
+
+  /**
+   * Verifies that a new player with no transactions starts as NOVICE.
+   */
+  @Test
+  void getStatus_newPlayer_returnsNovice() {
+    assertEquals(PlayerStatus.NOVICE, player.getStatus());
+  }
+
+  /**
+   * Verifies that a player with at least 10 active weeks and 20% growth
+   * is promoted to INVESTOR status.
+   */
+  @Test
+  void getStatus_tenWeeksAndTwentyPercentGrowth_returnsInvestor() {
+    Player investor = new Player("Investor", new BigDecimal("10000"));
+    simulateActiveWeeks(investor, 10);
+    investor.addMoney(new BigDecimal("2000"));
+
+    assertEquals(PlayerStatus.INVESTOR, investor.getStatus());
+  }
+
+  /**
+   * Verifies that a player with at least 20 active weeks and 100% growth
+   * is promoted to SPECULATOR status.
+   */
+  @Test
+  void getStatus_twentyWeeksAndHundredPercentGrowth_returnsSpeculator() {
+    Player speculator = new Player("Speculator", new BigDecimal("10000"));
+    simulateActiveWeeks(speculator, 20);
+    speculator.addMoney(new BigDecimal("10000"));
+
+    assertEquals(PlayerStatus.SPECULATOR, speculator.getStatus());
+  }
+
+  /**
+   * Verifies that a player with enough weeks but insufficient growth
+   * does not advance beyond NOVICE.
+   */
+  @Test
+  void getStatus_tenWeeksButInsufficientGrowth_returnsNovice() {
+    Player underperformer = new Player("Underperformer", new BigDecimal("10000"));
+    simulateActiveWeeks(underperformer, 10);
+
+    assertEquals(PlayerStatus.NOVICE, underperformer.getStatus());
+  }
+
+  /**
+   * Verifies that a player with sufficient growth but too few weeks
+   * does not advance to INVESTOR.
+   */
+  @Test
+  void getStatus_twentyPercentGrowthButTooFewWeeks_returnsNovice() {
+    player.addMoney(new BigDecimal("2000"));
+
+    assertEquals(PlayerStatus.NOVICE, player.getStatus());
+  }
+
+  /**
+   * Verifies that a player meeting INVESTOR requirements but not SPECULATOR
+   * requirements is correctly assigned INVESTOR and not promoted further.
+   */
+  @Test
+  void getStatus_investorRequirementsMet_doesNotPromoteToSpeculator() {
+    Player investor = new Player("Investor", new BigDecimal("10000"));
+    simulateActiveWeeks(investor, 10);
+    investor.addMoney(new BigDecimal("2000")); // 20% growth, not 100%
+
+    assertEquals(PlayerStatus.INVESTOR, investor.getStatus());
+    assertNotEquals(PlayerStatus.SPECULATOR, investor.getStatus());
+  }
+
+  /**
+   * Simulates a given number of distinct active trading weeks for a player
+   * by adding one purchase transaction per week directly to the archive.
+   *
+   * @param player the player to simulate activity for
+   * @param weeks  the number of distinct weeks to simulate
+   */
+  private void simulateActiveWeeks(Player player, int weeks) {
+    Stock stock = new Stock("SIM", "Simulated Corp", new BigDecimal("100"));
+    Share share = new Share(stock, BigDecimal.ONE, new BigDecimal("100"));
+
+    for (int i = 1; i <= weeks; i++) {
+      player.getTransactionArchive()
+          .add(new Purchase(share, i));
+    }
+  }
 }

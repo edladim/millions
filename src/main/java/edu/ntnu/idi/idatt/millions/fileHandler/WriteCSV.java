@@ -55,6 +55,7 @@ public class WriteCSV {
    * @throws RuntimeException if an I/O error occurs while writing to the file
    */
   public void writeStockData(Stock stock) {
+    Objects.requireNonNull(stock, "stock cannot be null");
     String path = Objects.requireNonNull(getClass().getResource(this.fileName)).getPath();
     try (FileWriter fileWriter = new FileWriter(path, true);
          BufferedWriter writer = new BufferedWriter(fileWriter)) {

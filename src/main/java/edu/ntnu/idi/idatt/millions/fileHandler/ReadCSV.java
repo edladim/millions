@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -66,7 +67,8 @@ public class ReadCSV {
     List<Stock> stocks = new ArrayList<>();
 
     try (InputStream is = getClass().getResourceAsStream(fileName);
-          BufferedReader bf = new BufferedReader(new InputStreamReader(is))) {
+          BufferedReader bf = new BufferedReader(new InputStreamReader(
+                  Objects.requireNonNull(is, "Recourse not found: " + fileName), StandardCharsets.UTF_8))) {
 
       String line;
       while ((line = bf.readLine()) != null) {

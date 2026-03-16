@@ -61,7 +61,7 @@ public class WriteCSV {
          BufferedWriter writer = new BufferedWriter(fileWriter)) {
       String line = stock.getSymbol() + "," +
               stock.getCompany() + "," +
-              stock.getHistoricalPrices().getFirst();
+              stock.getHistoricalPrices().getLast();
       writer.newLine();
       writer.write(line);
     } catch (IOException e) {

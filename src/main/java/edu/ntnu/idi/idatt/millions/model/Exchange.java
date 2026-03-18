@@ -202,7 +202,9 @@ public final class Exchange {
     Stock stock = getStock(symbol);
     Share share = new Share(stock, quantity, stock.getSalesPrice());
 
-    return new Purchase(share, week);
+    Purchase purchase = new Purchase(share, week);
+    purchase.commit(player);
+    return purchase;
   }
 
   /**
@@ -218,7 +220,9 @@ public final class Exchange {
     Objects.requireNonNull(share, "Share cannot be null");
     Objects.requireNonNull(player, "Player cannot be null");
 
-    return new Sale(share, week);
+    Sale sale = new Sale(share, week);
+    sale.commit(player);
+    return sale;
   }
 
   /**

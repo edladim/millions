@@ -22,14 +22,14 @@ import java.util.Objects;
  * <ul>
  *   <li>Gross = salesPrice × quantity</li>
  *   <li>Commission = 1% of gross</li>
- *   <li>Tax = 30% of profit (only if the transaction results in a profit)</li>
+ *   <li>Tax = 30% of profit (only if the transaction results in a profit, after commission)</li>
  *   <li>Total = gross − commission − tax</li>
  * </ul>
  *
  * <p>The profit used for tax calculation is determined as:</p>
  *
  * <ul>
- *   <li>Profit = gross − (purchasePrice × quantity)</li>
+ *   <li>Profit = gross − commission − (purchasePrice × quantity)</li>
  * </ul>
  *
  * <p>If the calculated profit is zero or negative, no tax is applied.</p>
@@ -90,7 +90,7 @@ public final class SaleCalculator implements TransactionCalculator {
 
     BigDecimal purchaseValue = purchasePrice.multiply(quantity);
 
-    BigDecimal profit = calculateGross().subtract(purchaseValue);
+    BigDecimal profit = calculateGross().subtract(calculateCommission()).subtract(purchaseValue);
 
     if (profit.compareTo(BigDecimal.ZERO) <= 0) {
       return BigDecimal.ZERO;

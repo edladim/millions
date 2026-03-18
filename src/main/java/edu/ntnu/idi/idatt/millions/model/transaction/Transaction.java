@@ -39,15 +39,15 @@ public abstract class Transaction {
    * @param calculator the calculator used for financial calculations
    *
    * @throws NullPointerException if share or calculator is null
-   * @throws IllegalArgumentException if week is negative
+   * @throws IllegalArgumentException if week is not positive
    */
   protected Transaction(Share share, int week, TransactionCalculator calculator) {
 
     this.share = Objects.requireNonNull(share, "Share cannot be null");
     this.calculator = Objects.requireNonNull(calculator, "Calculator cannot be null");
 
-    if (week < 0) {
-      throw new IllegalArgumentException("Week cannot be negative");
+    if (week <= 0) {
+      throw new IllegalArgumentException("Week must be positive");
     }
 
     this.week = week;

@@ -121,4 +121,14 @@ class TransactionTest {
     assertThrows(IllegalArgumentException.class,
         () -> new TestTransaction(share, -1, calculator));
   }
+
+  /**
+   * Ensures that week zero is rejected, since trading weeks start at 1.
+   */
+  @Test
+  void constructor_zeroWeek_throwsException() {
+
+    assertThrows(IllegalArgumentException.class,
+        () -> new TestTransaction(share, 0, calculator));
+  }
 }

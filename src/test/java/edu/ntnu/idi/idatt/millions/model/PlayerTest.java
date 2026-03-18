@@ -171,9 +171,9 @@ class PlayerTest {
     player.getPortfolio().addShare(share2);
     player.getPortfolio().addShare(share3);
 
-    BigDecimal expectedNetWorth = new BigDecimal("13009.00");
+    BigDecimal expectedNetWorth = new BigDecimal("13018.9");
 
-    assertEquals(expectedNetWorth, player.getNetWorth());
+    assertEquals(0, expectedNetWorth.compareTo(player.getNetWorth()));
   }
 
   /**

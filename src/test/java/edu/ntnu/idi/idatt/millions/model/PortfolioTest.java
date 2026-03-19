@@ -52,7 +52,7 @@ class PortfolioTest {
    */
   @Test
   void addShare_addsShareSuccessfully() {
-    assertTrue(portfolio.addShare(share1));
+    portfolio.addShare(share1);
     assertEquals(1, portfolio.size());
     assertTrue(portfolio.contains(share1));
   }
@@ -185,9 +185,9 @@ class PortfolioTest {
    */
   @Test
   void constructor_withShares_initializesPortfolio() {
-    Portfolio portfolio = new Portfolio(List.of(share1, share2));
+    Portfolio portfolioWithShares = new Portfolio(List.of(share1, share2));
 
-    assertEquals(2, portfolio.size());
+    assertEquals(2, portfolioWithShares.size());
   }
 
   /**

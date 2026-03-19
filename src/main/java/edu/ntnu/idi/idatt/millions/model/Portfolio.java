@@ -50,13 +50,11 @@ public final class Portfolio {
    * Adds a share to the portfolio.
    *
    * @param share the share to add, cannot be null
-   * @return {@code true} if the share was added successfully,
-   *         {@code false} if the share already exists in the portfolio
    * @throws NullPointerException if {@code share} is null
    */
-  public boolean addShare(Share share) {
+  public void addShare(Share share) {
     Objects.requireNonNull(share, "Share cannot be null");
-    return shares.add(share);
+    shares.add(share);
   }
 
   /**

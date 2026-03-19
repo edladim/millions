@@ -2,9 +2,7 @@ package edu.ntnu.idi.idatt.millions.fileHandler;
 
 import edu.ntnu.idi.idatt.millions.model.Stock;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -82,8 +80,8 @@ public class ReadCSV {
           stocks.add(new Stock(symbol, company, salesPrice));
         }
       }
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to read stock data from resource '" + fileName + "'", e);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;
   }

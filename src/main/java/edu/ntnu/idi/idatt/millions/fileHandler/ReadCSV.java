@@ -2,10 +2,9 @@ package edu.ntnu.idi.idatt.millions.fileHandler;
 
 import edu.ntnu.idi.idatt.millions.model.Stock;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +34,7 @@ public class ReadCSV {
   private String fileName;
 
   /**
-   * Constructs a new {@code WriteCSV} instance targeting the given classpath resource.
+   * Constructs a new {@code ReadCSV} instance targeting the given classpath resource.
    *
    * @param fileName the classpath-relative path to the CSV file (e.g. {@code "/StockData.csv"}),
    *                 cannot be null
@@ -66,7 +65,8 @@ public class ReadCSV {
     List<Stock> stocks = new ArrayList<>();
 
     try (InputStream is = getClass().getResourceAsStream(fileName);
-          BufferedReader bf = new BufferedReader(new InputStreamReader(is))) {
+          BufferedReader bf = new BufferedReader(new InputStreamReader(
+                  Objects.requireNonNull(is, "Recourse not found: " + fileName), StandardCharsets.UTF_8))) {
 
       String line;
       while ((line = bf.readLine()) != null) {
@@ -80,8 +80,8 @@ public class ReadCSV {
           stocks.add(new Stock(symbol, company, salesPrice));
         }
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;
   }

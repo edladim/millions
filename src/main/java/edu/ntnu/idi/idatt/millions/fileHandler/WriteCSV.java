@@ -1,6 +1,8 @@
 package edu.ntnu.idi.idatt.millions.fileHandler;
 
 import edu.ntnu.idi.idatt.millions.model.Stock;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -27,6 +29,7 @@ import java.util.Objects;
  * @see Stock
  */
 public class WriteCSV {
+  private static final Logger logger = LogManager.getLogger(WriteCSV.class);
 
   private String fileName;
 
@@ -65,6 +68,7 @@ public class WriteCSV {
       writer.newLine();
       writer.write(line);
     } catch (IOException e) {
+      logger.error("Failed to write stock data to resource '" + fileName + "'");
       throw new RuntimeException("Failed to write stock data to resource '" + fileName + "'", e);
     }
   }

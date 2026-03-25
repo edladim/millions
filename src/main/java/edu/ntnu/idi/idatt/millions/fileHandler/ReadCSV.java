@@ -84,7 +84,10 @@ public class ReadCSV {
         }
       }
     } catch (IOException e) {
-      logger.error("Failed to read stock data to resource '{}'", fileName);
+      logger.error("Failed to read stock data to resource '{}'", fileName, e);
+      throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
+    } catch (NullPointerException e) {
+      logger.error("Failed to read stock data to resource '{}'", fileName, e);
       throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;

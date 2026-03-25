@@ -68,8 +68,11 @@ public class WriteCSV {
       writer.newLine();
       writer.write(line);
     } catch (IOException e) {
-      logger.error("Failed to write stock data to resource '{}'", fileName);
+      logger.error("Failed to write stock data to resource '{}'", fileName, e);
       throw new RuntimeException("Failed to write stock data to resource '" + fileName + "'", e);
+    } catch (NullPointerException e) {
+      logger.error("Failed to read stock data from resource '{}'", fileName, e);
+      throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
   }
 }

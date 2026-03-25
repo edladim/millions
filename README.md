@@ -2,14 +2,14 @@
 
 STUDENT NAMES: Edvard Kvisler Ladim, Oskar Hellum Reppen
 
-STUDENT ID: 157325, 
+STUDENT ID: 157325, 157300
 
 ---
 ## Project description
 
 ---
 ## Project structure
-This project follows a layered architecture inspired by Onion Architecture / Clean Architecture.
+This project follows a layered architecture inspired by MVC.
 All source code is stored under the standard Maven directory layout.
 ### Source code layout
 ```

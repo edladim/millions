@@ -1,6 +1,8 @@
 package edu.ntnu.idi.idatt.millions.fileHandler;
 
 import edu.ntnu.idi.idatt.millions.model.Stock;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -31,6 +33,7 @@ import java.util.Objects;
  */
 public class ReadCSV {
 
+  private static final Logger logger = LogManager.getLogger(ReadCSV.class);
   private String fileName;
 
   /**
@@ -81,6 +84,7 @@ public class ReadCSV {
         }
       }
     } catch (IOException e) {
+      logger.error("Failed to read stock data to resource '{}'", fileName);
       throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;

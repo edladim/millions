@@ -67,9 +67,14 @@ public class ReadCSV {
   public List<Stock> readStockData() {
     List<Stock> stocks = new ArrayList<>();
 
-    try (InputStream is = getClass().getResourceAsStream(fileName);
-          BufferedReader bf = new BufferedReader(new InputStreamReader(
-                  Objects.requireNonNull(is, "Recourse not found: " + fileName), StandardCharsets.UTF_8))) {
+    InputStream is = getClass().getResourceAsStream(fileName);
+    if (is == null) {
+      String msg = "Resource not found: '" + fileName + "' (check classpath)";
+      logger.error(msg);
+      throw new RuntimeException(msg);
+    }
+
+    try (BufferedReader bf = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
 
       String line;
       while ((line = bf.readLine()) != null) {
@@ -83,8 +88,8 @@ public class ReadCSV {
           stocks.add(new Stock(symbol, company, salesPrice));
         }
       }
-    } catch (IOException | NullPointerException e) {
-      logger.error("Failed to read stock data to resource '{}'", fileName, e);
+    } catch (IOException e) {
+      logger.error("IO exception while reading stock data to resource '{}'", fileName, e);
       throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }
     return stocks;

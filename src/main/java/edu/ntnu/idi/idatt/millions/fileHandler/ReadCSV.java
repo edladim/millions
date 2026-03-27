@@ -83,10 +83,7 @@ public class ReadCSV {
           stocks.add(new Stock(symbol, company, salesPrice));
         }
       }
-    } catch (IOException e) {
-      logger.error("Failed to read stock data to resource '{}'", fileName, e);
-      throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
-    } catch (NullPointerException e) {
+    } catch (IOException | NullPointerException e) {
       logger.error("Failed to read stock data to resource '{}'", fileName, e);
       throw new RuntimeException("Failed to read stock data from resource '" + fileName + "'", e);
     }

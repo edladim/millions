@@ -10,11 +10,6 @@ target/
 *.iml
 *.ipr
 
-### Logs ###
-logs/
-*.log
-app.log
-
 ### Eclipse ###
 .apt_generated
 .classpath

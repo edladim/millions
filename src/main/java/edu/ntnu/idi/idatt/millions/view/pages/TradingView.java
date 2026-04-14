@@ -1,4 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-public class TradingView {
+import javafx.scene.layout.VBox;
+
+public class TradingView extends VBox {
 }

@@ -1,4 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-public class DashboardView {
+import javafx.scene.layout.VBox;
+
+public class DashboardView extends VBox {
 }

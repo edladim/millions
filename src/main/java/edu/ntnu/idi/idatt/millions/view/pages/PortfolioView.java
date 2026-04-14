@@ -1,4 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-public class PortfolioView {
+import javafx.scene.layout.VBox;
+
+public class PortfolioView extends VBox {
 }

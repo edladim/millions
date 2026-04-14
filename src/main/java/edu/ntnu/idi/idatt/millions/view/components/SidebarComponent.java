@@ -1,4 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.components;
 
-public class SidebarComponent {
+import javafx.scene.layout.VBox;
+
+public class SidebarComponent extends VBox {
 }

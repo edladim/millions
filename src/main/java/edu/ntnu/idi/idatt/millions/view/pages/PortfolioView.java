@@ -24,7 +24,11 @@ public class PortfolioView extends VBox {
     setSpacing(24);
     setPadding(new Insets(40));
 
-
+    getChildren().addAll(
+            buildHeader(),
+            buildSummaryRow(),
+            buildHoldingsSection()
+    );
   }
 
   private VBox buildHeader() {
@@ -78,7 +82,6 @@ public class PortfolioView extends VBox {
     Label heading = new Label("Holdings");
     heading.getStyleClass().add("section-heading");
 
-    // Table header
     HBox tableHeader = buildTableHeader();
 
     holdingsContainer = new VBox(4);

@@ -31,10 +31,16 @@ public class SidebarComponent extends VBox {
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 
+    getChildren().addAll(
+            setLogo(),
+            buildSpacer(24),
+            buildNavSection(),
+            buildBottomSection()
+    );
   }
 
   private FontIcon setLogo() {
-    FontIcon dashboardIcon = new FontIcon("fas-wave-squared");
+    FontIcon dashboardIcon = new FontIcon("fas-wave-square");
     dashboardIcon.setStyle("-fx-icon-color: white;");
     dashboardIcon.setIconSize(16);
     return dashboardIcon;

@@ -2,11 +2,10 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import java.util.function.BiConsumer;
 
@@ -104,9 +103,10 @@ public class TradingView extends BorderPane {
 
     Label qtyLabel = new Label("Quantity");
     qtyLabel.getStyleClass().add("input-label");
-    quantityField = new TextField("1");
-    quantityField.getStyleClass().add("search-field");
-    quantityField.textProperty().addListener((obs, old, val) -> updateCostPreview());
+    Spinner<Integer> quantitySpinner = new Spinner<>(1, 10000, 1);
+    quantitySpinner.setEditable(true);
+    quantitySpinner.getStyleClass().add("search-field");
+    quantitySpinner.valueProperty().addListener((obs, old, val) -> updateCostPreview());
 
     VBox costCard = buildCostCard();
 
@@ -130,6 +130,7 @@ public class TradingView extends BorderPane {
             stockInfoCard,
             buildSpacer(4),
             qtyLabel,
+            quantitySpinner,
             costCard,
             buildSpacer(4),
             buyButton
@@ -203,6 +204,87 @@ public class TradingView extends BorderPane {
 
   private void updateCostPreview() {
     // Controller should observe quantityField and push updates via setCostPreview()
+  }
+
+  public void addStockRow(String symbol, String company, String price,
+                          String change, String high, String low,
+                          boolean isPositive) {
+
+    Circle icon = new Circle(18, Color.web("#6366f1"));
+    Label letter = new Label(String.valueOf(symbol.charAt(0)));
+    letter.getStyleClass().add("mover-icon-letter");
+    StackPane iconPane = new StackPane(icon, letter);
+
+    Label nameLabel = new Label(symbol);
+    nameLabel.getStyleClass().add("mover-name");
+    Label compLabel = new Label(company);
+    compLabel.getStyleClass().add("mover-symbol");
+    VBox nameBox = new VBox(2, nameLabel, compLabel);
+    HBox stockCell = new HBox(10, iconPane, nameBox);
+    stockCell.setAlignment(Pos.CENTER_LEFT);
+    stockCell.setPrefWidth(220);
+
+    Label priceLabel  = makeDataCell(price,  120, "table-data-cell");
+    Label changeLabel = makeDataCell(change, 120,
+            isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
+    Label highLabel   = makeDataCell(high,   110, "table-data-cell");
+    Label lowLabel    = makeDataCell(low,    110, "table-data-cell");
+
+    Button selectBtn = new Button("Select");
+    selectBtn.getStyleClass().add("select-btn");
+    selectBtn.setPrefWidth(70);
+    selectBtn.setOnAction(e -> selectStock(symbol, company, price, change, high, low, isPositive));
+
+    HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("holding-row");
+    row.setPadding(new Insets(10, 0, 10, 0));
+
+    stockListContainer.getChildren().add(row);
+  }
+
+  public void clearStocks() {
+    stockListContainer.getChildren().clear();
+  }
+
+  private void selectStock(String symbol, String company, String price,
+                           String change, String high, String low, boolean isPositive) {
+    selectedSymbol = symbol;
+    buySymbolLabel.setText(symbol);
+    buyCompanyLabel.setText(company);
+    buyPriceLabel.setText(price);
+    buyChangeLabel.setText((isPositive ? "↗ " : "↘ ") + change);
+    buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
+    buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
+    buyHighLabel.setText("H: " + high);
+    buyLowLabel.setText("L: " + low);
+    buyButton.setDisable(false);
+  }
+
+  public void setCostPreview(String gross, String commission, String total) {
+    estimatedCostLabel.setText("Estimated Cost:   " + gross);
+    commissionLabel.setText("Commission (0.5%):   " + commission);
+    totalCostLabel.setText("Total:   " + total);
+  }
+
+  public String getQuantityInput() {
+    return quantityField.getText();
+  }
+
+  public TextField getSearchField() {
+    return searchField;
+  }
+
+  public void setOnBuy(BiConsumer<String, String> handler) {
+    this.onBuy = handler;
+  }
+
+  private Label makeDataCell(String text, double width, String styleClass) {
+    Label l = new Label(text);
+    l.getStyleClass().add(styleClass);
+    l.setPrefWidth(width);
+    l.setMinWidth(width);
+    return l;
   }
 
   private Region buildSpacer(double h) {

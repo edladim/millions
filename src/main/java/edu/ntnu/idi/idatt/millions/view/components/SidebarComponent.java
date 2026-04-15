@@ -39,11 +39,19 @@ public class SidebarComponent extends VBox {
     );
   }
 
-  private FontIcon setLogo() {
+  private HBox setLogo() {
     FontIcon dashboardIcon = new FontIcon("fas-wave-square");
-    dashboardIcon.setStyle("-fx-icon-color: white;");
+    dashboardIcon.getStyleClass().add("logo-icon-label");
     dashboardIcon.setIconSize(16);
-    return dashboardIcon;
+
+    Label name = new Label("Millions");
+    name.getStyleClass().add("logo-text");
+
+    HBox logo = new HBox(10, dashboardIcon, name);
+    logo.setAlignment(Pos.CENTER_LEFT);
+    logo.setPadding(new Insets(0, 0, 16, 4));
+
+    return logo;
   }
 
   private VBox buildNavSection() {
@@ -55,7 +63,8 @@ public class SidebarComponent extends VBox {
   }
 
   private Button buildNavButton(String text, FontIcon icon, Page page) {
-    Button btn = new Button(icon + text);
+    Button btn = new Button(text);
+    btn.setGraphic(icon);
     btn.getStyleClass().add("nav-btn");
     btn.setMaxWidth(Double.MAX_VALUE);
     btn.setOnAction(e -> {

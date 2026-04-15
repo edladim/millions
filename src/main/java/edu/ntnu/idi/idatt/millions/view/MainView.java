@@ -17,6 +17,8 @@ public class MainView {
   private final Node portfolioView;
   private final Node tradingView;
 
+  private Runnable onAdvanceWeek;
+
   public MainView() {
     root = new BorderPane();
     sidebar = new SidebarComponent();
@@ -28,15 +30,13 @@ public class MainView {
     root.getStylesheets().add("main-root");
 
     showPage(Page.DASHBOARD);
-    //sidebar.setActivePage(Page.DASHBOARD);
+    sidebar.setActivePage(Page.DASHBOARD);
 
-    //sidebar.setOnNavigate(this::showPage);
+    sidebar.setOnNavigate(this::showPage);
 
-    /*
     sidebar.setOnAdvanceWeek(() -> {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
     });
-     */
   }
 
   private void showPage(Page page) {
@@ -45,13 +45,13 @@ public class MainView {
       case PORTFOLIO -> root.setCenter(portfolioView);
       case TRADING -> root.setCenter(tradingView);
     }
-    //sidebar.setActivePage(page);
+    sidebar.setActivePage(page);
   }
 
   public Scene createScene() {
     Scene scene = new Scene(root, 1280, 800);
     scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
-    //scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
+    scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
     return scene;
   }
 
@@ -59,4 +59,10 @@ public class MainView {
   public Node getPortfolioView() { return portfolioView; }
   public Node getTradingView() { return tradingView; }
   public Node getSidebar() { return sidebar; }
+
+  public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
+
+  public void setWeek(int week) {
+    sidebar.setWeek(week);
+  }
 }

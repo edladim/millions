@@ -6,14 +6,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.function.BiConsumer;
 
-public class TradingView extends VBox {
+public class TradingView extends BorderPane {
 
   private TextField searchField;
   private VBox stockListContainer;
@@ -35,12 +32,15 @@ public class TradingView extends VBox {
   public TradingView() {
     getStyleClass().add("dashboard-view");
 
+    setCenter(buildStockListPanel());
+    setRight(buildBuyPanel());
   }
 
   private VBox buildStockListPanel() {
-    VBox panel = new VBox(24);
-    panel.setPadding(new Insets(40, 24, 40 ,24));
+    VBox panel = new VBox(16);
+    panel.setPadding(new Insets(24));
     panel.setMaxWidth(Double.MAX_VALUE);
+    VBox.setVgrow(panel, Priority.ALWAYS);
 
     Label title = new Label("Trading");
     title.getStyleClass().add("page-title");
@@ -79,12 +79,12 @@ public class TradingView extends VBox {
     header.setPadding(new Insets(0, 0, 8, 0));
 
     header.getChildren().addAll(
-            makeHeaderCell("Stock",         220),
-            makeHeaderCell("Price",         120),
-            makeHeaderCell("Change",        120),
-            makeHeaderCell("High",          110),
-            makeHeaderCell("Low",           110),
-            makeHeaderCell("",               80)
+            makeHeaderCell("Stock", 220),
+            makeHeaderCell("Price", 120),
+            makeHeaderCell("Change", 120),
+            makeHeaderCell("High", 110),
+            makeHeaderCell("Low", 110),
+            makeHeaderCell("", 80)
     );
     return header;
   }
@@ -92,9 +92,9 @@ public class TradingView extends VBox {
   private VBox buildBuyPanel() {
     VBox panel = new VBox(20);
     panel.getStyleClass().add("buy-panel");
-    panel.setPrefHeight(300);
-    panel.setMinWidth(300);
-    panel.setMaxWidth(300);
+    panel.setPrefHeight(250);
+    panel.setMinWidth(320);
+    panel.setMaxWidth(400);
     panel.setPadding(new Insets(40, 24, 40, 24));
 
     Label panelTitle = new Label("Buy Stock");
@@ -134,8 +134,9 @@ public class TradingView extends VBox {
             buildSpacer(4),
             buyButton
     );
-    return panel;
 
+    VBox.setVgrow(costCard, Priority.NEVER);
+    return panel;
   }
 
   private VBox buildSelectedStockInfo() {

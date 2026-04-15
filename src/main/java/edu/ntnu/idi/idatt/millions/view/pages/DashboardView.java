@@ -107,4 +107,37 @@ public class DashboardView extends VBox {
     section.setPadding(new Insets(24));
     return section;
   }
+
+  public void setPortfolioValue(String value) {
+    portfolioValueLabel.setText(value);
+  }
+
+  public void setPortfolioChange(String change, boolean isPositive) {
+    portfolioChangeLabel.setText("↗ " + change);
+    portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
+    if (!isPositive) {
+      portfolioChangeLabel.getStyleClass().add("banner-change-negative");
+    }
+  }
+
+  public void setTotalAssets(String value) {
+    totalAssetsLabel.setText(value);
+  }
+
+  public void setCostBasis(String value) {
+    costBasisLabel.setText(value);
+  }
+
+  public void setTotalProfit(String value, boolean isPositive) {
+    totalProfitLabel.setText(value);
+    totalProfitLabel.getStyleClass().removeAll("stat-card-value-loss");
+    if (!isPositive) {
+      totalProfitLabel.getStyleClass().add("stat-card-value-loss");
+    }
+  }
+
+  public void clearMovers() {
+    moversContainer.getChildren().clear();
+  }
+
 }

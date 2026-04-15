@@ -21,6 +21,12 @@ public class DashboardView extends VBox {
     setSpacing(24);
     setPadding(new Insets(40));
 
+    getChildren().addAll(
+            buildHeader(),
+            buildPortfolioBanner(),
+            buildStatsRow(),
+            buildMoversSection()
+    );
   }
 
   public VBox buildHeader() {
@@ -56,5 +62,49 @@ public class DashboardView extends VBox {
     return wrapper;
   }
 
+  private HBox buildStatsRow() {
+    HBox row = new HBox(16);
+    row.setMaxWidth(Double.MAX_VALUE);
 
+    VBox totalAssets = buildStatsCard("Total Assets", "4", false);
+    VBox costBasis = buildStatsCard("Cost Basis", "$0.00", false);
+    VBox profitLoss = buildStatsCard("Total Profit/Loss", "$+0.00", true);
+
+    totalAssetsLabel = (Label) totalAssets.getChildren().get(1);
+    costBasisLabel = (Label) costBasis.getChildren().get(1);
+    totalProfitLabel = (Label) totalAssets.getChildren().get(1);
+
+    HBox.setHgrow(totalAssets, Priority.ALWAYS);
+    HBox.setHgrow(costBasis, Priority.ALWAYS);
+    HBox.setHgrow(profitLoss, Priority.ALWAYS);
+
+    row.getChildren().addAll(totalAssets, costBasis, profitLoss);
+    return row;
+  }
+
+  private VBox buildStatsCard(String title, String value, boolean isProfit) {
+    Label titleLabel = new Label(title);
+    titleLabel.getStyleClass().add("stats-card-title");
+
+    Label valueLabel = new Label(value);
+    valueLabel.getStyleClass().add(isProfit ? "stats-card-value-profit" : "stats-card-value");
+
+    VBox card = new VBox(12, titleLabel, valueLabel);
+    card.getStyleClass().add("stats-card");
+    card.setPadding(new Insets(24));
+    card.setMaxWidth(Double.MAX_VALUE);
+    return card;
+  }
+
+  private VBox buildMoversSection() {
+    Label heading = new Label("Biggest Movers This Week");
+    heading.getStyleClass().add("section-heading");
+
+    moversContainer = new VBox(8);
+
+    VBox section = new VBox(16, heading, moversContainer);
+    section.getStyleClass().add("stat-card");
+    section.setPadding(new Insets(24));
+    return section;
+  }
 }

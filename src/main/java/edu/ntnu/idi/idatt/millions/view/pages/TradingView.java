@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -13,6 +14,7 @@ public class TradingView extends BorderPane {
 
   private TextField searchField;
   private VBox stockListContainer;
+  private StockChartComponent stockChart;
   private Label buySymbolLabel;
   private Label buyCompanyLabel;
   private Label buyPriceLabel;
@@ -31,13 +33,30 @@ public class TradingView extends BorderPane {
   public TradingView() {
     getStyleClass().add("dashboard-view");
 
-    setCenter(buildStockListPanel());
+    setCenter(buildCenterPanel());
     setRight(buildBuyPanel());
   }
 
+  private VBox buildCenterPanel() {
+    VBox center = new VBox(5);
+    center.setPadding(new Insets(24));
+    center.setMaxWidth(Double.MAX_VALUE);
+    VBox.setVgrow(center, Priority.ALWAYS);
+
+    stockChart = new StockChartComponent("–", "No stock selected");
+    stockChart.setChartHeight(250);
+    stockChart.setPrefHeight(300);
+
+    VBox stockPanel = buildStockListPanel();
+    VBox.setVgrow(stockPanel, Priority.ALWAYS);
+
+    center.getChildren().addAll(stockChart, buildDivider(), stockPanel);
+    return center;
+  }
+
   private VBox buildStockListPanel() {
-    VBox panel = new VBox(16);
-    panel.setPadding(new Insets(24));
+    VBox panel = new VBox(8);
+    panel.setPadding(new Insets(0,24,24,24));
     panel.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(panel, Priority.ALWAYS);
 
@@ -68,7 +87,7 @@ public class TradingView extends BorderPane {
     tableCard.setPadding(new Insets(24));
     VBox.setVgrow(tableCard, Priority.ALWAYS);
 
-    panel.getChildren().addAll(scroll, searchField, tableCard);
+    panel.getChildren().addAll(header, searchField, tableCard);
     VBox.setVgrow(panel, Priority.ALWAYS);
     return panel;
   }
@@ -258,6 +277,8 @@ public class TradingView extends BorderPane {
     buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     buyHighLabel.setText("H: " + high);
     buyLowLabel.setText("L: " + low);
+
+    stockChart.setStockInfo(symbol, company);
     buyButton.setDisable(false);
   }
 

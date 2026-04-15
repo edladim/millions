@@ -118,6 +118,11 @@ public class TradingView extends BorderPane {
     Label panelTitle = new Label("Buy Stock");
     panelTitle.getStyleClass().add("section-heading");
 
+    TextField buySearchField = new TextField();
+    buySearchField.setPromptText("Search stocks...");
+    buySearchField.getStyleClass().add("search-field");
+    buySearchField.setMaxWidth(Double.MAX_VALUE);
+
     VBox stockInfoCard = buildSelectedStockInfo();
 
     Label qtyLabel = new Label("Quantity");
@@ -139,13 +144,9 @@ public class TradingView extends BorderPane {
       }
     });
 
-    Label noneSelected = new Label("Select a stock from the list to start trading");
-    noneSelected.getStyleClass().add("empty-label");
-    noneSelected.setWrapText(true);
-
     panel.getChildren().addAll(
             panelTitle,
-            noneSelected,
+            buySearchField,
             stockInfoCard,
             buildSpacer(4),
             qtyLabel,

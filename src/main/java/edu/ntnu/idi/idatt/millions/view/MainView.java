@@ -49,7 +49,7 @@ public class MainView {
   }
 
   public Scene createScene() {
-    Scene scene = new Scene(root, 1280, 800);
+    Scene scene = new Scene(root);
     scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
     scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
     return scene;

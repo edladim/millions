@@ -79,7 +79,7 @@ public class SidebarComponent extends VBox {
     VBox.setVgrow(bottom, Priority.ALWAYS);
     bottom.setAlignment(Pos.BOTTOM_CENTER);
 
-    Button advanceBtn = new Button("Advance Week, ");
+    Button advanceBtn = new Button("Advance Week");
     advanceBtn.getStyleClass().add("advance-btn");
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
     advanceBtn.setOnAction(e -> {

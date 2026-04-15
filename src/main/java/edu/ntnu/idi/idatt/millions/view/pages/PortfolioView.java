@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -18,6 +19,7 @@ public class PortfolioView extends VBox {
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
+  private StockChartComponent portfolioChart;
 
   public PortfolioView() {
     getStyleClass().add("dashboard-view");
@@ -25,10 +27,18 @@ public class PortfolioView extends VBox {
     setPadding(new Insets(40));
 
     getChildren().addAll(
+            buildPortfolioChart(),
             buildHeader(),
             buildSummaryRow(),
             buildHoldingsSection()
     );
+  }
+
+  private StockChartComponent buildPortfolioChart() {
+    portfolioChart = new StockChartComponent("–", "No stock selected");
+    portfolioChart.setChartHeight(200);
+    portfolioChart.setPrefHeight(250);
+    return portfolioChart;
   }
 
   private VBox buildHeader() {

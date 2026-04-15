@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════════════════
+   dashboard.css  –  Millions · Dashboard page styles
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ────────────────────────────────────── */
+.dashboard-view {
+    -fx-background-color: #f1f5f9;
+}
+
+/* ── Header ──────────────────────────────────────────── */
+.page-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
+}
+
+/* ── Portfolio banner ────────────────────────────────── */
+.portfolio-banner {
+    -fx-background-color: linear-gradient(to right, #6366f1, #818cf8);
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.35), 20, 0, 0, 6);
+}
+
+.banner-heading {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255, 255, 255, 0.85);
+    -fx-font-weight: normal;
+}
+
+.banner-value {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.banner-change {
+    -fx-font-size: 15px;
+    -fx-text-fill: rgba(255, 255, 255, 0.90);
+}
+
+.banner-change-negative {
+    -fx-text-fill: #fca5a5;
+}
+
+/* ── Stat cards ──────────────────────────────────────── */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);
+}
+
+.stat-card-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: normal;
+}
+
+.stat-card-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.stat-card-value-profit {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #16a34a;
+}
+
+.stat-card-value-loss {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #dc2626;
+}
+
+/* ── Section heading ─────────────────────────────────── */
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+/* ── Mover rows ──────────────────────────────────────── */
+.mover-row {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+}
+
+.mover-row:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-cursor: hand;
+}
+
+.mover-rank {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-weight: bold;
+}
+
+.mover-icon-letter {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.mover-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.mover-symbol {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+}
+
+.mover-price {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.mover-change-positive {
+    -fx-font-size: 12px;
+    -fx-text-fill: #16a34a;
+    -fx-font-weight: bold;
+}
+
+.mover-change-negative {
+    -fx-font-size: 12px;
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+}

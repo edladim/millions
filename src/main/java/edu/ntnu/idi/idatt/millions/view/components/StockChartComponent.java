@@ -20,8 +20,8 @@ public class StockChartComponent extends VBox {
 
   public StockChartComponent(String symbol, String company) {
     getStyleClass().add("stat-card");
-    setPadding(new Insets(20));
-    setSpacing(12);
+    setPadding(new Insets(5,20,5,20));
+    setSpacing(5);
 
     titleLabel = new Label(symbol);
     titleLabel.getStyleClass().add("chart-title");

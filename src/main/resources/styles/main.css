@@ -396,3 +396,154 @@
     -fx-text-fill: -text-muted;
     -fx-cursor: default;
 }
+
+ /* Stock chart components */
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.chart-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+}
+
+.chart-axis {
+    -fx-tick-label-fill: -text-muted;
+    -fx-font-size: 11px;
+}
+
+.stock-line-chart {
+    -fx-background-color: transparent;
+    -fx-plot-background-color: transparent;
+    -fx-horizontal-grid-lines-visible: true;
+    -fx-vertical-grid-lines-visible: false;
+    -fx-horizontal-zero-line-visible: false;
+}
+
+.stock-line-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.stock-line-chart .axis {
+    -fx-tick-label-fill: #64748b;
+}
+
+/* Green line when trend is up */
+.stock-line-chart.chart-positive .chart-series-line {
+    -fx-stroke: #16a34a;
+    -fx-stroke-width: 2.5px;
+}
+
+/* Red line when trend is down */
+.stock-line-chart.chart-negative .chart-series-line {
+    -fx-stroke: #dc2626;
+    -fx-stroke-width: 2.5px;
+}
+
+.stock-line-chart .chart-legend {
+    -fx-background-color: transparent;
+}
+
+/* TRANSACTION RECEIPT COMPONENT */
+
+.receipt-root {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 40, 0, 0, 8);
+}
+
+/* Banner */
+.receipt-banner-buy {
+    -fx-background-color: linear-gradient(to bottom right, #6366f1, #818cf8);
+    -fx-background-radius: 16 16 0 0;
+}
+
+.receipt-banner-sell {
+    -fx-background-color: linear-gradient(to bottom right, #16a34a, #4ade80);
+    -fx-background-radius: 16 16 0 0;
+}
+
+.receipt-icon-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.receipt-type-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.receipt-stock-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+/* Body */
+.receipt-body {
+    -fx-background-color: white;
+}
+
+.receipt-row {
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 1;
+}
+
+.receipt-row-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+.receipt-row-value {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.receipt-row-value-highlight {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary;
+}
+
+.receipt-total-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.receipt-total-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.receipt-total-value-green {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -green;
+}
+
+/* Footer */
+.receipt-footer {
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 16 16;
+}
+
+.receipt-close-btn {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 13 0 13 0;
+}
+
+.receipt-close-btn:hover {
+    -fx-background-color: -primary-light;
+}

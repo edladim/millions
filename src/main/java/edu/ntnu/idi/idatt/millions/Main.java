@@ -13,6 +13,7 @@ public class Main extends Application {
 
     primaryStage.setTitle("Millions");
     primaryStage.setScene(mainView.createScene());
+    primaryStage.setMaximized(true);
     primaryStage.show();
   }
   static void main() {

@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="error">
+<Configuration status="WARN">
     <Appenders>
-        <File name="file" fileName="logs/app.log" append="true">
+        <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout>
-                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+                <Pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+        </Console>
+        <File name="File" fileName="logs/app.log" append="true">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</Pattern>
             </PatternLayout>
         </File>
     </Appenders>
     <Loggers>
         <Logger name="edu.ntnu.idi.idatt.millions" level="info" additivity="false">
-            <AppenderRef ref="file"/>
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="File"/>
         </Logger>
-        <Root level="error">
-            <AppenderRef ref="file"/>
+        <Root level="warn">
+            <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
 </Configuration>

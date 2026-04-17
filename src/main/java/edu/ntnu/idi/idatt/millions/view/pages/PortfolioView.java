@@ -1,5 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.model.Player;
+import edu.ntnu.idi.idatt.millions.model.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -125,6 +128,32 @@ public class PortfolioView extends VBox {
     header.getChildren().addAll(stock, quantity, buyPrice, current, value, gainLoss, actions);
     return header;
   }
+
+  public void refreshPortfolioData(Player player) {
+    Portfolio portfolio = player.getPortfolio();
+
+    netWorthLabel.setText("$" + player.getNetWorth().toPlainString());
+    cashBalanceLabel.setText("$" + player.getMoney().toPlainString());
+    portfolioValueLabel.setText("$" + portfolio.getTotalValue().toPlainString());
+    statusLabel.setText(player.getStatus().name());
+
+    holdingsContainer.getChildren().clear();
+
+    if (portfolio.getShares().isEmpty()) {
+      holdingsContainer.getChildren().add(emptyLabel);
+      return;
+    }
+
+    for (Share share : portfolio.getShares()) {
+      Label row = new Label(
+              share.getStock().getSymbol() + " x " + share.getQuantity()
+      );
+      row.getStyleClass().add("holding-row");
+      holdingsContainer.getChildren().add(row);
+    }
+  }
+
+  // --- helpers ---
 
   private Label makeHeaderCell(String text, double width) {
     Label l = new Label(text);

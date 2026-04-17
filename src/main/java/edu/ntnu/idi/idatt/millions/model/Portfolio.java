@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleCalculator;
+import edu.ntnu.idi.idatt.millions.observer.Observer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.Objects;
  */
 public final class Portfolio {
 
+  private final List<Observer> observers = new ArrayList<>();
   private final List<Share> shares = new ArrayList<>();
 
   /**
@@ -55,6 +57,7 @@ public final class Portfolio {
   public void addShare(Share share) {
     Objects.requireNonNull(share, "Share cannot be null");
     shares.add(share);
+    notifyObservers();
   }
 
   /**
@@ -67,7 +70,11 @@ public final class Portfolio {
    */
   public boolean removeShare(Share share) {
     Objects.requireNonNull(share, "Share cannot be null");
-    return shares.remove(share);
+    boolean removed = shares.remove(share);
+    if (removed) {
+      notifyObservers();
+    }
+    return removed;
   }
 
   /**
@@ -188,6 +195,19 @@ public final class Portfolio {
             .map(SaleCalculator::new)
             .map(SaleCalculator::calculateTotal)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  public void addObserver(Observer observer) {
+    Objects.requireNonNull(observer, "Observer cannot be null");
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
+  }
+
+  private void notifyObservers() {
+    for (Observer observer : observers) {
+      observer.updatePortfolio();
+    }
   }
 
 }

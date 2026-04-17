@@ -4,7 +4,7 @@ import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.Portfolio;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 
-public class PortfolioObserverA implements PortfolioObserver {
+public class PortfolioObserverA implements Observer {
 
   public final Portfolio portfolio;
   private final PortfolioView view;

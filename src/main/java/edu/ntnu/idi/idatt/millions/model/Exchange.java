@@ -1,8 +1,9 @@
 package edu.ntnu.idi.idatt.millions.model;
 
-import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
-import edu.ntnu.idi.idatt.millions.model.transaction.Sale;
+import edu.ntnu.idi.idatt.millions.model.transaction.PurchaseFactory;
+import edu.ntnu.idi.idatt.millions.model.transaction.SaleFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -23,6 +24,8 @@ public final class Exchange {
   private int week;
   private final Map<String, Stock> stockMap;
   private final Random random;
+  private final TransactionFactory purchaseFactory = new PurchaseFactory();
+  private final TransactionFactory saleFactory = new SaleFactory();
 
   /**
    * Creates a new exchange.
@@ -201,10 +204,7 @@ public final class Exchange {
 
     Stock stock = getStock(symbol);
     Share share = new Share(stock, quantity, stock.getSalesPrice());
-
-    Purchase purchase = new Purchase(share, week);
-    purchase.commit(player);
-    return purchase;
+    return purchaseFactory.createAndCommit(share, week, player);
   }
 
   /**
@@ -220,9 +220,7 @@ public final class Exchange {
     Objects.requireNonNull(share, "Share cannot be null");
     Objects.requireNonNull(player, "Player cannot be null");
 
-    Sale sale = new Sale(share, week);
-    sale.commit(player);
-    return sale;
+    return saleFactory.createAndCommit(share, week, player);
   }
 
   /**

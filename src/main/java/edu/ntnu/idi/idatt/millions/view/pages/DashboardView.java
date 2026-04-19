@@ -72,7 +72,7 @@ public class DashboardView extends VBox {
 
     totalAssetsLabel = (Label) totalAssets.getChildren().get(1);
     costBasisLabel = (Label) costBasis.getChildren().get(1);
-    totalProfitLabel = (Label) totalAssets.getChildren().get(1);
+    totalProfitLabel = (Label) profitLoss.getChildren().get(1);
 
     HBox.setHgrow(totalAssets, Priority.ALWAYS);
     HBox.setHgrow(costBasis, Priority.ALWAYS);

@@ -47,6 +47,25 @@ public class Main extends Application {
     PortfolioObserverA observer = new PortfolioObserverA(player.getPortfolio(), portfolioView, player);
     player.getPortfolio().addObserver(observer);
 
+    TradingView tradingView = (TradingView) mainView.getTradingView();
+
+    tradingView.clearStocks();
+    for (Stock stock : exchange.getStocks()) {
+      String symbol = stock.getSymbol();
+      String company = stock.getCompany();
+
+      String price = "$" + stock.getSalesPrice().toPlainString();
+      String change = stock.getLatestPriceChange().toPlainString();
+
+      String high = "$" + stock.getHighestPrice().toPlainString();
+      String low  = "$" + stock.getLowestPrice().toPlainString();
+
+      boolean isPositive = stock.getLatestPriceChange()
+              .compareTo(BigDecimal.ZERO) >= 0;
+
+      tradingView.addStockRow(symbol, company, price, change, high, low, isPositive);
+    }
+
     Stock apple = new Stock("AAPL", "Apple Inc.", new BigDecimal("150.00"));
     Share share = new Share(apple, new BigDecimal("2"), new BigDecimal("150.00"));
     player.getPortfolio().addShare(share);

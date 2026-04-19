@@ -4,7 +4,7 @@ import edu.ntnu.idi.idatt.millions.model.transaction.PurchaseFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
-
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -20,6 +20,7 @@ import java.util.*;
  */
 public final class Exchange {
 
+  private final List<ExchangeObserver> observers = new ArrayList<>();
   private final String name;
   private int week;
   private final Map<String, Stock> stockMap;
@@ -224,10 +225,23 @@ public final class Exchange {
   }
 
   /**
+   * Registers an {@link ExchangeObserver} to be notified when the exchange advances.
+   *
+   * @param observer the observer to add, cannot be null
+   * @throws NullPointerException if {@code observer} is null
+   */
+  public void addObserver(ExchangeObserver observer) {
+    Objects.requireNonNull(observer, "Observer cannot be null");
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
+  }
+
+  /**
    * Advances the exchange to the next trading week.
    *
-   * <p>This increments the week number and updates stock prices.
-   * Prices change randomly but remain positive.</p>
+   * <p>This increments the week number, updates stock prices randomly,
+   * and notifies all registered {@link ExchangeObserver}s.</p>
    */
   public void advance() {
     week++;
@@ -243,6 +257,10 @@ public final class Exchange {
       }
 
       stock.addNewSalesPrice(newPrice);
+    }
+
+    for (ExchangeObserver observer : observers) {
+      observer.onExchangeUpdated(this);
     }
   }
 

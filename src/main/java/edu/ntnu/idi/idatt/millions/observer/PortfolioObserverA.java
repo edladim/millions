@@ -1,3 +1,4 @@
+/*
 package edu.ntnu.idi.idatt.millions.observer;
 
 import edu.ntnu.idi.idatt.millions.model.Player;
@@ -21,3 +22,4 @@ public class PortfolioObserverA implements Observer {
     view.refreshPortfolioData(player);
   }
 }
+*/

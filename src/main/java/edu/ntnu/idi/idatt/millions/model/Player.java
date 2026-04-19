@@ -1,8 +1,10 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
-
+import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -19,6 +21,7 @@ public final class Player {
   private static final BigDecimal INVESTOR_GROWTH_REQUIREMENT = new BigDecimal("0.20");
   private static final BigDecimal SPECULATOR_GROWTH_REQUIREMENT = BigDecimal.ONE;
 
+  private final List<PlayerObserver> observers = new ArrayList<>();
   private final String name;
   private final BigDecimal startingMoney;
   private BigDecimal money;
@@ -74,6 +77,7 @@ public final class Player {
   public void addMoney(BigDecimal amount) {
     amount = validateAmount(amount);
     money = money.add(amount);
+    notifyObservers();
   }
 
   /**
@@ -91,6 +95,7 @@ public final class Player {
       throw new IllegalStateException("Insufficient funds");
     }
     money = money.subtract(amount);
+    notifyObservers();
   }
 
   /**
@@ -194,6 +199,25 @@ public final class Player {
     }
 
     return PlayerStatus.NOVICE;
+  }
+
+  /**
+   * Registers a {@link PlayerObserver} to be notified when the player's state changes.
+   *
+   * @param observer the observer to add, cannot be null
+   * @throws NullPointerException if {@code observer} is null
+   */
+  public void addObserver(PlayerObserver observer) {
+    Objects.requireNonNull(observer, "Observer cannot be null");
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
+  }
+
+  private void notifyObservers() {
+    for (PlayerObserver observer : observers) {
+      observer.onPlayerUpdated(this);
+    }
   }
 
   private static String validateName(String name) {

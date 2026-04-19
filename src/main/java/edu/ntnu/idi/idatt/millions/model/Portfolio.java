@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleCalculator;
-import edu.ntnu.idi.idatt.millions.observer.Observer;
+import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.Objects;
  */
 public final class Portfolio {
 
-  private final List<Observer> observers = new ArrayList<>();
+  private final List<PortfolioObserver> observers = new ArrayList<>();
   private final List<Share> shares = new ArrayList<>();
 
   /**
@@ -197,7 +197,13 @@ public final class Portfolio {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
-  public void addObserver(Observer observer) {
+  /**
+   * Registers a {@link PortfolioObserver} to be notified on portfolio changes.
+   *
+   * @param observer the observer to add, cannot be null
+   * @throws NullPointerException if {@code observer} is null
+   */
+  public void addObserver(PortfolioObserver observer) {
     Objects.requireNonNull(observer, "Observer cannot be null");
     if (!observers.contains(observer)) {
       observers.add(observer);
@@ -205,8 +211,8 @@ public final class Portfolio {
   }
 
   private void notifyObservers() {
-    for (Observer observer : observers) {
-      observer.updatePortfolio();
+    for (PortfolioObserver observer : observers) {
+      observer.onPortfolioUpdated(this);
     }
   }
 

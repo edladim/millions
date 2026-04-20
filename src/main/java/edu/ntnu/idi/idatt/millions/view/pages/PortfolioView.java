@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.millions.model.Portfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
+import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -199,9 +200,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   public void refreshPortfolioData(Player player) {
     Portfolio portfolio = player.getPortfolio();
 
-    netWorthLabel.setText("$" + player.getNetWorth().toPlainString());
-    cashBalanceLabel.setText("$" + player.getMoney().toPlainString());
-    portfolioValueLabel.setText("$" + portfolio.getTotalValue().toPlainString());
+    netWorthLabel.setText(ViewFormatter.price(player.getNetWorth()));
+    cashBalanceLabel.setText(ViewFormatter.price(player.getMoney()));
+    portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
     statusLabel.setText(player.getStatus().name());
 
     holdingsContainer.getChildren().clear();

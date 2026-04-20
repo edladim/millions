@@ -7,8 +7,8 @@ import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
+import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -252,19 +252,14 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     BigDecimal profit = player.getProfit();
     boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 
-    setPortfolioValue("$" + portfolio.getTotalValue().setScale(2, RoundingMode.HALF_UP).toPlainString());
+    setPortfolioValue(ViewFormatter.price(portfolio.getTotalValue()));
     setTotalAssets(String.valueOf(portfolio.size()));
-    setCostBasis("$" + portfolio.getTotalInvestment().setScale(2, RoundingMode.HALF_UP).toPlainString());
-    setTotalProfit(
-        (isPositive ? "$+" : "$") + profit.setScale(2, RoundingMode.HALF_UP).toPlainString(),
-        isPositive
-    );
+    setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
+    setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
 
-    BigDecimal rate = player.getReturnRate()
-        .multiply(new BigDecimal("100"))
-        .setScale(2, RoundingMode.HALF_UP);
-    String changeStr = (isPositive ? "+" : "") + rate.toPlainString() + "%"
-        + "  ($" + (isPositive ? "+" : "") + profit.setScale(2, RoundingMode.HALF_UP).toPlainString() + ")";
+    BigDecimal rate = player.getReturnRate().multiply(new BigDecimal("100"));
+    String changeStr = ViewFormatter.percent(rate)
+        + "  (" + ViewFormatter.signedPrice(profit) + ")";
     setPortfolioChange(changeStr, isPositive);
   }
 
@@ -286,9 +281,9 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
 
     BigDecimal change = stock.getLatestPriceChange();
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
-    Label priceLabel = new Label("$" + stock.getSalesPrice().setScale(2, RoundingMode.HALF_UP).toPlainString());
+    Label priceLabel = new Label(ViewFormatter.price(stock.getSalesPrice()));
     priceLabel.getStyleClass().add("mover-price");
-    Label changeLabel = new Label((isPositive ? "↗ +" : "↘ ") + change.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%");
+    Label changeLabel = new Label(ViewFormatter.changeArrow(change));
     changeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     VBox priceBox = new VBox(2, priceLabel, changeLabel);
     priceBox.setAlignment(Pos.CENTER_RIGHT);

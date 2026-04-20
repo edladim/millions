@@ -16,7 +16,7 @@ public class Main extends Application {
     primaryStage.setMaximized(true);
     primaryStage.show();
   }
-  static void main() {
+  public static void main(String[] args) {
     launch();
   }
 }

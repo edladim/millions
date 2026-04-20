@@ -1,8 +1,5 @@
-package edu.ntnu.idi.idatt.millions.fileHandler;
+package edu.ntnu.idi.idatt.millions.filehandler;
 
-import edu.ntnu.idi.idatt.millions.filehandler.StockFileException;
-import edu.ntnu.idi.idatt.millions.filehandler.StockReader;
-import edu.ntnu.idi.idatt.millions.filehandler.CsvStockWriter;
 import edu.ntnu.idi.idatt.millions.model.Stock;
 import java.io.BufferedReader;
 import java.io.IOException;

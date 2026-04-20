@@ -1,5 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.components;
 
+import edu.ntnu.idi.idatt.millions.model.Exchange;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.Page;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,7 +27,7 @@ import java.util.function.Consumer;
  * provides a method for updating the visible week label.
  * </p>
  */
-public class SidebarComponent extends VBox {
+public class SidebarComponent extends VBox implements ExchangeObserver {
 
   private Button dashboardBtn;
   private Button portfolioBtn;
@@ -208,5 +211,10 @@ public class SidebarComponent extends VBox {
    */
   public void setOnNavigate(Consumer<Page> handler) {
     this.onNavigate = handler;
+  }
+
+  @Override
+  public void onExchangeUpdated(Exchange exchange) {
+    setWeek(exchange.getWeek());
   }
 }

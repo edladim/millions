@@ -1,6 +1,11 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.model.Exchange;
+import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -20,7 +25,7 @@ import java.util.function.BiConsumer;
  * setting order cost previews.
  * </p>
  */
-public class TradingView extends BorderPane {
+public class TradingView extends BorderPane implements ExchangeObserver {
 
   private TextField searchField;
   private VBox stockListContainer;
@@ -406,6 +411,25 @@ public class TradingView extends BorderPane {
    */
   public void setOnBuy(BiConsumer<String, String> handler) {
     this.onBuy = handler;
+  }
+
+  @Override
+  public void onExchangeUpdated(Exchange exchange) {
+    clearStocks();
+    for (Stock stock : exchange.getStocks()) {
+      BigDecimal price = stock.getSalesPrice();
+      BigDecimal change = stock.getLatestPriceChange();
+      boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
+      addStockRow(
+          stock.getSymbol(),
+          stock.getCompany(),
+          "$" + price.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+          (isPositive ? "+" : "") + change.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+          "$" + stock.getHighestPrice().setScale(2, RoundingMode.HALF_UP).toPlainString(),
+          "$" + stock.getLowestPrice().setScale(2, RoundingMode.HALF_UP).toPlainString(),
+          isPositive
+      );
+    }
   }
 
   /**

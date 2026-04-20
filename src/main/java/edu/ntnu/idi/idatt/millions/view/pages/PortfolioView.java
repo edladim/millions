@@ -3,6 +3,8 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.Portfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
+import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,7 +14,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import javax.swing.text.Position;
+
 
 /**
  * <p>
@@ -24,7 +26,8 @@ import javax.swing.text.Position;
  * {@link edu.ntnu.idi.idatt.millions.model.Player} state.
  * </p>
  */
-public class PortfolioView extends VBox {
+public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
+  private Player player;
 
   private Label netWorthLabel;
   private Label cashBalanceLabel;
@@ -173,6 +176,19 @@ public class PortfolioView extends VBox {
 
     header.getChildren().addAll(stock, quantity, buyPrice, current, value, gainLoss, actions);
     return header;
+  }
+
+  @Override
+  public void onPortfolioUpdated(Portfolio portfolio) {
+    if (player != null) {
+      refreshPortfolioData(player);
+    }
+  }
+
+  @Override
+  public void onPlayerUpdated(Player player) {
+    this.player = player;
+    refreshPortfolioData(player);
   }
 
   /**

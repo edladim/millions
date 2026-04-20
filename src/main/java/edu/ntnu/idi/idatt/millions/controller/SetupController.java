@@ -2,6 +2,7 @@ package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -17,12 +18,15 @@ public class SetupController {
     this.primaryStage = primaryStage;
     this.screen = new StartupScreen();
 
+    screen.setOnBrowse(this::handleBrowse);
   }
 
   public void show() {
     Scene scene = new Scene(screen, 520, 660);
     scene.getStylesheets().add(
             getClass().getResource("/styles/main.css").toExternalForm()
+
+
     );
 
     primaryStage.setScene(scene);
@@ -32,6 +36,20 @@ public class SetupController {
     primaryStage.setResizable(false);
     primaryStage.centerOnScreen();
     primaryStage.show();
+  }
+
+  public void handleBrowse() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Select Stock Data File");
+    fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("CSV Files", "*.csv")
+    );
+
+    File file = fileChooser.showOpenDialog(primaryStage);
+    if (file != null) {
+      selectedFile = file;
+      screen.setFileName(file.getName());
+    }
   }
 
 

@@ -19,6 +19,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+/**
+ * <p>
+ * Dashboard page view that renders portfolio summary, statistics, and movers.
+ * </p>
+ *
+ * <p>
+ * The view exposes setters for updating the displayed values and a method for
+ * clearing the movers list.
+ * </p>
+ */
 public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
 
   private Player player;
@@ -30,6 +40,9 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label totalProfitLabel;
   private VBox moversContainer;
 
+  /**
+   * <p>Constructs the dashboard view and builds its initial layout.</p>
+   */
   public DashboardView() {
     getStyleClass().add("dashboard-view");
     setSpacing(24);
@@ -43,6 +56,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     );
   }
 
+  /**
+   * <p>Builds the header section containing title and subtitle.</p>
+   *
+   * @return the header container
+   */
   public VBox buildHeader() {
     Label title = new Label("DashBoard");
     title.getStyleClass().add("page-title");
@@ -54,6 +72,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     return header;
   }
 
+  /**
+   * <p>Builds the banner showing the portfolio value and change.</p>
+   *
+   * @return the banner wrapper
+   */
   public StackPane buildPortfolioBanner() {
     VBox content = new VBox(8);
     content.setPadding(new Insets(32));
@@ -76,6 +99,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     return wrapper;
   }
 
+  /**
+   * <p>Builds the row of statistics cards.</p>
+   *
+   * @return the stats row container
+   */
   private HBox buildStatsRow() {
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
@@ -96,6 +124,14 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     return row;
   }
 
+  /**
+   * <p>Builds a single statistics card.</p>
+   *
+   * @param title   the card title
+   * @param value   the card value text
+   * @param isProfit whether the value represents profit styling
+   * @return the stats card container
+   */
   private VBox buildStatsCard(String title, String value, boolean isProfit) {
     Label titleLabel = new Label(title);
     titleLabel.getStyleClass().add("stats-card-title");
@@ -110,6 +146,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     return card;
   }
 
+  /**
+   * <p>Builds the movers section container.</p>
+   *
+   * @return the movers section container
+   */
   private VBox buildMoversSection() {
     Label heading = new Label("Biggest Movers This Week");
     heading.getStyleClass().add("section-heading");
@@ -122,10 +163,21 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     return section;
   }
 
+  /**
+   * <p>Updates the displayed portfolio value.</p>
+   *
+   * @param value the formatted portfolio value
+   */
   public void setPortfolioValue(String value) {
     portfolioValueLabel.setText(value);
   }
 
+  /**
+   * <p>Updates the displayed portfolio change value and styling.</p>
+   *
+   * @param change     the formatted change text
+   * @param isPositive whether the change is positive
+   */
   public void setPortfolioChange(String change, boolean isPositive) {
     portfolioChangeLabel.setText("↗ " + change);
     portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
@@ -134,14 +186,30 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     }
   }
 
+  /**
+   * <p>Updates the displayed total assets value.</p>
+   *
+   * @param value the formatted assets value
+   */
   public void setTotalAssets(String value) {
     totalAssetsLabel.setText(value);
   }
 
+  /**
+   * <p>Updates the displayed cost basis value.</p>
+   *
+   * @param value the formatted cost basis value
+   */
   public void setCostBasis(String value) {
     costBasisLabel.setText(value);
   }
 
+  /**
+   * <p>Updates the displayed total profit value and styling.</p>
+   *
+   * @param value      the formatted profit/loss value
+   * @param isPositive whether the value is positive
+   */
   public void setTotalProfit(String value, boolean isPositive) {
     totalProfitLabel.setText(value);
     totalProfitLabel.getStyleClass().removeAll("stat-card-value-loss");
@@ -150,6 +218,9 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     }
   }
 
+  /**
+   * <p>Clears all items from the movers list.</p>
+   */
   public void clearMovers() {
     moversContainer.getChildren().clear();
   }

@@ -15,6 +15,16 @@ import javafx.scene.shape.Circle;
 
 import java.util.function.BiConsumer;
 
+/**
+ * <p>
+ * Trading page view that renders stock listings, a chart preview, and a buy panel.
+ * </p>
+ *
+ * <p>
+ * The view exposes methods for adding rows, updating the selected stock, and
+ * setting order cost previews.
+ * </p>
+ */
 public class TradingView extends BorderPane implements ExchangeObserver {
 
   private TextField searchField;
@@ -35,6 +45,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private String selectedSymbol = null;
   private BiConsumer<String, String> onBuy;
 
+  /**
+   * <p>Constructs the trading view and builds its initial layout.</p>
+   */
   public TradingView() {
     getStyleClass().add("dashboard-view");
 
@@ -42,6 +55,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     setRight(buildBuyPanel());
   }
 
+  /**
+   * <p>Builds the center panel containing the chart and stock list.</p>
+   *
+   * @return the center panel container
+   */
   private VBox buildCenterPanel() {
     VBox center = new VBox(5);
     center.setPadding(new Insets(24));
@@ -59,6 +77,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return center;
   }
 
+  /**
+   * <p>Builds the stock list panel with header, search, and table.</p>
+   *
+   * @return the stock list panel container
+   */
   private VBox buildStockListPanel() {
     VBox panel = new VBox(8);
     panel.setPadding(new Insets(0,24,24,24));
@@ -97,6 +120,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return panel;
   }
 
+  /**
+   * <p>Builds the header row for the stock table.</p>
+   *
+   * @return the table header container
+   */
   private HBox buildStockTableHeader() {
     HBox header = new HBox();
     header.setPadding(new Insets(0, 0, 8, 0));
@@ -112,6 +140,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return header;
   }
 
+  /**
+   * <p>Builds the buy panel containing stock info, quantity input, and summary.</p>
+   *
+   * @return the buy panel container
+   */
   private VBox buildBuyPanel() {
     VBox panel = new VBox(20);
     panel.getStyleClass().add("buy-panel");
@@ -165,6 +198,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return panel;
   }
 
+  /**
+   * <p>Builds the card that shows the selected stock information.</p>
+   *
+   * @return the stock info card container
+   */
   private VBox buildSelectedStockInfo() {
     buySymbolLabel  = new Label("–");
     buySymbolLabel.getStyleClass().add("buy-stock-symbol");
@@ -190,6 +228,13 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return card;
   }
 
+  /**
+   * <p>Creates a table header cell label with a fixed width.</p>
+   *
+   * @param text  the header text
+   * @param width the fixed width in pixels
+   * @return the header label
+   */
   private Label makeHeaderCell(String text, double width) {
     Label l = new Label(text);
     l.getStyleClass().add("table-header-cell");
@@ -198,6 +243,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return l;
   }
 
+  /**
+   * <p>Builds the order summary cost card.</p>
+   *
+   * @return the cost card container
+   */
   private VBox buildCostCard() {
     Label title = new Label("Order Summary");
     title.getStyleClass().add("stat-card-title");
@@ -219,6 +269,13 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return card;
   }
 
+  /**
+   * <p>Creates a cost row label with text and value.</p>
+   *
+   * @param labelText the label text
+   * @param value     the value text
+   * @return the cost row label
+   */
   private Label makeCostRow(String labelText, String value) {
     // We return a container disguised as a label – use HBox instead
     Label lbl = new Label(labelText + ":   " + value);
@@ -227,10 +284,24 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return lbl;
   }
 
+  /**
+   * <p>Triggers a refresh of the cost preview based on current input.</p>
+   */
   private void updateCostPreview() {
     // Controller should observe quantityField and push updates via setCostPreview()
   }
 
+  /**
+   * <p>Adds a stock row to the stock list panel.</p>
+   *
+   * @param symbol     the stock symbol
+   * @param company    the company name
+   * @param price      the current price text
+   * @param change     the change text
+   * @param high       the day high text
+   * @param low        the day low text
+   * @param isPositive whether the change is positive
+   */
   public void addStockRow(String symbol, String company, String price,
                           String change, String high, String low,
                           boolean isPositive) {
@@ -268,10 +339,24 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     stockListContainer.getChildren().add(row);
   }
 
+  /**
+   * <p>Clears all stock rows from the list.</p>
+   */
   public void clearStocks() {
     stockListContainer.getChildren().clear();
   }
 
+  /**
+   * <p>Selects a stock and updates the buy panel and chart.</p>
+   *
+   * @param symbol     the stock symbol
+   * @param company    the company name
+   * @param price      the current price text
+   * @param change     the change text
+   * @param high       the day high text
+   * @param low        the day low text
+   * @param isPositive whether the change is positive
+   */
   private void selectStock(String symbol, String company, String price,
                            String change, String high, String low, boolean isPositive) {
     selectedSymbol = symbol;
@@ -288,20 +373,42 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     buyButton.setDisable(false);
   }
 
+  /**
+   * <p>Updates the displayed order cost preview values.</p>
+   *
+   * @param gross      the estimated cost
+   * @param commission the commission value
+   * @param total      the total cost
+   */
   public void setCostPreview(String gross, String commission, String total) {
     estimatedCostLabel.setText("Estimated Cost:   " + gross);
     commissionLabel.setText("Commission (0.5%):   " + commission);
     totalCostLabel.setText("Total:   " + total);
   }
 
+  /**
+   * <p>Returns the current quantity input value.</p>
+   *
+   * @return the quantity text
+   */
   public String getQuantityInput() {
     return quantitySpinner.getValue().toString();
   }
 
+  /**
+   * <p>Returns the search field used for stock filtering.</p>
+   *
+   * @return the search field
+   */
   public TextField getSearchField() {
     return searchField;
   }
 
+  /**
+   * <p>Registers a handler that runs when the user confirms a buy.</p>
+   *
+   * @param handler the buy handler accepting symbol and quantity
+   */
   public void setOnBuy(BiConsumer<String, String> handler) {
     this.onBuy = handler;
   }
@@ -325,6 +432,14 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     }
   }
 
+  /**
+   * <p>Creates a table data cell label with a fixed width.</p>
+   *
+   * @param text       the cell text
+   * @param width      the fixed width in pixels
+   * @param styleClass the style class to apply
+   * @return the data cell label
+   */
   private Label makeDataCell(String text, double width, String styleClass) {
     Label l = new Label(text);
     l.getStyleClass().add(styleClass);
@@ -333,12 +448,23 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return l;
   }
 
+  /**
+   * <p>Creates a vertical spacer region with a fixed height.</p>
+   *
+   * @param h the spacer height in pixels
+   * @return the spacer region
+   */
   private Region buildSpacer(double h) {
     Region r = new Region();
     r.setPrefHeight(h);
     return r;
   }
 
+  /**
+   * <p>Creates a divider line for section separation.</p>
+   *
+   * @return the divider region
+   */
   private Region buildDivider() {
     Region d = new Region();
     d.getStyleClass().add("divider");

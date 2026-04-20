@@ -14,8 +14,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
 
+
+/**
+ * <p>
+ * Portfolio page view that renders balances, holdings, and a chart summary.
+ * </p>
+ *
+ * <p>
+ * The view exposes methods to refresh displayed data based on the current
+ * {@link edu.ntnu.idi.idatt.millions.model.Player} state.
+ * </p>
+ */
+public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
   private Player player;
 
   private Label netWorthLabel;
@@ -26,6 +37,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label emptyLabel;
   private StockChartComponent portfolioChart;
 
+  /**
+   * <p>Constructs the portfolio view and builds its initial layout.</p>
+   */
   public PortfolioView() {
     getStyleClass().add("dashboard-view");
     setSpacing(24);
@@ -39,6 +53,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     );
   }
 
+  /**
+   * <p>Builds the portfolio chart component.</p>
+   *
+   * @return the chart component
+   */
   private StockChartComponent buildPortfolioChart() {
     portfolioChart = new StockChartComponent("–", "No stock selected");
     portfolioChart.setChartHeight(200);
@@ -46,6 +65,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return portfolioChart;
   }
 
+  /**
+   * <p>Builds the header section containing title and subtitle.</p>
+   *
+   * @return the header container
+   */
   private VBox buildHeader() {
     Label title = new Label("My Portfolio");
     title.getStyleClass().add("page-title");
@@ -56,6 +80,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return new VBox(4, title, subtitle);
   }
 
+  /**
+   * <p>Builds the summary row containing key portfolio metrics.</p>
+   *
+   * @return the summary row container
+   */
   private HBox buildSummaryRow() {
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
@@ -79,6 +108,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return row;
   }
 
+  /**
+   * <p>Builds a summary card with title and value labels.</p>
+   *
+   * @param title           the card title
+   * @param value           the value text
+   * @param valueStyleClass the style class applied to the value label
+   * @return the summary card container
+   */
   private VBox buildSummaryCard(String title, String value, String valueStyleClass) {
     Label titleLabel = new Label(title);
     titleLabel.getStyleClass().add("stat-card-title");
@@ -93,6 +130,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return card;
   }
 
+  /**
+   * <p>Builds the holdings section with table header and list container.</p>
+   *
+   * @return the holdings section container
+   */
   private VBox buildHoldingsSection() {
     Label heading = new Label("Holdings");
     heading.getStyleClass().add("section-heading");
@@ -114,6 +156,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return section;
   }
 
+  /**
+   * <p>Builds the table header row for the holdings list.</p>
+   *
+   * @return the table header container
+   */
   private HBox buildTableHeader() {
     HBox header = new HBox();
     header.getStyleClass().add("table-header-row");
@@ -144,6 +191,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     refreshPortfolioData(player);
   }
 
+  /**
+   * <p>Refreshes the view with values from the provided player.</p>
+   *
+   * @param player the player whose portfolio data should be displayed
+   */
   public void refreshPortfolioData(Player player) {
     Portfolio portfolio = player.getPortfolio();
 
@@ -170,6 +222,13 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
   // --- helpers ---
 
+  /**
+   * <p>Creates a header cell label with a fixed width.</p>
+   *
+   * @param text  the header text
+   * @param width the fixed width in pixels
+   * @return the header label
+   */
   private Label makeHeaderCell(String text, double width) {
     Label l = new Label(text);
     l.getStyleClass().add("table-header-cell");
@@ -178,12 +237,23 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return l;
   }
 
+  /**
+   * <p>Creates a vertical spacer region with a fixed height.</p>
+   *
+   * @param h the spacer height in pixels
+   * @return the spacer region
+   */
   private Region buildSpacer(double h) {
     Region r = new Region();
     r.setPrefHeight(h);
     return r;
   }
 
+  /**
+   * <p>Creates a divider line for section separation.</p>
+   *
+   * @return the divider region
+   */
   private Region buildDivider() {
     Region d = new Region();
     d.getStyleClass().add("divider");

@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.BiConsumer;
 
@@ -80,10 +81,10 @@ public class StartupScreen extends StackPane{
   }
 
   private VBox buildCardHeader() {
-    Circle iconBg = new Circle(32, Color.web("rgba(255,255,255,0.2)"));
-    Label iconArrow = new Label("↗");
-    iconArrow.getStyleClass().add("startup-logo-icon");
-    StackPane logoIcon = new StackPane(iconBg, iconArrow);
+    FontIcon icon = new FontIcon("fas-wave-square");
+    icon.setIconSize(34);
+    icon.setIconColor(Color.WHITE);
+    icon.getStyleClass().add("logo-icon-label");
 
     Label title = new Label("Millions");
     title.getStyleClass().add("startup-title");
@@ -93,7 +94,7 @@ public class StartupScreen extends StackPane{
 
     HBox pills = buildFeaturePills();
 
-    VBox header = new VBox(10, logoIcon, title, subtitle, pills);
+    VBox header = new VBox(10, icon, title, subtitle, pills);
     header.setAlignment(Pos.CENTER);
     header.setPadding(new Insets(44, 40, 36, 40));
     header.getStyleClass().add("startup-header");

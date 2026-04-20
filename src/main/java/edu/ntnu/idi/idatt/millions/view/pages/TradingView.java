@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
+import edu.ntnu.idi.idatt.millions.view.StockRowData;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
@@ -302,34 +303,36 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param low        the day low text
    * @param isPositive whether the change is positive
    */
-  public void addStockRow(String symbol, String company, String price,
-                          String change, String high, String low,
-                          boolean isPositive) {
-
+  /**
+   * <p>Adds a stock row to the stock list panel.</p>
+   *
+   * @param data the display data for the stock row
+   */
+  public void addStockRow(StockRowData data) {
     Circle icon = new Circle(18, Color.web("#6366f1"));
-    Label letter = new Label(String.valueOf(symbol.charAt(0)));
+    Label letter = new Label(String.valueOf(data.symbol().charAt(0)));
     letter.getStyleClass().add("mover-icon-letter");
     StackPane iconPane = new StackPane(icon, letter);
 
-    Label nameLabel = new Label(symbol);
+    Label nameLabel = new Label(data.symbol());
     nameLabel.getStyleClass().add("mover-name");
-    Label compLabel = new Label(company);
+    Label compLabel = new Label(data.company());
     compLabel.getStyleClass().add("mover-symbol");
     VBox nameBox = new VBox(2, nameLabel, compLabel);
     HBox stockCell = new HBox(10, iconPane, nameBox);
     stockCell.setAlignment(Pos.CENTER_LEFT);
     stockCell.setPrefWidth(220);
 
-    Label priceLabel  = makeDataCell(price,  120, "table-data-cell");
-    Label changeLabel = makeDataCell(change, 120,
-        isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
-    Label highLabel   = makeDataCell(high,   110, "table-data-cell");
-    Label lowLabel    = makeDataCell(low,    110, "table-data-cell");
+    Label priceLabel  = makeDataCell(data.price(),  120, "table-data-cell");
+    Label changeLabel = makeDataCell(data.change(), 120,
+        data.isPositive() ? "table-data-cell-profit" : "table-data-cell-loss");
+    Label highLabel   = makeDataCell(data.high(),   110, "table-data-cell");
+    Label lowLabel    = makeDataCell(data.low(),    110, "table-data-cell");
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");
     selectBtn.setPrefWidth(70);
-    selectBtn.setOnAction(e -> selectStock(symbol, company, price, change, high, low, isPositive));
+    selectBtn.setOnAction(e -> selectStock(data));
 
     HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
     row.setAlignment(Pos.CENTER_LEFT);
@@ -357,19 +360,18 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param low        the day low text
    * @param isPositive whether the change is positive
    */
-  private void selectStock(String symbol, String company, String price,
-                           String change, String high, String low, boolean isPositive) {
-    selectedSymbol = symbol;
-    buySymbolLabel.setText(symbol);
-    buyCompanyLabel.setText(company);
-    buyPriceLabel.setText(price);
-    buyChangeLabel.setText((isPositive ? "↗ " : "↘ ") + change);
+  private void selectStock(StockRowData data) {
+    selectedSymbol = data.symbol();
+    buySymbolLabel.setText(data.symbol());
+    buyCompanyLabel.setText(data.company());
+    buyPriceLabel.setText(data.price());
+    buyChangeLabel.setText((data.isPositive() ? "↗ " : "↘ ") + data.change());
     buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
-    buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
-    buyHighLabel.setText("H: " + high);
-    buyLowLabel.setText("L: " + low);
+    buyChangeLabel.getStyleClass().add(data.isPositive() ? "mover-change-positive" : "mover-change-negative");
+    buyHighLabel.setText("H: " + data.high());
+    buyLowLabel.setText("L: " + data.low());
 
-    stockChart.setStockInfo(symbol, company);
+    stockChart.setStockInfo(data.symbol(), data.company());
     buyButton.setDisable(false);
   }
 
@@ -419,7 +421,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     for (Stock stock : exchange.getStocks()) {
       BigDecimal change = stock.getLatestPriceChange();
       boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
-      addStockRow(
+      addStockRow(new StockRowData(
           stock.getSymbol(),
           stock.getCompany(),
           ViewFormatter.price(stock.getSalesPrice()),
@@ -427,7 +429,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
           ViewFormatter.price(stock.getHighestPrice()),
           ViewFormatter.price(stock.getLowestPrice()),
           isPositive
-      );
+      ));
     }
   }
 

@@ -21,7 +21,7 @@ public class TradingView extends BorderPane {
   private Label buyHighLabel;
   private Label buyLowLabel;
   private Label buyChangeLabel;
-  private TextField quantityField;
+  private Spinner<Integer> quantitySpinner;
   private Label estimatedCostLabel;
   private Label commissionLabel;
   private Label totalCostLabel;
@@ -127,7 +127,7 @@ public class TradingView extends BorderPane {
 
     Label qtyLabel = new Label("Quantity");
     qtyLabel.getStyleClass().add("input-label");
-    Spinner<Integer> quantitySpinner = new Spinner<>(1, 10000, 1);
+    quantitySpinner = new Spinner<>(1, 10000, 1);
     quantitySpinner.setEditable(true);
     quantitySpinner.getStyleClass().add("search-field");
     quantitySpinner.valueProperty().addListener((obs, old, val) -> updateCostPreview());
@@ -140,7 +140,7 @@ public class TradingView extends BorderPane {
     buyButton.setDisable(true);
     buyButton.setOnAction(e -> {
       if (onBuy != null && selectedSymbol != null) {
-        onBuy.accept(selectedSymbol, quantityField.getText());
+        onBuy.accept(selectedSymbol, quantitySpinner.getValue().toString());
       }
     });
 
@@ -246,7 +246,7 @@ public class TradingView extends BorderPane {
 
     Label priceLabel  = makeDataCell(price,  120, "table-data-cell");
     Label changeLabel = makeDataCell(change, 120,
-            isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
+        isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
     Label highLabel   = makeDataCell(high,   110, "table-data-cell");
     Label lowLabel    = makeDataCell(low,    110, "table-data-cell");
 
@@ -290,7 +290,7 @@ public class TradingView extends BorderPane {
   }
 
   public String getQuantityInput() {
-    return quantityField.getText();
+    return quantitySpinner.getValue().toString();
   }
 
   public TextField getSearchField() {

@@ -13,6 +13,17 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.Consumer;
 
+/**
+ * <p>
+ * Sidebar UI component that contains navigation buttons, a week indicator,
+ * and an action to advance the week.
+ * </p>
+ *
+ * <p>
+ * The component exposes callbacks for navigation and week-advance actions and
+ * provides a method for updating the visible week label.
+ * </p>
+ */
 public class SidebarComponent extends VBox {
 
   private Button dashboardBtn;
@@ -23,6 +34,9 @@ public class SidebarComponent extends VBox {
   private Runnable onAdvanceWeek;
   private Consumer<Page> onNavigate;
 
+  /**
+   * <p>Constructs the sidebar and builds its initial layout.</p>
+   */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
     setPrefWidth(260);
@@ -39,6 +53,11 @@ public class SidebarComponent extends VBox {
     );
   }
 
+  /**
+   * <p>Builds the logo section shown at the top of the sidebar.</p>
+   *
+   * @return the logo container
+   */
   private HBox setLogo() {
     FontIcon dashboardIcon = new FontIcon("fas-wave-square");
     dashboardIcon.getStyleClass().add("logo-icon-label");
@@ -54,6 +73,11 @@ public class SidebarComponent extends VBox {
     return logo;
   }
 
+  /**
+   * <p>Builds the navigation section containing page buttons.</p>
+   *
+   * @return the navigation container
+   */
   private VBox buildNavSection() {
     dashboardBtn = buildNavButton("Dashboard", new FontIcon("fas-digital-tachograph"), Page.DASHBOARD);
     portfolioBtn = buildNavButton("My Portfolio", new FontIcon("fas-id-card"), Page.PORTFOLIO);
@@ -62,6 +86,14 @@ public class SidebarComponent extends VBox {
     return new VBox(4, dashboardBtn, portfolioBtn, tradingBtn);
   }
 
+  /**
+   * <p>Creates a navigation button with icon and click handler.</p>
+   *
+   * @param text the button label
+   * @param icon the icon to display
+   * @param page the page associated with the button
+   * @return a configured navigation button
+   */
   private Button buildNavButton(String text, FontIcon icon, Page page) {
     Button btn = new Button(text);
     btn.setGraphic(icon);
@@ -74,6 +106,11 @@ public class SidebarComponent extends VBox {
     return btn;
   }
 
+  /**
+   * <p>Builds the bottom section containing the advance button and week box.</p>
+   *
+   * @return the bottom section container
+   */
   private VBox buildBottomSection() {
     VBox bottom = new VBox(12);
     VBox.setVgrow(bottom, Priority.ALWAYS);
@@ -92,6 +129,11 @@ public class SidebarComponent extends VBox {
     return bottom;
   }
 
+  /**
+   * <p>Builds the week indicator box.</p>
+   *
+   * @return the week box container
+   */
   private HBox buildWeekBox() {
     Label currentWeekLabel = new Label("Current Week");
     currentWeekLabel.getStyleClass().add("week-box-title");
@@ -112,6 +154,11 @@ public class SidebarComponent extends VBox {
     return weekBox;
   }
 
+  /**
+   * <p>Marks the active page by updating the button style classes.</p>
+   *
+   * @param page the page that should be highlighted as active
+   */
   public void setActivePage(Page page) {
     dashboardBtn.getStyleClass().removeAll("nav-btn-active");
     portfolioBtn.getStyleClass().removeAll("nav-btn-active");
@@ -124,20 +171,41 @@ public class SidebarComponent extends VBox {
     }
   }
 
+  /**
+   * <p>Creates a spacer region with a fixed height.</p>
+   *
+   * @param height the spacer height in pixels
+   * @return the spacer region
+   */
   private Region buildSpacer(double height) {
     Region r = new Region();
     r.setPrefHeight(height);
     return r;
   }
 
+  /**
+   * <p>Updates the displayed week number in the sidebar.</p>
+   *
+   * @param week the current week number to display
+   */
   public void setWeek(int week) {
     weekLabel.setText("Week " + week);
   }
 
+  /**
+   * <p>Registers a handler that runs when the "Advance Week" button is pressed.</p>
+   *
+   * @param handler the action to run on button press
+   */
   public void setOnAdvanceWeek(Runnable handler) {
     this.onAdvanceWeek = handler;
   }
 
+  /**
+   * <p>Registers a handler that runs when a navigation button is selected.</p>
+   *
+   * @param handler the consumer that receives the selected page
+   */
   public void setOnNavigate(Consumer<Page> handler) {
     this.onNavigate = handler;
   }

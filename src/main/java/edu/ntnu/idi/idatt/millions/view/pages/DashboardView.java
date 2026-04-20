@@ -1,13 +1,27 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.model.Exchange;
+import edu.ntnu.idi.idatt.millions.model.Player;
+import edu.ntnu.idi.idatt.millions.model.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
+import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
+import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
-public class DashboardView extends VBox {
+public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
+
+  private Player player;
 
   private Label portfolioValueLabel;
   private Label portfolioChangeLabel;
@@ -138,6 +152,83 @@ public class DashboardView extends VBox {
 
   public void clearMovers() {
     moversContainer.getChildren().clear();
+  }
+
+  @Override
+  public void onPlayerUpdated(Player player) {
+    this.player = player;
+    refreshStats();
+  }
+
+  @Override
+  public void onPortfolioUpdated(Portfolio portfolio) {
+    if (player != null) {
+      refreshStats();
+    }
+  }
+
+  @Override
+  public void onExchangeUpdated(Exchange exchange) {
+    clearMovers();
+    int rank = 1;
+    for (Stock stock : exchange.getGainers(5)) {
+      moversContainer.getChildren().add(buildMoverRow(rank++, stock));
+    }
+  }
+
+  private void refreshStats() {
+    Portfolio portfolio = player.getPortfolio();
+    BigDecimal profit = player.getProfit();
+    boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
+
+    setPortfolioValue("$" + portfolio.getTotalValue().setScale(2, RoundingMode.HALF_UP).toPlainString());
+    setTotalAssets(String.valueOf(portfolio.size()));
+    setCostBasis("$" + portfolio.getTotalInvestment().setScale(2, RoundingMode.HALF_UP).toPlainString());
+    setTotalProfit(
+        (isPositive ? "$+" : "$") + profit.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+        isPositive
+    );
+
+    BigDecimal rate = player.getReturnRate()
+        .multiply(new BigDecimal("100"))
+        .setScale(2, RoundingMode.HALF_UP);
+    String changeStr = (isPositive ? "+" : "") + rate.toPlainString() + "%"
+        + "  ($" + (isPositive ? "+" : "") + profit.setScale(2, RoundingMode.HALF_UP).toPlainString() + ")";
+    setPortfolioChange(changeStr, isPositive);
+  }
+
+  private HBox buildMoverRow(int rank, Stock stock) {
+    Label rankLabel = new Label("#" + rank);
+    rankLabel.getStyleClass().add("mover-rank");
+    rankLabel.setPrefWidth(32);
+
+    Circle icon = new Circle(18, Color.web("#6366f1"));
+    Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
+    letter.getStyleClass().add("mover-icon-letter");
+    StackPane iconPane = new StackPane(icon, letter);
+
+    Label name = new Label(stock.getCompany());
+    name.getStyleClass().add("mover-name");
+    Label symbol = new Label(stock.getSymbol());
+    symbol.getStyleClass().add("mover-symbol");
+    VBox nameBox = new VBox(2, name, symbol);
+
+    BigDecimal change = stock.getLatestPriceChange();
+    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
+    Label priceLabel = new Label("$" + stock.getSalesPrice().setScale(2, RoundingMode.HALF_UP).toPlainString());
+    priceLabel.getStyleClass().add("mover-price");
+    Label changeLabel = new Label((isPositive ? "↗ +" : "↘ ") + change.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%");
+    changeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
+    VBox priceBox = new VBox(2, priceLabel, changeLabel);
+    priceBox.setAlignment(Pos.CENTER_RIGHT);
+
+    HBox row = new HBox(12, rankLabel, iconPane, nameBox);
+    HBox.setHgrow(nameBox, Priority.ALWAYS);
+    row.getChildren().add(priceBox);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("mover-row");
+    row.setPadding(new Insets(8, 0, 8, 0));
+    return row;
   }
 
 }

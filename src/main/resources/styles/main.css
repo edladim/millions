@@ -618,6 +618,14 @@
     -fx-padding: 5 12 5 12;
 }
 
+.startup-pill-text {
+    -fx-text-fill: white;
+}
+
+.startup-pill-icon {
+    -fx-icon-color: white;
+}
+
 /* ── Body / form ─────────────────────────────────────── */
 .startup-body {
     -fx-background-color: white;

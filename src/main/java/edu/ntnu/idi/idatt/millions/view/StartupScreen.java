@@ -103,17 +103,24 @@ public class StartupScreen extends StackPane{
 
   private HBox buildFeaturePills() {
     HBox pills = new HBox(10,
-            buildPill("📈  Live Prices"),
-            buildPill("💼  Portfolio"),
-            buildPill("💹  Trading")
+            buildPill(new FontIcon("fas-dollar-sign"), "Live Prices"),
+            buildPill(new FontIcon("fas-id-card"), "Portfolio"),
+            buildPill(new FontIcon("fas-chart-line"), "Trading")
     );
     pills.setAlignment(Pos.CENTER);
     return pills;
   }
 
-  private Label buildPill(String text) {
-    Label pill = new Label(text);
+  private HBox buildPill(FontIcon icon, String text) {
+    Label label = new Label(text);
+    label.getStyleClass().add("startup-pill-text");
+
+    icon.getStyleClass().add("startup-pill-icon");
+    icon.setIconSize(14);
+
+    HBox pill = new HBox(6, icon, label);
     pill.getStyleClass().add("startup-pill");
+    pill.setAlignment(Pos.CENTER);
     return pill;
   }
 

@@ -1,11 +1,21 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
+import edu.ntnu.idi.idatt.millions.filehandler.CsvStockReader;
+import edu.ntnu.idi.idatt.millions.filehandler.StockReader;
+import edu.ntnu.idi.idatt.millions.model.Exchange;
+import edu.ntnu.idi.idatt.millions.model.Player;
+import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.List;
 
 public class SetupController {
 
@@ -52,6 +62,66 @@ public class SetupController {
     }
   }
 
+  private void handleStart(String name, String capitalText) {
+    BigDecimal capital;
+    try {
+      capital = new BigDecimal(capitalText);
+      if (capital.compareTo(BigDecimal.ZERO) <= 0) throw new NumberFormatException();
+    } catch (NumberFormatException e) {
+      screen.showError("Starting capital must be a positive number.");
+      return;
+    }
 
+    List<Stock> stocks = loadStocks();
+    if (stocks == null) return;
+
+    if (stocks.isEmpty()) {
+      screen.showError("The file contained no valid stocks. Check the format.");
+      return;
+    }
+
+    Player   player   = new Player(name, capital);
+    Exchange exchange = new Exchange("Global Exchange", stocks);
+
+    launchGame(player, exchange);
+
+  }
+
+  private List<Stock> loadStocks() {
+    if (selectedFile != null) {
+      try {
+        return new CsvStockReader(selectedFile.toPath()).readStockData();
+      } catch (Exception e) {
+        screen.showError("Could not read file: " + e.getMessage());
+        return null;
+      }
+    }
+
+    try {
+      InputStream stream = getClass().getResourceAsStream(DEFAULT_STOCK_FILE);
+      if (stream == null) {
+        screen.showError(
+                "Default StockData.csv not found. Please select a file manually."
+        );
+        return null;
+      }
+      return CsvStockReader.fromClasspath(DEFAULT_STOCK_FILE).readStockData();
+    } catch (Exception e) {
+      screen.showError("Could not load default stock data: " + e.getMessage());
+      return null;
+    }
+  }
+
+  private void launchGame(Player player, Exchange exchange) {
+    MainView mainView = new MainView();
+
+    primaryStage.setScene(mainView.createScene());
+    primaryStage.setTitle("Millions - " + player.getName());
+    primaryStage.setWidth(1280);
+    primaryStage.setHeight(800);
+    primaryStage.setResizable(true);
+    primaryStage.centerOnScreen();
+
+  }
 
 }

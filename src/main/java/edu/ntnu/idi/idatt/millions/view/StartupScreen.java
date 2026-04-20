@@ -13,6 +13,11 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.BiConsumer;
 
+/**
+ * <p>Startup screen view that collects initial player settings before the game starts.</p>
+ * <p>Builds the background, card UI, and input fields, and exposes callbacks for browsing
+ * and starting the game.</p>
+ */
 public class StartupScreen extends StackPane{
 
   private TextField nameField;
@@ -22,6 +27,9 @@ public class StartupScreen extends StackPane{
   private Runnable onBrowse;
   private BiConsumer<String, String> onStart;
 
+  /**
+   * <p>Creates the startup screen and initializes UI layout, styles, and fade-in animation.</p>
+   */
   public StartupScreen() {
     getStyleClass().add("startup-root");
     setAlignment(Pos.CENTER);
@@ -37,6 +45,11 @@ public class StartupScreen extends StackPane{
     fade.play();
   }
 
+  /**
+   * <p>Builds the decorative background layer for the startup screen.</p>
+   *
+   * @return background stack pane with blobs.
+   */
   private StackPane buildBackground() {
     StackPane bg = new StackPane();
     bg.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -51,6 +64,17 @@ public class StartupScreen extends StackPane{
     return bg;
   }
 
+  /**
+   * <p>Builds a single translucent blob used in the background.</p>
+   *
+   * @param w width of the blob.
+   * @param h height of the blob.
+   * @param color hex color string.
+   * @param opacity alpha value from 0.0 to 1.0.
+   * @param tx translate X offset.
+   * @param ty translate Y offset.
+   * @return a stack pane containing the blob rectangle.
+   */
   private StackPane buildBlob(double w, double h, String color,
                               double opacity, double tx, double ty) {
     Rectangle blob = new Rectangle(w, h);
@@ -66,6 +90,11 @@ public class StartupScreen extends StackPane{
     return p;
   }
 
+  /**
+   * <p>Builds the main card containing header and body sections.</p>
+   *
+   * @return card container.
+   */
   private VBox buildCard() {
     VBox card = new VBox(0);
     card.getStyleClass().add("startup-card");
@@ -80,6 +109,11 @@ public class StartupScreen extends StackPane{
     return card;
   }
 
+  /**
+   * <p>Builds the header section with logo, title, subtitle, and feature pills.</p>
+   *
+   * @return header container.
+   */
   private VBox buildCardHeader() {
     FontIcon icon = new FontIcon("fas-wave-square");
     icon.setIconSize(34);
@@ -101,6 +135,11 @@ public class StartupScreen extends StackPane{
     return header;
   }
 
+  /**
+   * <p>Builds the row of feature pills shown under the header.</p>
+   *
+   * @return pills container.
+   */
   private HBox buildFeaturePills() {
     HBox pills = new HBox(10,
             buildPill(new FontIcon("fas-dollar-sign"), "Live Prices"),
@@ -111,6 +150,13 @@ public class StartupScreen extends StackPane{
     return pills;
   }
 
+  /**
+   * <p>Builds a single feature pill with an icon and label.</p>
+   *
+   * @param icon icon to display in the pill.
+   * @param text label text for the pill.
+   * @return pill container.
+   */
   private HBox buildPill(FontIcon icon, String text) {
     Label label = new Label(text);
     label.getStyleClass().add("startup-pill-text");
@@ -124,36 +170,35 @@ public class StartupScreen extends StackPane{
     return pill;
   }
 
+  /**
+   * <p>Builds the body section with input fields, file selection, and start button.</p>
+   *
+   * @return body container.
+   */
   private VBox buildCardBody() {
     VBox body = new VBox(20);
     body.setPadding(new Insets(32, 40, 36, 40));
     body.getStyleClass().add("startup-body");
 
-    // Name field
     nameField = new TextField();
     nameField.setPromptText("e.g. Warren Buffett");
     nameField.getStyleClass().add("startup-field");
 
-    // Capital field
     capitalField = new TextField("10000");
     capitalField.getStyleClass().add("startup-field");
 
-    // File row
     VBox fileSection = buildFileSection();
 
-    // Error label
     errorLabel = new Label("");
     errorLabel.getStyleClass().add("startup-error");
     errorLabel.setVisible(false);
     errorLabel.setManaged(false);
 
-    // Start button
     Button startBtn = new Button("Start Game  →");
     startBtn.getStyleClass().add("startup-start-btn");
     startBtn.setMaxWidth(Double.MAX_VALUE);
     startBtn.setOnAction(e -> handleStart());
 
-    // Enter key also triggers start
     nameField.setOnAction(e -> handleStart());
     capitalField.setOnAction(e -> handleStart());
 
@@ -168,6 +213,11 @@ public class StartupScreen extends StackPane{
     return body;
   }
 
+  /**
+   * <p>Builds the file selection row with filename label and browse button.</p>
+   *
+   * @return file section container.
+   */
   private VBox buildFileSection() {
     fileNameLabel = new Label("StockData.csv  (default)");
     fileNameLabel.getStyleClass().add("startup-file-label");
@@ -189,6 +239,13 @@ public class StartupScreen extends StackPane{
     return section;
   }
 
+  /**
+   * <p>Builds a labeled field group for inputs.</p>
+   *
+   * @param labelText text shown above the input.
+   * @param input input node to place under the label.
+   * @return grouped container.
+   */
   private VBox buildFieldGroup(String labelText, javafx.scene.Node input) {
     Label label = new Label(labelText);
     label.getStyleClass().add("startup-field-label");
@@ -196,6 +253,9 @@ public class StartupScreen extends StackPane{
     return group;
   }
 
+  /**
+   * <p>Validates inputs and triggers the start callback if valid.</p>
+   */
   private void handleStart() {
     hideError();
 
@@ -221,18 +281,50 @@ public class StartupScreen extends StackPane{
     }
   }
 
+  /**
+   * <p>Registers a callback for the browse action.</p>
+   *
+   * @param handler runnable to execute when browsing for a file.
+   */
   public void setOnBrowse(Runnable handler)                       { this.onBrowse = handler; }
+
+  /**
+   * <p>Registers a callback for the start action.</p>
+   *
+   * @param handler consumer receiving name and capital input.
+   */
   public void setOnStart(BiConsumer<String, String> handler)      { this.onStart  = handler; }
 
+  /**
+   * <p>Gets the trimmed name input from the field.</p>
+   *
+   * @return name input string.
+   */
   public String getNameInput()    { return nameField.getText().trim(); }
+
+  /**
+   * <p>Gets the trimmed capital input from the field.</p>
+   *
+   * @return capital input string.
+   */
   public String getCapitalInput() { return capitalField.getText().trim(); }
 
+  /**
+   * <p>Updates the displayed filename and applies the selected styling.</p>
+   *
+   * @param name display name of the chosen file.
+   */
   public void setFileName(String name) {
     fileNameLabel.setText(name);
     fileNameLabel.getStyleClass().removeAll("startup-file-label-default");
     fileNameLabel.getStyleClass().add("startup-file-label-selected");
   }
 
+  /**
+   * <p>Displays an error message with a brief fade-in animation.</p>
+   *
+   * @param message error text to display.
+   */
   public void showError(String message) {
     errorLabel.setText("⚠  " + message);
     errorLabel.setVisible(true);
@@ -244,6 +336,9 @@ public class StartupScreen extends StackPane{
     fade.play();
   }
 
+  /**
+   * <p>Hides the error message and removes it from layout flow.</p>
+   */
   public void hideError() {
     errorLabel.setVisible(false);
     errorLabel.setManaged(false);

@@ -18,6 +18,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * <p>Controller responsible for the startup flow and initial game setup.</p>
+ * <p>Shows the startup screen, handles file selection, validates inputs, and
+ * launches the main game view.</p>
+ */
 public class SetupController {
 
   private static final String DEFAULT_STOCK_FILE = "/StockData.csv";
@@ -25,6 +30,11 @@ public class SetupController {
   private final StartupScreen screen;
   private File selectedFile = null;
 
+  /**
+   * <p>Creates a setup controller bound to the primary stage.</p>
+   *
+   * @param primaryStage application window to control.
+   */
   public SetupController(Stage primaryStage) {
     this.primaryStage = primaryStage;
     this.screen = new StartupScreen();
@@ -33,6 +43,9 @@ public class SetupController {
     screen.setOnStart(this::handleStart);
   }
 
+  /**
+   * <p>Displays the startup screen and applies base styles.</p>
+   */
   public void show() {
     Scene scene = new Scene(screen, 520, 660);
     scene.getStylesheets().add(
@@ -47,6 +60,9 @@ public class SetupController {
     primaryStage.show();
   }
 
+  /**
+   * <p>Opens a file chooser for selecting a stock data CSV file.</p>
+   */
   public void handleBrowse() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Select Stock Data File");
@@ -61,6 +77,12 @@ public class SetupController {
     }
   }
 
+  /**
+   * <p>Validates input and starts the game if successful.</p>
+   *
+   * @param name player name input.
+   * @param capitalText starting capital input.
+   */
   private void handleStart(String name, String capitalText) {
     BigDecimal capital;
     try {
@@ -86,6 +108,11 @@ public class SetupController {
 
   }
 
+  /**
+   * <p>Loads stock data from a selected file or the default classpath resource.</p>
+   *
+   * @return list of loaded stocks, or null if loading failed.
+   */
   private List<Stock> loadStocks() {
     if (selectedFile != null) {
       try {
@@ -111,6 +138,12 @@ public class SetupController {
     }
   }
 
+  /**
+   * <p>Creates the main view and switches the stage to the game UI.</p>
+   *
+   * @param player initialized player model.
+   * @param exchange initialized exchange model.
+   */
   private void launchGame(Player player, Exchange exchange) {
     MainView mainView = new MainView();
 

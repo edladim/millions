@@ -68,8 +68,8 @@ public class StartupScreen extends StackPane{
   private VBox buildCard() {
     VBox card = new VBox(0);
     card.getStyleClass().add("startup-card");
-    card.setMaxWidth(480);
-    card.setMinWidth(480);
+    card.setMaxWidth(550);
+    card.setMinWidth(550);
 
     card.getChildren().addAll(
             buildCardHeader(),
@@ -104,7 +104,7 @@ public class StartupScreen extends StackPane{
     HBox pills = new HBox(10,
             buildPill("📈  Live Prices"),
             buildPill("💼  Portfolio"),
-            buildPill("🏆  Rankings")
+            buildPill("💹  Trading")
     );
     pills.setAlignment(Pos.CENTER);
     return pills;

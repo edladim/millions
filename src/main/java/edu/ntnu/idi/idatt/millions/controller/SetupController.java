@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 public class SetupController {
 
@@ -29,21 +30,19 @@ public class SetupController {
     this.screen = new StartupScreen();
 
     screen.setOnBrowse(this::handleBrowse);
+    screen.setOnStart(this::handleStart);
   }
 
   public void show() {
     Scene scene = new Scene(screen, 520, 660);
     scene.getStylesheets().add(
-            getClass().getResource("/styles/main.css").toExternalForm()
-
-
+            Objects.requireNonNull(getClass().getResource("/styles/main.css")).toExternalForm()
     );
 
     primaryStage.setScene(scene);
     primaryStage.setTitle("Millions");
-    primaryStage.setWidth(520);
-    primaryStage.setHeight(660);
-    primaryStage.setResizable(false);
+    primaryStage.setMaximized(true);
+    primaryStage.setResizable(true);
     primaryStage.centerOnScreen();
     primaryStage.show();
   }
@@ -117,8 +116,7 @@ public class SetupController {
 
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());
-    primaryStage.setWidth(1280);
-    primaryStage.setHeight(800);
+    primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
     primaryStage.centerOnScreen();
 

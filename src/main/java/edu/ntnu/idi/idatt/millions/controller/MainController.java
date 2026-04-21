@@ -41,13 +41,6 @@ public class MainController {
   public void advanceWeek() {
     exchange.advance();
     view.setWeek(exchange.getWeek());
-    refresh();
   }
 
-  /**
-   * <p>Refreshes view state from the current model data.</p>
-   */
-  public void refresh() {
-
-  }
 }

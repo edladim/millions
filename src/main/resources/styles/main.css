@@ -1,4 +1,8 @@
+/* ═══════════════════════════════════════════════════════
+   main.css  –  Millions · Global styles
+   ═══════════════════════════════════════════════════════ */
 
+/* ── Color tokens ────────────────────────────────────── */
 .root {
     -primary:        #6366f1;
     -primary-light:  #818cf8;
@@ -13,12 +17,14 @@
     -fx-font-family: "Segoe UI";
 }
 
-/*  Root layout */
+/* ── Root layout ─────────────────────────────────────── */
 .main-root {
     -fx-background-color: -bg;
 }
 
-/* SIDEBAR */
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════ */
 .sidebar {
     -fx-background-color: white;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 2, 0);
@@ -105,7 +111,9 @@
     -fx-font-size: 18px;
 }
 
-/* SHARED PAGE ELEMENTS */
+/* ═══════════════════════════════════════════════════════
+   SHARED PAGE ELEMENTS
+   ═══════════════════════════════════════════════════════ */
 
 /* Page wrapper */
 .dashboard-view {
@@ -242,7 +250,9 @@
     -fx-padding: 24;
 }
 
-/* TABLE STYLES (Portfolio + Trading) */
+/* ═══════════════════════════════════════════════════════
+   TABLE STYLES (Portfolio + Trading)
+   ═══════════════════════════════════════════════════════ */
 
 .table-header-cell {
     -fx-font-size: 12px;
@@ -279,7 +289,9 @@
     -fx-background-radius: 8;
 }
 
-/* PORTFOLIO PAGE */
+/* ═══════════════════════════════════════════════════════
+   PORTFOLIO PAGE
+   ═══════════════════════════════════════════════════════ */
 
 .sell-btn {
     -fx-background-color: -red;
@@ -296,7 +308,9 @@
     -fx-background-color: #b91c1c;
 }
 
-/* TRADING PAGE */
+/* ═══════════════════════════════════════════════════════
+   TRADING PAGE
+   ═══════════════════════════════════════════════════════ */
 
 .search-field {
     -fx-background-color: white;
@@ -397,7 +411,10 @@
     -fx-cursor: default;
 }
 
- /* Stock chart components */
+/* ═══════════════════════════════════════════════════════
+   STOCK CHART COMPONENT
+   ═══════════════════════════════════════════════════════ */
+
 .chart-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -446,7 +463,9 @@
     -fx-background-color: transparent;
 }
 
-/* TRANSACTION RECEIPT COMPONENT */
+/* ═══════════════════════════════════════════════════════
+   TRANSACTION RECEIPT COMPONENT
+   ═══════════════════════════════════════════════════════ */
 
 .receipt-root {
     -fx-background-color: white;
@@ -546,4 +565,169 @@
 
 .receipt-close-btn:hover {
     -fx-background-color: -primary-light;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STARTUP SCREEN
+   ═══════════════════════════════════════════════════════ */
+
+.startup-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.startup-bg {
+    -fx-background-color: linear-gradient(to bottom right, #eef2ff, #f1f5f9);
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.startup-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.18), 48, 0, 0, 12);
+}
+
+/* ── Header banner ───────────────────────────────────── */
+.startup-header {
+    -fx-background-color: linear-gradient(to bottom right, #6366f1, #818cf8);
+    -fx-background-radius: 20 20 0 0;
+}
+
+.startup-logo-icon {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.startup-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.startup-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255,255,255,0.82);
+}
+
+/* Feature pills */
+.startup-pill {
+    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5 12 5 12;
+}
+
+.startup-pill-text {
+    -fx-text-fill: white;
+}
+
+.startup-pill-icon {
+    -fx-icon-color: white;
+}
+
+/* ── Body / form ─────────────────────────────────────── */
+.startup-body {
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.startup-field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.startup-field {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 11 14 11 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: #0f172a;
+}
+
+.startup-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #6366f1;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 8, 0, 0, 0);
+}
+
+/* File row */
+.startup-file-row {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+.startup-file-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}
+
+.startup-file-label-selected {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.startup-browse-btn {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #6366f1;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 7 14 7 14;
+}
+
+.startup-browse-btn:hover {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+}
+
+.startup-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* Start button */
+.startup-start-btn {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 14 0 14 0;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.4), 16, 0, 0, 4);
+}
+
+.startup-start-btn:hover {
+    -fx-background-color: #818cf8;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.5), 20, 0, 0, 6);
+}
+
+.startup-start-btn:pressed {
+    -fx-background-color: #4f46e5;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.3), 8, 0, 0, 2);
+}
+
+/* Error */
+.startup-error {
+    -fx-font-size: 13px;
+    -fx-text-fill: #dc2626;
+    -fx-background-color: #fef2f2;
+    -fx-background-radius: 8;
+    -fx-border-color: #fecaca;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
 }

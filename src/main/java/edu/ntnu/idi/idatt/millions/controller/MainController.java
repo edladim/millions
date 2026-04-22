@@ -28,9 +28,9 @@ public class MainController {
                         Player player,
                         Exchange exchange) {
     this.primaryStage = primaryStage;
-    this.view         = view;
-    this.player       = player;
-    this.exchange     = exchange;
+    this.view = view;
+    this.player = player;
+    this.exchange = exchange;
 
     view.setOnAdvanceWeek(this::advanceWeek);
   }

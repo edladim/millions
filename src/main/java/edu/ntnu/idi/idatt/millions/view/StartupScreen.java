@@ -6,11 +6,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-
 import java.util.function.BiConsumer;
 
 /**
@@ -23,7 +21,7 @@ public class StartupScreen extends StackPane{
   private TextField nameField;
   private TextField capitalField;
   private Label fileNameLabel;
-  private Label     errorLabel;
+  private Label errorLabel;
   private Runnable onBrowse;
   private BiConsumer<String, String> onStart;
 
@@ -286,14 +284,14 @@ public class StartupScreen extends StackPane{
    *
    * @param handler runnable to execute when browsing for a file.
    */
-  public void setOnBrowse(Runnable handler)                       { this.onBrowse = handler; }
+  public void setOnBrowse(Runnable handler) { this.onBrowse = handler; }
 
   /**
    * <p>Registers a callback for the start action.</p>
    *
    * @param handler consumer receiving name and capital input.
    */
-  public void setOnStart(BiConsumer<String, String> handler)      { this.onStart  = handler; }
+  public void setOnStart(BiConsumer<String, String> handler) { this.onStart  = handler; }
 
   /**
    * <p>Gets the trimmed name input from the field.</p>

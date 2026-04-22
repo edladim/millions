@@ -146,13 +146,13 @@ public class SetupController {
    */
   private void launchGame(Player player, Exchange exchange) {
     MainView mainView = new MainView();
+    MainController mainController = new MainController(primaryStage, mainView, player, exchange);
 
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());
     primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
     primaryStage.centerOnScreen();
-
   }
 
 }

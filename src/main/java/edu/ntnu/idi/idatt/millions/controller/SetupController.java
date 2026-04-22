@@ -1,7 +1,6 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.filehandler.CsvStockReader;
-import edu.ntnu.idi.idatt.millions.filehandler.StockReader;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.Stock;
@@ -12,7 +11,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
@@ -146,7 +144,7 @@ public class SetupController {
    */
   private void launchGame(Player player, Exchange exchange) {
     MainView mainView = new MainView();
-    MainController mainController = new MainController(primaryStage, mainView, player, exchange);
+    new MainController(mainView, player, exchange);
 
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());

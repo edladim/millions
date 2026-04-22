@@ -4,7 +4,6 @@ import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
 import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 
@@ -23,9 +22,9 @@ public class MainView {
   private final BorderPane root;
   private final SidebarComponent sidebar;
 
-  private final Node dashboardView;
-  private final Node portfolioView;
-  private final Node tradingView;
+  private final DashboardView dashboardView;
+  private final PortfolioView portfolioView;
+  private final TradingView tradingView;
 
   private Runnable onAdvanceWeek;
 
@@ -40,7 +39,6 @@ public class MainView {
     tradingView = new TradingView();
 
     root.setLeft(sidebar);
-    root.getStylesheets().add("main-root");
 
     showPage(Page.DASHBOARD);
     sidebar.setActivePage(Page.DASHBOARD);
@@ -79,32 +77,32 @@ public class MainView {
   }
 
   /**
-   * <p>Returns the dashboard view node.</p>
+   * <p>Returns the dashboard view.</p>
    *
    * @return the dashboard view
    */
-  public Node getDashboardView() { return dashboardView; }
+  public DashboardView getDashboardView() { return dashboardView; }
 
   /**
-   * <p>Returns the portfolio view node.</p>
+   * <p>Returns the portfolio view.</p>
    *
    * @return the portfolio view
    */
-  public Node getPortfolioView() { return portfolioView; }
+  public PortfolioView getPortfolioView() { return portfolioView; }
 
   /**
-   * <p>Returns the trading view node.</p>
+   * <p>Returns the trading view.</p>
    *
    * @return the trading view
    */
-  public Node getTradingView() { return tradingView; }
+  public TradingView getTradingView() { return tradingView; }
 
   /**
-   * <p>Returns the sidebar component node.</p>
+   * <p>Returns the sidebar component.</p>
    *
    * @return the sidebar component
    */
-  public Node getSidebar() { return sidebar; }
+  public SidebarComponent getSidebar() { return sidebar; }
 
   /**
    * <p>Registers a handler that runs when "Advance Week" is triggered.</p>

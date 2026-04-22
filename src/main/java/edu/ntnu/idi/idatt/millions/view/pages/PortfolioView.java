@@ -7,8 +7,11 @@ import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
+import java.math.BigDecimal;
+import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -29,6 +32,7 @@ import javafx.scene.layout.VBox;
  */
 public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
   private Player player;
+  private Consumer<Share> onSell;
 
   private Label netWorthLabel;
   private Label cashBalanceLabel;
@@ -213,15 +217,59 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     }
 
     for (Share share : portfolio.getShares()) {
-      Label row = new Label(
-              share.getStock().getSymbol() + " x " + share.getQuantity()
-      );
-      row.getStyleClass().add("holding-row");
-      holdingsContainer.getChildren().add(row);
+      holdingsContainer.getChildren().add(buildHoldingRow(share));
     }
   }
 
+  /**
+   * <p>Registers a handler that runs when the user requests to sell a share.</p>
+   *
+   * @param handler the handler receiving the share to sell
+   */
+  public void setOnSell(Consumer<Share> handler) {
+    this.onSell = handler;
+  }
+
+  private HBox buildHoldingRow(Share share) {
+    String symbol  = share.getStock().getSymbol();
+    String company = share.getStock().getCompany();
+
+    Label stockLabel = new Label(symbol + "\n" + company);
+    stockLabel.getStyleClass().add("mover-name");
+    stockLabel.setPrefWidth(200);
+
+    Label qtyLabel = makeDataCell(share.getQuantity().toPlainString(), 120);
+
+    BigDecimal gainOrLoss = share.getGainOrLoss();
+    boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
+
+    Label buyPriceLabel  = makeDataCell(ViewFormatter.price(share.getPurchasePrice()),      140);
+    Label currPriceLabel = makeDataCell(ViewFormatter.price(share.getStock().getSalesPrice()), 140);
+    Label valueLabel     = makeDataCell(ViewFormatter.price(share.getCurrentValue()),        140);
+    Label gainLabel      = makeDataCell(ViewFormatter.signedPrice(gainOrLoss),               140);
+    gainLabel.getStyleClass().add(isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
+
+    Button sellBtn = new Button("Sell");
+    sellBtn.getStyleClass().add("select-btn");
+    sellBtn.setPrefWidth(90);
+    sellBtn.setOnAction(e -> { if (onSell != null) onSell.accept(share); });
+
+    HBox row = new HBox(stockLabel, qtyLabel, buyPriceLabel, currPriceLabel, valueLabel, gainLabel, sellBtn);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("holding-row");
+    row.setPadding(new Insets(10, 0, 10, 0));
+    return row;
+  }
+
   // --- helpers ---
+
+  private Label makeDataCell(String text, double width) {
+    Label l = new Label(text);
+    l.getStyleClass().add("table-data-cell");
+    l.setPrefWidth(width);
+    l.setMinWidth(width);
+    return l;
+  }
 
   /**
    * <p>Creates a header cell label with a fixed width.</p>

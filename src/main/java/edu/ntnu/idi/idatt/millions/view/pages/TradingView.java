@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -45,6 +46,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
   private String selectedSymbol = null;
   private BiConsumer<String, String> onBuy;
+  private Runnable onQuantityChanged;
+  private Consumer<String> onSelectStock;
 
   /**
    * <p>Constructs the trading view and builds its initial layout.</p>
@@ -169,7 +172,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     quantitySpinner = new Spinner<>(1, 10000, 1);
     quantitySpinner.setEditable(true);
     quantitySpinner.getStyleClass().add("search-field");
-    quantitySpinner.valueProperty().addListener((obs, old, val) -> updateCostPreview());
+    quantitySpinner.valueProperty().addListener((_, _, _) -> updateCostPreview());
 
     VBox costCard = buildCostCard();
 
@@ -278,7 +281,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @return the cost row label
    */
   private Label makeCostRow(String labelText, String value) {
-    // We return a container disguised as a label – use HBox instead
+    // We return a container disguised as a label use HBox instead
     Label lbl = new Label(labelText + ":   " + value);
     lbl.getStyleClass().add("cost-row");
     lbl.setMaxWidth(Double.MAX_VALUE);
@@ -289,20 +292,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * <p>Triggers a refresh of the cost preview based on current input.</p>
    */
   private void updateCostPreview() {
-    // Controller should observe quantityField and push updates via setCostPreview()
+    if (onQuantityChanged != null) onQuantityChanged.run();
   }
 
-  /**
-   * <p>Adds a stock row to the stock list panel.</p>
-   *
-   * @param symbol     the stock symbol
-   * @param company    the company name
-   * @param price      the current price text
-   * @param change     the change text
-   * @param high       the day high text
-   * @param low        the day low text
-   * @param isPositive whether the change is positive
-   */
   /**
    * <p>Adds a stock row to the stock list panel.</p>
    *
@@ -352,13 +344,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /**
    * <p>Selects a stock and updates the buy panel and chart.</p>
    *
-   * @param symbol     the stock symbol
-   * @param company    the company name
-   * @param price      the current price text
-   * @param change     the change text
-   * @param high       the day high text
-   * @param low        the day low text
-   * @param isPositive whether the change is positive
+   * @param data the display data for the selected stock row
    */
   private void selectStock(StockRowData data) {
     selectedSymbol = data.symbol();
@@ -373,6 +359,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     stockChart.setStockInfo(data.symbol(), data.company());
     buyButton.setDisable(false);
+
+    if (onSelectStock != null) onSelectStock.accept(data.symbol());
+    updateCostPreview();
   }
 
   /**
@@ -413,6 +402,33 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   public void setOnBuy(BiConsumer<String, String> handler) {
     this.onBuy = handler;
+  }
+
+  /**
+   * <p>Registers a handler that runs when the quantity spinner value changes.</p>
+   *
+   * @param handler the handler to run on change
+   */
+  public void setOnQuantityChanged(Runnable handler) {
+    this.onQuantityChanged = handler;
+  }
+
+  /**
+   * <p>Registers a handler that runs when a stock is selected, receiving its symbol.</p>
+   *
+   * @param handler the handler accepting the selected symbol
+   */
+  public void setOnSelectStock(Consumer<String> handler) {
+    this.onSelectStock = handler;
+  }
+
+  /**
+   * <p>Returns the currently selected stock symbol, or null if none selected.</p>
+   *
+   * @return the selected symbol
+   */
+  public String getSelectedSymbol() {
+    return selectedSymbol;
   }
 
   @Override

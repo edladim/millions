@@ -86,6 +86,28 @@ public final class ViewFormatter {
     return (positive ? "↗ " : "↘ ") + signedAmount(value);
   }
 
+  /**
+   * <p>Converts a decimal return rate to a signed percentage string,
+   * e.g. {@code 0.20} becomes {@code "+20.00%"}.</p>
+   *
+   * @param rate the decimal rate (e.g. {@code 0.20} for 20%)
+   * @return the formatted percentage string
+   */
+  public static String rateAsPercent(BigDecimal rate) {
+    return percent(rate.multiply(new BigDecimal("100")));
+  }
+
+  /**
+   * <p>Formats a share quantity as a plain decimal string scaled to two
+   * decimal places, e.g. {@code "10.00"}.</p>
+   *
+   * @param quantity the share quantity to format
+   * @return the formatted quantity string
+   */
+  public static String quantity(BigDecimal quantity) {
+    return scale(quantity).toPlainString();
+  }
+
   private static BigDecimal scale(BigDecimal value) {
     return value.setScale(2, RoundingMode.HALF_UP);
   }

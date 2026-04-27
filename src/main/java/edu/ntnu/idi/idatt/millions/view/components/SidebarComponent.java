@@ -1,7 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.components;
 
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.Page;
 import javafx.geometry.Insets;
@@ -214,7 +213,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   @Override
-  public void onExchangeUpdated(Exchange exchange) {
+  public void onExchangeUpdated(ReadOnlyExchange exchange) {
     setWeek(exchange.getWeek());
   }
 }

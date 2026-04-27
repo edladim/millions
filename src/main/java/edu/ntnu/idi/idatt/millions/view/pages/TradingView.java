@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.Exchange;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.StockRowData;
@@ -432,7 +432,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   @Override
-  public void onExchangeUpdated(Exchange exchange) {
+  public void onExchangeUpdated(ReadOnlyExchange exchange) {
     clearStocks();
     for (Stock stock : exchange.getStocks()) {
       BigDecimal change = stock.getLatestPriceChange();

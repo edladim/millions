@@ -1,8 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
@@ -31,7 +31,7 @@ import javafx.scene.shape.Circle;
  */
 public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
 
-  private Player player;
+  private ReadOnlyPlayer player;
 
   private Label portfolioValueLabel;
   private Label portfolioChangeLabel;
@@ -225,20 +225,20 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   @Override
-  public void onPlayerUpdated(Player player) {
+  public void onPlayerUpdated(ReadOnlyPlayer player) {
     this.player = player;
     refreshStats();
   }
 
   @Override
-  public void onPortfolioUpdated(Portfolio portfolio) {
+  public void onPortfolioUpdated(ReadOnlyPortfolio portfolio) {
     if (player != null) {
       refreshStats();
     }
   }
 
   @Override
-  public void onExchangeUpdated(Exchange exchange) {
+  public void onExchangeUpdated(ReadOnlyExchange exchange) {
     clearMovers();
     int rank = 1;
     for (Stock stock : exchange.getGainers(5)) {
@@ -247,7 +247,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   private void refreshStats() {
-    Portfolio portfolio = player.getPortfolio();
+    ReadOnlyPortfolio portfolio = player.getPortfolio();
     BigDecimal profit = player.getProfit();
     boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 

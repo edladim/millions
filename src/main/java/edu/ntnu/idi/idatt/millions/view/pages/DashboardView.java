@@ -61,15 +61,14 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @return the header container
    */
-  public VBox buildHeader() {
+  private VBox buildHeader() {
     Label title = new Label("DashBoard");
     title.getStyleClass().add("page-title");
 
     Label subtitle = new Label("Welcome back to your investment game");
     subtitle.getStyleClass().add("page-subtitle");
 
-    VBox header = new VBox(4, title, subtitle);
-    return header;
+    return new VBox(4, title, subtitle);
   }
 
   /**
@@ -77,7 +76,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @return the banner wrapper
    */
-  public StackPane buildPortfolioBanner() {
+  private StackPane buildPortfolioBanner() {
     VBox content = new VBox(8);
     content.setPadding(new Insets(32));
     content.getStyleClass().add("portfolio-banner");
@@ -257,8 +256,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
     setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
 
-    BigDecimal rate = player.getReturnRate().multiply(new BigDecimal("100"));
-    String changeStr = ViewFormatter.percent(rate)
+    String changeStr = ViewFormatter.rateAsPercent(player.getReturnRate())
         + "  (" + ViewFormatter.signedPrice(profit) + ")";
     setPortfolioChange(changeStr, isPositive);
   }

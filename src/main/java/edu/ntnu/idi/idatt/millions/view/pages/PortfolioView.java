@@ -31,6 +31,10 @@ import javafx.scene.layout.VBox;
  * </p>
  */
 public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
+
+  private static final String ZERO_PRICE     = ViewFormatter.price(BigDecimal.ZERO);
+  private static final String VALUE_STYLE    = "stat-card-value";
+
   private Player player;
   private Consumer<Share> onSell;
 
@@ -40,7 +44,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
-  private StockChartComponent portfolioChart;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -64,10 +67,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the chart component
    */
   private StockChartComponent buildPortfolioChart() {
-    portfolioChart = new StockChartComponent("–", "No stock selected");
-    portfolioChart.setChartHeight(200);
-    portfolioChart.setPrefHeight(250);
-    return portfolioChart;
+    StockChartComponent chart = new StockChartComponent("–", "No stock selected");
+    chart.setChartHeight(200);
+    chart.setPrefHeight(250);
+    return chart;
   }
 
   /**
@@ -94,9 +97,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox netWorthCard = buildSummaryCard("Net Worth", "$0.00", "stat-card-value");
-    VBox cashCard = buildSummaryCard("Cash Balance", "$0.00", "stat-card-value");
-    VBox portfolioCard = buildSummaryCard("Portfolio Value", "$0.00", "stat-card-value");
+    VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
+    VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
+    VBox portfolioCard = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
     VBox statusCard = buildSummaryCard("Status", "Novice", "stat-card-value-status");
 
     netWorthLabel = (Label) netWorthCard.getChildren().get(1);
@@ -238,7 +241,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     stockLabel.getStyleClass().add("mover-name");
     stockLabel.setPrefWidth(200);
 
-    Label qtyLabel = makeDataCell(share.getQuantity().toPlainString(), 120);
+    Label qtyLabel = makeDataCell(ViewFormatter.quantity(share.getQuantity()), 120);
 
     BigDecimal gainOrLoss = share.getGainOrLoss();
     boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;

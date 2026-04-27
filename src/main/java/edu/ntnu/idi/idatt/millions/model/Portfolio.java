@@ -20,7 +20,7 @@ import java.util.Objects;
  *   <li>The internal collection cannot be modified externally</li>
  * </ul>
  */
-public final class Portfolio {
+public final class Portfolio implements ReadOnlyPortfolio {
 
   private final List<PortfolioObserver> observers = new ArrayList<>();
   private final List<Share> shares = new ArrayList<>();

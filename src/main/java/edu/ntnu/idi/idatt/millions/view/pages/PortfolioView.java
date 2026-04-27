@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
@@ -35,7 +35,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private static final String ZERO_PRICE     = ViewFormatter.price(BigDecimal.ZERO);
   private static final String VALUE_STYLE    = "stat-card-value";
 
-  private Player player;
+  private ReadOnlyPlayer player;
   private Consumer<Share> onSell;
 
   private Label netWorthLabel;
@@ -187,14 +187,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   @Override
-  public void onPortfolioUpdated(Portfolio portfolio) {
+  public void onPortfolioUpdated(ReadOnlyPortfolio portfolio) {
     if (player != null) {
       refreshPortfolioData(player);
     }
   }
 
   @Override
-  public void onPlayerUpdated(Player player) {
+  public void onPlayerUpdated(ReadOnlyPlayer player) {
     this.player = player;
     refreshPortfolioData(player);
   }
@@ -202,10 +202,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   /**
    * <p>Refreshes the view with values from the provided player.</p>
    *
-   * @param player the player whose portfolio data should be displayed
+   * @param player a read-only view of the player whose portfolio data should be displayed
    */
-  public void refreshPortfolioData(Player player) {
-    Portfolio portfolio = player.getPortfolio();
+  public void refreshPortfolioData(ReadOnlyPlayer player) {
+    ReadOnlyPortfolio portfolio = player.getPortfolio();
 
     netWorthLabel.setText(ViewFormatter.price(player.getNetWorth()));
     cashBalanceLabel.setText(ViewFormatter.price(player.getMoney()));

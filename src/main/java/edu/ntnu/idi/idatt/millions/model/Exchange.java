@@ -18,7 +18,7 @@ import java.util.*;
  * <p>The exchange also tracks the current trading week and updates stock
  * prices when advancing to the next week.</p>
  */
-public final class Exchange {
+public final class Exchange implements ReadOnlyExchange {
 
   private final List<ExchangeObserver> observers = new ArrayList<>();
   private final String name;

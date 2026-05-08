@@ -39,6 +39,7 @@ public class MainView {
     tradingView = new TradingView();
 
     root.setLeft(sidebar);
+    sidebar.prefHeightProperty().bind(root.heightProperty());
 
     showPage(Page.DASHBOARD);
     sidebar.setActivePage(Page.DASHBOARD);
@@ -73,6 +74,8 @@ public class MainView {
     Scene scene = new Scene(root);
     scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
     scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
+    root.prefHeightProperty().bind(scene.heightProperty());
+    root.minHeightProperty().bind(scene.heightProperty());
     return scene;
   }
 

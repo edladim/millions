@@ -13,6 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -44,6 +45,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
+  private StockChartComponent portfolioChart;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -67,10 +69,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the chart component
    */
   private StockChartComponent buildPortfolioChart() {
-    StockChartComponent chart = new StockChartComponent("–", "No stock selected");
-    chart.setChartHeight(200);
-    chart.setPrefHeight(250);
-    return chart;
+    portfolioChart = new StockChartComponent("–", "Your Portfolio");
+    portfolioChart.setChartHeight(200);
+    portfolioChart.setPrefHeight(250);
+    return portfolioChart;
   }
 
   /**
@@ -157,10 +159,19 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     emptyLabel.setAlignment(Pos.CENTER);
     holdingsContainer.getChildren().add(emptyLabel);
 
-    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), holdingsContainer);
+    ScrollPane holdingsScroll = new ScrollPane(holdingsContainer);
+    holdingsScroll.setFitToWidth(true);
+    holdingsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    holdingsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    holdingsScroll.getStyleClass().add("stock-scroll");
+
+    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), holdingsScroll);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24));
-    VBox.setVgrow(section, Priority.ALWAYS);
+    section.setPrefHeight(320);
+    section.setMinHeight(320);
+    section.setMaxHeight(320);
+    VBox.setVgrow(section, Priority.NEVER);
     return section;
   }
 

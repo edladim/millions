@@ -16,7 +16,7 @@ import java.util.Objects;
  * <p>The player also owns a {@link Portfolio} containing shares
  * and a {@link TransactionArchive} storing completed transactions.</p>
  */
-public final class Player {
+public final class Player implements ReadOnlyPlayer {
 
   private static final BigDecimal INVESTOR_GROWTH_REQUIREMENT = new BigDecimal("0.20");
   private static final BigDecimal SPECULATOR_GROWTH_REQUIREMENT = BigDecimal.ONE;

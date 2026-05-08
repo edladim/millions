@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
@@ -32,7 +32,11 @@ import javafx.scene.layout.VBox;
  * </p>
  */
 public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
-  private Player player;
+
+  private static final String ZERO_PRICE     = ViewFormatter.price(BigDecimal.ZERO);
+  private static final String VALUE_STYLE    = "stat-card-value";
+
+  private ReadOnlyPlayer player;
   private Consumer<Share> onSell;
 
   private Label netWorthLabel;
@@ -41,7 +45,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
-  private StockChartComponent portfolioChart;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -95,9 +98,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox netWorthCard = buildSummaryCard("Net Worth", "$0.00", "stat-card-value");
-    VBox cashCard = buildSummaryCard("Cash Balance", "$0.00", "stat-card-value");
-    VBox portfolioCard = buildSummaryCard("Portfolio Value", "$0.00", "stat-card-value");
+    VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
+    VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
+    VBox portfolioCard = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
     VBox statusCard = buildSummaryCard("Status", "Novice", "stat-card-value-status");
 
     netWorthLabel = (Label) netWorthCard.getChildren().get(1);
@@ -194,14 +197,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   @Override
-  public void onPortfolioUpdated(Portfolio portfolio) {
+  public void onPortfolioUpdated(ReadOnlyPortfolio portfolio) {
     if (player != null) {
       refreshPortfolioData(player);
     }
   }
 
   @Override
-  public void onPlayerUpdated(Player player) {
+  public void onPlayerUpdated(ReadOnlyPlayer player) {
     this.player = player;
     refreshPortfolioData(player);
   }
@@ -209,10 +212,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   /**
    * <p>Refreshes the view with values from the provided player.</p>
    *
-   * @param player the player whose portfolio data should be displayed
+   * @param player a read-only view of the player whose portfolio data should be displayed
    */
-  public void refreshPortfolioData(Player player) {
-    Portfolio portfolio = player.getPortfolio();
+  public void refreshPortfolioData(ReadOnlyPlayer player) {
+    ReadOnlyPortfolio portfolio = player.getPortfolio();
 
     netWorthLabel.setText(ViewFormatter.price(player.getNetWorth()));
     cashBalanceLabel.setText(ViewFormatter.price(player.getMoney()));
@@ -248,7 +251,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     stockLabel.getStyleClass().add("mover-name");
     stockLabel.setPrefWidth(200);
 
-    Label qtyLabel = makeDataCell(share.getQuantity().toPlainString(), 120);
+    Label qtyLabel = makeDataCell(ViewFormatter.quantity(share.getQuantity()), 120);
 
     BigDecimal gainOrLoss = share.getGainOrLoss();
     boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;

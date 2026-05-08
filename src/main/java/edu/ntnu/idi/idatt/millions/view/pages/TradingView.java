@@ -1,12 +1,9 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
-import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.StockRowData;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
-import java.math.BigDecimal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -48,6 +45,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private BiConsumer<String, String> onBuy;
   private Runnable onQuantityChanged;
   private Consumer<String> onSelectStock;
+  private Runnable onRefresh;
 
   /**
    * <p>Constructs the trading view and builds its initial layout.</p>
@@ -431,22 +429,19 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return selectedSymbol;
   }
 
+  /**
+   * <p>Registers a handler that runs when the exchange updates, so the controller
+   * can rebuild the stock list respecting any active search filter.</p>
+   *
+   * @param handler the handler to run on exchange update
+   */
+  public void setOnRefresh(Runnable handler) {
+    this.onRefresh = handler;
+  }
+
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
-    clearStocks();
-    for (Stock stock : exchange.getStocks()) {
-      BigDecimal change = stock.getLatestPriceChange();
-      boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
-      addStockRow(new StockRowData(
-          stock.getSymbol(),
-          stock.getCompany(),
-          ViewFormatter.price(stock.getSalesPrice()),
-          ViewFormatter.signedAmount(change),
-          ViewFormatter.price(stock.getHighestPrice()),
-          ViewFormatter.price(stock.getLowestPrice()),
-          isPositive
-      ));
-    }
+    if (onRefresh != null) onRefresh.run();
   }
 
   /**

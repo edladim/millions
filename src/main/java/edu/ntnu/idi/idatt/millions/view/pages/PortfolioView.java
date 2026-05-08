@@ -45,6 +45,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
+  private StockChartComponent portfolioChart;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>

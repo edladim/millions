@@ -37,22 +37,22 @@ public class MainController {
 
     view.setOnAdvanceWeek(this::advanceWeek);
 
-    notifyAll(exchange, player);
+    initializeViews(exchange, player);
   }
 
   /**
-   * <p>Advances the exchange by one week and refreshes the sidebar week display.</p>
+   * <p>Advances the exchange by one week; all registered observers are notified
+   * automatically by the exchange.</p>
    */
   public void advanceWeek() {
     exchange.advance();
-    notifyAll(exchange, player);
-    view.setWeek(exchange.getWeek());
   }
 
   /**
    * <p>Registers all views as observers on the appropriate models.</p>
    */
   private void registerObservers() {
+    exchange.addObserver(view.getSidebar());
     exchange.addObserver(view.getDashboardView());
     exchange.addObserver(view.getTradingView());
 
@@ -64,12 +64,13 @@ public class MainController {
   }
 
   /**
-   * <p>Sends an initial notification to all views so they populate on startup.</p>
+   * <p>Fires an initial notification to all views so they populate on startup.</p>
    *
    * @param exchange the exchange to push to exchange observers.
    * @param player   the player to push to player observers.
    */
-  private void notifyAll(Exchange exchange, Player player) {
+  private void initializeViews(Exchange exchange, Player player) {
+    view.getSidebar().onExchangeUpdated(exchange);
     view.getDashboardView().onExchangeUpdated(exchange);
     view.getTradingView().onExchangeUpdated(exchange);
     view.getDashboardView().onPlayerUpdated(player);

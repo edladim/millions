@@ -64,6 +64,7 @@ public class MainController {
     player.getPortfolio().addObserver(view.getPortfolioView());
   }
 
+
   /**
    * <p>Sends an initial notification to all views so they populate on startup.</p>
    *

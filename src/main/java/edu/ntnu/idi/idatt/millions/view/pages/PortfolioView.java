@@ -99,6 +99,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
+
     VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
     VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
     VBox portfolioCard = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
@@ -135,7 +136,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
     VBox card = new VBox(12, titleLabel, valueLabel);
     card.getStyleClass().add("stat-card");
-    card.setPadding(new Insets(24));
+    card.setPadding(new Insets(10));
     card.setMaxWidth(Double.MAX_VALUE);
     return card;
   }

@@ -27,6 +27,7 @@ public final class Player implements ReadOnlyPlayer {
   private BigDecimal money;
   private final Portfolio portfolio;
   private final TransactionArchive transactionArchive;
+  private final List<BigDecimal> historicalNetWorth;
 
   /**
    * Creates a new player.
@@ -46,6 +47,7 @@ public final class Player implements ReadOnlyPlayer {
     this.money = startingMoney;
     this.portfolio = new Portfolio();
     this.transactionArchive = new TransactionArchive();
+    this.historicalNetWorth = new ArrayList<>();
   }
 
   /**
@@ -128,6 +130,13 @@ public final class Player implements ReadOnlyPlayer {
     return portfolio.getNetWorth().add(money);
   }
 
+  public void updateHistoricalNetWorth() {
+    historicalNetWorth.add(getNetWorth());
+  }
+
+  public List<BigDecimal> getHistoricalNetWorth() {
+    return historicalNetWorth;
+  }
 
   /**
    * Calculates the player's profit relative to the starting capital.

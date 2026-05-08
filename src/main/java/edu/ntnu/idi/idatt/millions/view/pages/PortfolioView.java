@@ -224,7 +224,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
     statusLabel.setText(player.getStatus().name());
 
-    portfolioChart.setData(portfolio.getNetWorthOverTime());
+    portfolioChart.setData(player.getHistoricalNetWorth());
 
     holdingsContainer.getChildren().clear();
 

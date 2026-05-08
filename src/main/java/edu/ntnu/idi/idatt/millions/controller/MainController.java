@@ -45,6 +45,7 @@ public class MainController {
    */
   public void advanceWeek() {
     exchange.advance();
+    player.updateHistoricalNetWorth();
     notifyAll(exchange, player);
     view.setWeek(exchange.getWeek());
   }

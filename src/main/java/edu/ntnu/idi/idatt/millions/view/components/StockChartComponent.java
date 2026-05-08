@@ -47,6 +47,7 @@ public class StockChartComponent extends VBox {
 
     xAxis = new NumberAxis();
     xAxis.setLabel("Week");
+    xAxis.setLowerBound(0);
     xAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(xAxis) {
       @Override
       public String toString(Number value) {

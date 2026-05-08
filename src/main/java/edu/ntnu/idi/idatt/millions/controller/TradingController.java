@@ -37,6 +37,8 @@ public class TradingController {
     this.exchange = exchange;
     this.player   = player;
 
+    view.setOnRefresh(() -> filterStocks(view.getSearchField().getText()));
+
     view.setOnSelectStock(symbol -> {
       selectedSymbol = symbol;
       updateCostPreview();

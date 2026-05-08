@@ -53,11 +53,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   public PortfolioView() {
     getStyleClass().add("dashboard-view");
     setSpacing(24);
-    setPadding(new Insets(40));
+    setPadding(new Insets(20));
 
     getChildren().addAll(
-            buildPortfolioChart(),
             buildHeader(),
+            buildPortfolioChart(),
             buildSummaryRow(),
             buildHoldingsSection()
     );
@@ -223,6 +223,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     cashBalanceLabel.setText(ViewFormatter.price(player.getMoney()));
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
     statusLabel.setText(player.getStatus().name());
+
+    portfolioChart.setData(portfolio.getNetWorthOverTime());
 
     holdingsContainer.getChildren().clear();
 

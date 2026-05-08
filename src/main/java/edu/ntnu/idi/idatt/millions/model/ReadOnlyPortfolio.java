@@ -52,6 +52,8 @@ public interface ReadOnlyPortfolio {
    */
   BigDecimal getNetWorth();
 
+  List<BigDecimal> getNetWorthOverTime();
+
   /**
    * Returns the number of shares currently in the portfolio.
    *

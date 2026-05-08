@@ -197,6 +197,34 @@ public final class Portfolio implements ReadOnlyPortfolio {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
+  public List<BigDecimal> getNetWorthOverTime() {
+    if (shares.isEmpty()) {
+      return List.of();
+    }
+
+    int maxWeeks = shares.stream()
+            .mapToInt(share -> share.getStock().getHistoricalPrices().size())
+            .max()
+            .orElse(0);
+
+    List<BigDecimal> values = new ArrayList<>(maxWeeks);
+    for (int weekIdx = 0; weekIdx < maxWeeks; weekIdx++) {
+      BigDecimal total = BigDecimal.ZERO;
+
+      for  (Share share : shares) {
+        List<BigDecimal> history = share.getStock().getHistoricalPrices();
+        if (history.isEmpty()) {
+          continue;
+        }
+        int idx = Math.min(weekIdx, history.size() - 1);
+        BigDecimal price = history.get(idx);
+        total = total.add(price.multiply(share.getQuantity()));
+      }
+      values.add(total);
+    }
+    return List.copyOf(values);
+  }
+
   /**
    * Registers a {@link PortfolioObserver} to be notified on portfolio changes.
    *

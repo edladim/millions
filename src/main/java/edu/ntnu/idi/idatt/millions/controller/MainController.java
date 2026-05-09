@@ -41,7 +41,7 @@ public class MainController {
   }
 
   /**
-   * <p>Advances the exchange by one week and refreshes the sidebar week display.</p>
+   * <p>Advances the exchange by one week, registers current net worth and refreshes the sidebar week display.</p>
    */
   public void advanceWeek() {
     exchange.advance();

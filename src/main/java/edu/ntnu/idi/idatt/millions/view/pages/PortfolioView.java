@@ -278,8 +278,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     return row;
   }
 
-  // --- helpers ---
-
   private Label makeDataCell(String text, double width) {
     Label l = new Label(text);
     l.getStyleClass().add("table-data-cell");

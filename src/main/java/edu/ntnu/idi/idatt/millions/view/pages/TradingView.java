@@ -11,7 +11,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -41,8 +40,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Label totalCostLabel;
   private Button buyButton;
 
-  private String selectedSymbol = null;
-  private BiConsumer<String, String> onBuy;
+  private Consumer<String> onBuy;
   private Runnable onQuantityChanged;
   private Consumer<String> onSelectStock;
   private Runnable onRefresh;
@@ -179,8 +177,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     buyButton.setMaxWidth(Double.MAX_VALUE);
     buyButton.setDisable(true);
     buyButton.setOnAction(e -> {
-      if (onBuy != null && selectedSymbol != null) {
-        onBuy.accept(selectedSymbol, quantitySpinner.getValue().toString());
+      if (onBuy != null) {
+        onBuy.accept(quantitySpinner.getValue().toString());
       }
     });
 
@@ -345,7 +343,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param data the display data for the selected stock row
    */
   private void selectStock(StockRowData data) {
-    selectedSymbol = data.symbol();
     buySymbolLabel.setText(data.symbol());
     buyCompanyLabel.setText(data.company());
     buyPriceLabel.setText(data.price());
@@ -396,9 +393,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /**
    * <p>Registers a handler that runs when the user confirms a buy.</p>
    *
-   * @param handler the buy handler accepting symbol and quantity
+   * @param handler the buy handler accepting the quantity string
    */
-  public void setOnBuy(BiConsumer<String, String> handler) {
+  public void setOnBuy(Consumer<String> handler) {
     this.onBuy = handler;
   }
 
@@ -418,15 +415,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   public void setOnSelectStock(Consumer<String> handler) {
     this.onSelectStock = handler;
-  }
-
-  /**
-   * <p>Returns the currently selected stock symbol, or null if none selected.</p>
-   *
-   * @return the selected symbol
-   */
-  public String getSelectedSymbol() {
-    return selectedSymbol;
   }
 
   /**

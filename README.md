@@ -1,105 +1,80 @@
-# Millions project IDATT2003
+# Millions — IDATT2003
 
-STUDENT NAMES: Edvard Kvisler Ladim, Oskar Hellum Reppen
+**Students:** Edvard Kvisler Ladim (157325), Oskar Hellum Reppen (157300)
 
-STUDENT ID: 157325, 157300
+**Repository:** https://github.com/edladim/millions
 
 ---
+
 ## Project description
 
+Millions is a stock trading simulation game built in Java with JavaFX. The player starts with a chosen capital and a stock exchange loaded from a CSV file. Each week, stock prices fluctuate and the player can buy and sell shares to grow their portfolio. The game tracks net worth, profit, and awards the player a status (Novice → Investor → Speculator) based on performance.
+
 ---
+
+## Requirements
+
+- Java 21 or newer
+- Maven 3.8 or newer
+
+---
+
+## Build and run
+
+### Run the application
+```bash
+mvn javafx:run
+```
+
+### Run all tests
+```bash
+mvn test
+```
+
+### Compile only
+```bash
+mvn compile
+```
+
+### Build a packaged JAR
+```bash
+mvn package
+```
+
+---
+
 ## Project structure
-This project follows a layered architecture inspired by MVC.
-All source code is stored under the standard Maven directory layout.
-### Source code layout
+
+The project follows MVC with an Observer pattern and uses the standard Maven directory layout.
+
 ```
 src/
 ├── main/
-│   └── java/
-│       └── edu.ntnu.idi.idatt.millions/
-│           ├── model/                   # Core domain entities and repository interfaces
-│           └──  fileHandler/             # Application services and DTOs
-│
+│   ├── java/edu/ntnu/idi/idatt/millions/
+│   │   ├── controller/       # Page controllers (setup, trading, portfolio)
+│   │   ├── filehandler/      # CSV reading and writing
+│   │   ├── model/            # Domain entities (Exchange, Player, Portfolio, Stock, Share)
+│   │   │   └── transaction/  # Transaction types, calculators and factory
+│   │   ├── observer/         # Observer interfaces (Exchange, Player, Portfolio)
+│   │   └── view/             # JavaFX views and formatter
+│   │       ├── components/   # Reusable UI components (Sidebar, Chart)
+│   │       └── pages/        # Full-page views (Dashboard, Trading, Portfolio)
+│   └── resources/
+│       ├── StockData.csv     # Default stock data loaded on startup
+│       └── styles/           # CSS stylesheets
 └── test/
-    └── java/
-        └── edu.ntnu.idi.idatt.millions/  # All JUnit test classes
+    └── java/edu/ntnu/idi/idatt/millions/
+        ├── model/            # Unit tests for domain classes
+        │   └── transaction/  # Unit tests for transaction logic
+        └── filehandler/      # Unit tests for CSV parsing
 ```
-### Package Overview
-- ***"model"***
-
-  Contains all core business entities (Author, JournalEntry)
-  and repository interfaces.
-
-### JUnit test structure
-All JUnit tests are stored in:
-```
-src/test/java/edu.ntnu.idi.idatt.millions/
-```
-and mirror the structure of the main code, for example:
-```
-src/test/java/edu.ntnu.idi.idatt.millions/model/PlayerTest.java
-````
-
-This ensures a clean 1-to-1 relationship between production code and test code.
-
----
-## Link to repository
-
-https://github.com/NTNU-IDI/mappe-2025-edladim/tree/main
-
----
-## How to run the project
-
-What is the input and output of the program? What is the expected behaviour of the program?)
-- Java **21 or newer** (Java 25 recommended)
-- Maven installed (optional if you only run the JAR)
----
-### Running in an IDEA
-(IntelliJ, VS Code, Eclipse, NetBeans, etc.)
-1. Open or import the project as a **Maven project**
-2. Wait for Maven to import dependencies
-3. Navigate to: `src/main/java/edu/ntnu/idi/idatt/millions/Main.java`
-4. Run the `main` method
-
-The program will run in a terminal window inside your IDE.
 
 ---
 
-### Running From Terminal
-#### Build the project
+## Test coverage
 
-```bash 
-
-mvn clean package
-```
-This will generate a runnable fat JAR here:
-
-`target/journal-1.0-SNAPSHOT.jar`
-
----
-
-#### Run the JAR
-```bash
-
-java -jar target/journal-1.0-SNAPSHOT.jar
+After running `mvn test`, a JaCoCo coverage report is generated at:
 
 ```
-This is a **self-contained JAR**, meaning:
-- It does not require any other dependencies to run
-- Does not require maven to be installed
-- Works on any operating system
-
----
-## How to run the tests
-
-```bash
-
-mvn test
-```
-### Coverage Report (JaCoCo)
-#### Go to:
-```
-
 target/site/jacoco/index.html
 ```
-Open the report in your browser to see the code coverage.

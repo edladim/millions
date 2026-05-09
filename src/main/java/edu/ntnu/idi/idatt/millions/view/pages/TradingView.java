@@ -1,12 +1,10 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
-import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
-import edu.ntnu.idi.idatt.millions.view.StockRowData;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
-import java.math.BigDecimal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -14,7 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
-import java.util.function.BiConsumer;
+import java.math.BigDecimal;
 import java.util.function.Consumer;
 
 /**
@@ -44,10 +42,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Label totalCostLabel;
   private Button buyButton;
 
-  private String selectedSymbol = null;
-  private BiConsumer<String, String> onBuy;
+  private Consumer<String> onBuy;
   private Runnable onQuantityChanged;
   private Consumer<String> onSelectStock;
+  private Runnable onRefresh;
 
   /**
    * <p>Constructs the trading view and builds its initial layout.</p>
@@ -181,8 +179,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     buyButton.setMaxWidth(Double.MAX_VALUE);
     buyButton.setDisable(true);
     buyButton.setOnAction(e -> {
-      if (onBuy != null && selectedSymbol != null) {
-        onBuy.accept(selectedSymbol, quantitySpinner.getValue().toString());
+      if (onBuy != null) {
+        onBuy.accept(quantitySpinner.getValue().toString());
       }
     });
 
@@ -298,33 +296,36 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /**
    * <p>Adds a stock row to the stock list panel.</p>
    *
-   * @param data the display data for the stock row
+   * @param stock the read-only stock to display in the row
    */
-  public void addStockRow(StockRowData data) {
+  public void addStockRow(ReadOnlyStock stock) {
+    BigDecimal change = stock.getLatestPriceChange();
+    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
+
     Circle icon = new Circle(18, Color.web("#6366f1"));
-    Label letter = new Label(String.valueOf(data.symbol().charAt(0)));
+    Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
     letter.getStyleClass().add("mover-icon-letter");
     StackPane iconPane = new StackPane(icon, letter);
 
-    Label nameLabel = new Label(data.symbol());
+    Label nameLabel = new Label(stock.getSymbol());
     nameLabel.getStyleClass().add("mover-name");
-    Label compLabel = new Label(data.company());
+    Label compLabel = new Label(stock.getCompany());
     compLabel.getStyleClass().add("mover-symbol");
     VBox nameBox = new VBox(2, nameLabel, compLabel);
     HBox stockCell = new HBox(10, iconPane, nameBox);
     stockCell.setAlignment(Pos.CENTER_LEFT);
     stockCell.setPrefWidth(220);
 
-    Label priceLabel  = makeDataCell(data.price(),  120, "table-data-cell");
-    Label changeLabel = makeDataCell(data.change(), 120,
-        data.isPositive() ? "table-data-cell-profit" : "table-data-cell-loss");
-    Label highLabel   = makeDataCell(data.high(),   110, "table-data-cell");
-    Label lowLabel    = makeDataCell(data.low(),    110, "table-data-cell");
+    Label priceLabel  = makeDataCell(ViewFormatter.price(stock.getSalesPrice()),       120, "table-data-cell");
+    Label changeLabel = makeDataCell(ViewFormatter.signedAmount(change),               120,
+        isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
+    Label highLabel   = makeDataCell(ViewFormatter.price(stock.getHighestPrice()),     110, "table-data-cell");
+    Label lowLabel    = makeDataCell(ViewFormatter.price(stock.getLowestPrice()),      110, "table-data-cell");
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");
     selectBtn.setPrefWidth(70);
-    selectBtn.setOnAction(e -> selectStock(data));
+    selectBtn.setOnAction(e -> selectStock(stock));
 
     HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
     row.setAlignment(Pos.CENTER_LEFT);
@@ -344,23 +345,25 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /**
    * <p>Selects a stock and updates the buy panel and chart.</p>
    *
-   * @param data the display data for the selected stock row
+   * @param stock the read-only stock that was selected
    */
-  private void selectStock(StockRowData data) {
-    selectedSymbol = data.symbol();
-    buySymbolLabel.setText(data.symbol());
-    buyCompanyLabel.setText(data.company());
-    buyPriceLabel.setText(data.price());
-    buyChangeLabel.setText((data.isPositive() ? "↗ " : "↘ ") + data.change());
-    buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
-    buyChangeLabel.getStyleClass().add(data.isPositive() ? "mover-change-positive" : "mover-change-negative");
-    buyHighLabel.setText("H: " + data.high());
-    buyLowLabel.setText("L: " + data.low());
+  private void selectStock(ReadOnlyStock stock) {
+    BigDecimal change = stock.getLatestPriceChange();
+    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 
-    stockChart.setStockInfo(data.symbol(), data.company());
+    buySymbolLabel.setText(stock.getSymbol());
+    buyCompanyLabel.setText(stock.getCompany());
+    buyPriceLabel.setText(ViewFormatter.price(stock.getSalesPrice()));
+    buyChangeLabel.setText(ViewFormatter.priceChangeArrow(change));
+    buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
+    buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
+    buyHighLabel.setText("H: " + ViewFormatter.price(stock.getHighestPrice()));
+    buyLowLabel.setText("L: " + ViewFormatter.price(stock.getLowestPrice()));
+
+    stockChart.setStockInfo(stock.getSymbol(), stock.getCompany());
     buyButton.setDisable(false);
 
-    if (onSelectStock != null) onSelectStock.accept(data.symbol());
+    if (onSelectStock != null) onSelectStock.accept(stock.getSymbol());
     updateCostPreview();
   }
 
@@ -398,9 +401,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /**
    * <p>Registers a handler that runs when the user confirms a buy.</p>
    *
-   * @param handler the buy handler accepting symbol and quantity
+   * @param handler the buy handler accepting the quantity string
    */
-  public void setOnBuy(BiConsumer<String, String> handler) {
+  public void setOnBuy(Consumer<String> handler) {
     this.onBuy = handler;
   }
 
@@ -423,30 +426,18 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Returns the currently selected stock symbol, or null if none selected.</p>
+   * <p>Registers a handler that runs when the exchange updates, so the controller
+   * can rebuild the stock list respecting any active search filter.</p>
    *
-   * @return the selected symbol
+   * @param handler the handler to run on exchange update
    */
-  public String getSelectedSymbol() {
-    return selectedSymbol;
+  public void setOnRefresh(Runnable handler) {
+    this.onRefresh = handler;
   }
 
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
-    clearStocks();
-    for (Stock stock : exchange.getStocks()) {
-      BigDecimal change = stock.getLatestPriceChange();
-      boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
-      addStockRow(new StockRowData(
-          stock.getSymbol(),
-          stock.getCompany(),
-          ViewFormatter.price(stock.getSalesPrice()),
-          ViewFormatter.signedAmount(change),
-          ViewFormatter.price(stock.getHighestPrice()),
-          ViewFormatter.price(stock.getLowestPrice()),
-          isPositive
-      ));
-    }
+    if (onRefresh != null) onRefresh.run();
   }
 
   /**

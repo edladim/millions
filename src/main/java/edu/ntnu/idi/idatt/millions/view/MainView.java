@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
 import javafx.scene.Scene;
+import java.util.Objects;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -72,8 +73,8 @@ public class MainView {
    */
   public Scene createScene() {
     Scene scene = new Scene(root);
-    scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
-    scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
+    scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/main.css")).toExternalForm());
+    scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles/dashboard.css")).toExternalForm());
     root.prefHeightProperty().bind(scene.heightProperty());
     root.minHeightProperty().bind(scene.heightProperty());
     return scene;
@@ -114,7 +115,7 @@ public class MainView {
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
 
-  /**
+    /**
    * <p>Updates the displayed week in the sidebar.</p>
    *
    * @param week the current week number

@@ -46,9 +46,9 @@ public final class Share {
   /**
    * Returns the stock associated with this share.
    *
-   * @return the stock, never null
+   * @return the stock as a read-only view, never null
    */
-  public Stock getStock() {
+  public ReadOnlyStock getStock() {
     return stock;
   }
 

@@ -41,11 +41,13 @@ public class MainController {
   }
 
   /**
-   * <p>Advances the exchange by one week; all registered observers are notified
-   * automatically by the exchange.</p>
+   * <p>Advances the exchange by one week, registers current net worth and refreshes the sidebar week display.</p>
    */
   public void advanceWeek() {
     exchange.advance();
+    player.updateHistoricalNetWorth();
+    initializeViews(exchange, player);
+    view.setWeek(exchange.getWeek());
   }
 
   /**
@@ -62,6 +64,7 @@ public class MainController {
     player.getPortfolio().addObserver(view.getDashboardView());
     player.getPortfolio().addObserver(view.getPortfolioView());
   }
+
 
   /**
    * <p>Fires an initial notification to all views so they populate on startup.</p>

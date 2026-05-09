@@ -27,6 +27,7 @@ public final class Player implements ReadOnlyPlayer {
   private BigDecimal money;
   private final Portfolio portfolio;
   private final TransactionArchive transactionArchive;
+  private final List<BigDecimal> historicalNetWorth;
 
   /**
    * Creates a new player.
@@ -46,6 +47,7 @@ public final class Player implements ReadOnlyPlayer {
     this.money = startingMoney;
     this.portfolio = new Portfolio();
     this.transactionArchive = new TransactionArchive();
+    this.historicalNetWorth = new ArrayList<>();
   }
 
   /**
@@ -128,6 +130,22 @@ public final class Player implements ReadOnlyPlayer {
     return portfolio.getNetWorth().add(money);
   }
 
+  /**
+   * Appends the player's current net worth to the historical series.
+   * <p>The recorded value reflects the latest snapshot of {@link #getNetWorth()}
+   * at the time of the call.</p>
+   */
+  public void updateHistoricalNetWorth() {
+    historicalNetWorth.add(getNetWorth());
+  }
+
+  /**
+   * Returns the recorded net worth history for the player.
+   * @return a list of net worth snapshots in chronological order
+   */
+  public List<BigDecimal> getHistoricalNetWorth() {
+    return historicalNetWorth;
+  }
 
   /**
    * Calculates the player's profit relative to the starting capital.

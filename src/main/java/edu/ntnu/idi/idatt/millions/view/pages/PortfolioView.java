@@ -53,11 +53,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   public PortfolioView() {
     getStyleClass().add("dashboard-view");
     setSpacing(24);
-    setPadding(new Insets(40));
+    setPadding(new Insets(20));
 
     getChildren().addAll(
-            buildPortfolioChart(),
             buildHeader(),
+            buildPortfolioChart(),
             buildSummaryRow(),
             buildHoldingsSection()
     );
@@ -69,9 +69,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the chart component
    */
   private StockChartComponent buildPortfolioChart() {
-    portfolioChart = new StockChartComponent("–", "Your Portfolio");
-    portfolioChart.setChartHeight(200);
-    portfolioChart.setPrefHeight(250);
+    portfolioChart = new StockChartComponent("Portfolio value", "");
+    portfolioChart.setYAxisLabel("Value ($)");
+    VBox.setVgrow(portfolioChart, Priority.ALWAYS);
     return portfolioChart;
   }
 
@@ -98,6 +98,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private HBox buildSummaryRow() {
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
+
 
     VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
     VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
@@ -135,7 +136,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
     VBox card = new VBox(12, titleLabel, valueLabel);
     card.getStyleClass().add("stat-card");
-    card.setPadding(new Insets(24));
+    card.setPadding(new Insets(10));
     card.setMaxWidth(Double.MAX_VALUE);
     return card;
   }
@@ -223,6 +224,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
     statusLabel.setText(player.getStatus().name());
 
+    portfolioChart.setData(player.getHistoricalNetWorth());
+
     holdingsContainer.getChildren().clear();
 
     if (portfolio.getShares().isEmpty()) {
@@ -274,8 +277,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     row.setPadding(new Insets(10, 0, 10, 0));
     return row;
   }
-
-  // --- helpers ---
 
   private Label makeDataCell(String text, double width) {
     Label l = new Label(text);

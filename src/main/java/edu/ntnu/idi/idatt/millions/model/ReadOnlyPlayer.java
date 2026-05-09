@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -36,6 +37,8 @@ public interface ReadOnlyPlayer {
    * @return the total net worth
    */
   BigDecimal getNetWorth();
+
+  List<BigDecimal> getHistoricalNetWorth();
 
   /**
    * Returns the player's profit relative to starting capital.

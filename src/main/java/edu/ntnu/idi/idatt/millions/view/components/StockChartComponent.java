@@ -5,6 +5,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
@@ -36,7 +37,7 @@ public class StockChartComponent extends VBox {
    */
   public StockChartComponent(String symbol, String company) {
     getStyleClass().add("stat-card");
-    setPadding(new Insets(5,20,5,20));
+    setPadding(new Insets(5,10,5,10));
     setSpacing(5);
 
     titleLabel = new Label(symbol);
@@ -47,6 +48,7 @@ public class StockChartComponent extends VBox {
 
     xAxis = new NumberAxis();
     xAxis.setLabel("Week");
+    xAxis.setLowerBound(0);
     xAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(xAxis) {
       @Override
       public String toString(Number value) {
@@ -65,7 +67,7 @@ public class StockChartComponent extends VBox {
     lineChart.setLegendVisible(false);
     lineChart.setAnimated(false);
     lineChart.getStyleClass().add("stock-line-chart");
-    lineChart.setPrefHeight(220);
+    VBox.setVgrow(lineChart, Priority.ALWAYS);
     lineChart.setMaxWidth(Double.MAX_VALUE);
 
     getChildren().addAll(titleLabel, subtitleLabel, lineChart);

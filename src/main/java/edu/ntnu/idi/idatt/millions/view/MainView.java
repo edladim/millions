@@ -4,8 +4,8 @@ import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
 import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
-import java.util.Objects;
 import javafx.scene.Scene;
+import java.util.Objects;
 import javafx.scene.layout.BorderPane;
 
 /**
@@ -114,4 +114,15 @@ public class MainView {
    * @param handler the action to run
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
+
+    /**
+   * <p>Updates the displayed week in the sidebar.</p>
+   *
+   * @param week the current week number
+   */
+  public void setWeek(int week) {
+    sidebar.setWeek(week);
+  }
+
+
 }

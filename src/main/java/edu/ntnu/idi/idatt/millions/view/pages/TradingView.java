@@ -158,11 +158,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     Label panelTitle = new Label("Buy Stock");
     panelTitle.getStyleClass().add("section-heading");
 
-    TextField buySearchField = new TextField();
-    buySearchField.setPromptText("Search stocks...");
-    buySearchField.getStyleClass().add("search-field");
-    buySearchField.setMaxWidth(Double.MAX_VALUE);
-
     VBox stockInfoCard = buildSelectedStockInfo();
 
     Label qtyLabel = new Label("Quantity");
@@ -186,7 +181,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     panel.getChildren().addAll(
             panelTitle,
-            buySearchField,
             stockInfoCard,
             buildSpacer(4),
             qtyLabel,

@@ -4,12 +4,12 @@ import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import javafx.scene.control.Alert;
 
 /**
  * <p>Controller for the trading page.</p>
@@ -89,26 +89,11 @@ public class TradingController {
     try {
       BigDecimal quantity = new BigDecimal(quantityStr);
       Transaction tx = exchange.buy(symbol, quantity, player);
-
-      BigDecimal gross      = tx.getCalculator().calculateGross();
-      BigDecimal commission = tx.getCalculator().calculateCommission();
-      BigDecimal total      = tx.getCalculator().calculateTotal();
-
-      Alert alert = new Alert(Alert.AlertType.INFORMATION);
-      alert.setTitle("Purchase Confirmed");
-      alert.setHeaderText("Bought " + quantityStr + " × " + symbol);
-      alert.setContentText(
-          "Cost:        " + ViewFormatter.price(gross)      + "\n"
-        + "Commission:  " + ViewFormatter.price(commission) + "\n"
-        + "Total paid:  " + ViewFormatter.price(total)      + "\n"
-        + "Cash left:   " + ViewFormatter.price(player.getMoney())
-      );
-      alert.showAndWait();
-
+      TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
     } catch (IllegalStateException e) {
-      showError("Insufficient funds", e.getMessage());
+      TransactionDialog.showError("Insufficient funds", e.getMessage());
     } catch (Exception e) {
-      showError("Purchase failed", e.getMessage());
+      TransactionDialog.showError("Purchase failed", e.getMessage());
     }
   }
 
@@ -130,17 +115,4 @@ public class TradingController {
     }
   }
 
-  /**
-   * <p>Displays an error alert with the given title and message.</p>
-   *
-   * @param title   the dialog title.
-   * @param message the error message to display.
-   */
-  private void showError(String title, String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle(title);
-    alert.setHeaderText(null);
-    alert.setContentText(message);
-    alert.showAndWait();
-  }
 }

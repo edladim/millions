@@ -4,9 +4,8 @@ import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
-import javafx.scene.control.Alert;
 
 /**
  * <p>Controller for the portfolio page.</p>
@@ -40,28 +39,9 @@ public class PortfolioController {
   private void handleSell(Share share) {
     try {
       Transaction tx = exchange.sell(share, player);
-
-      String symbol   = share.getStock().getSymbol();
-      String quantity = share.getQuantity().toPlainString();
-
-      Alert alert = new Alert(Alert.AlertType.INFORMATION);
-      alert.setTitle("Sale Confirmed");
-      alert.setHeaderText("Sold " + quantity + " × " + symbol);
-      alert.setContentText(
-          "Proceeds:    " + ViewFormatter.price(tx.getCalculator().calculateGross())      + "\n"
-        + "Commission:  " + ViewFormatter.price(tx.getCalculator().calculateCommission()) + "\n"
-        + "Tax:         " + ViewFormatter.price(tx.getCalculator().calculateTax())        + "\n"
-        + "Net received:" + ViewFormatter.price(tx.getCalculator().calculateTotal())      + "\n"
-        + "Cash balance:" + ViewFormatter.price(player.getMoney())
-      );
-      alert.showAndWait();
-
+      TransactionDialog.showSaleConfirmation(tx, player.getMoney());
     } catch (Exception e) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("Sale failed");
-      alert.setHeaderText(null);
-      alert.setContentText(e.getMessage());
-      alert.showAndWait();
+      TransactionDialog.showError("Sale failed", e.getMessage());
     }
   }
 }

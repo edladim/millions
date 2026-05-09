@@ -2,7 +2,7 @@ package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
@@ -37,6 +37,8 @@ public class TradingController {
     this.exchange = exchange;
     this.player   = player;
 
+    view.setOnRefresh(() -> filterStocks(view.getSearchField().getText()));
+
     view.setOnSelectStock(symbol -> {
       selectedSymbol = symbol;
       updateCostPreview();
@@ -44,7 +46,7 @@ public class TradingController {
 
     view.setOnQuantityChanged(this::updateCostPreview);
 
-    view.setOnBuy(this::handleBuy);
+    view.setOnBuy(qty -> handleBuy(selectedSymbol, qty));
 
     view.getSearchField().textProperty().addListener(
         (_, _, text) -> filterStocks(text)
@@ -59,7 +61,7 @@ public class TradingController {
     if (selectedSymbol == null) return;
 
     try {
-      Stock stock = exchange.getStock(selectedSymbol);
+      ReadOnlyStock stock = exchange.getStock(selectedSymbol);
       int qty = Integer.parseInt(view.getQuantityInput());
 
       BigDecimal gross      = stock.getSalesPrice().multiply(BigDecimal.valueOf(qty));
@@ -119,22 +121,12 @@ public class TradingController {
    */
   private void filterStocks(String text) {
     view.clearStocks();
-    List<Stock> results = text.isBlank()
+    List<? extends ReadOnlyStock> results = text.isBlank()
         ? exchange.getStocks()
         : exchange.findStocks(text);
 
-    for (Stock stock : results) {
-      BigDecimal change    = stock.getLatestPriceChange();
-      boolean isPositive   = change.compareTo(BigDecimal.ZERO) >= 0;
-      view.addStockRow(new edu.ntnu.idi.idatt.millions.view.StockRowData(
-          stock.getSymbol(),
-          stock.getCompany(),
-          ViewFormatter.price(stock.getSalesPrice()),
-          ViewFormatter.signedAmount(change),
-          ViewFormatter.price(stock.getHighestPrice()),
-          ViewFormatter.price(stock.getLowestPrice()),
-          isPositive
-      ));
+    for (ReadOnlyStock stock : results) {
+      view.addStockRow(stock);
     }
   }
 

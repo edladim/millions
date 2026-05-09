@@ -122,4 +122,6 @@ public class MainView {
   public void setWeek(int week) {
     sidebar.setWeek(week);
   }
+
+
 }

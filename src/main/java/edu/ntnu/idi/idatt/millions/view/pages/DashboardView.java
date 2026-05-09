@@ -3,7 +3,7 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
-import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
@@ -241,7 +241,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
     clearMovers();
     int rank = 1;
-    for (Stock stock : exchange.getGainers(5)) {
+    for (ReadOnlyStock stock : exchange.getGainers(5)) {
       moversContainer.getChildren().add(buildMoverRow(rank++, stock));
     }
   }
@@ -261,7 +261,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     setPortfolioChange(changeStr, isPositive);
   }
 
-  private HBox buildMoverRow(int rank, Stock stock) {
+  private HBox buildMoverRow(int rank, ReadOnlyStock stock) {
     Label rankLabel = new Label("#" + rank);
     rankLabel.getStyleClass().add("mover-rank");
     rankLabel.setPrefWidth(32);

@@ -35,7 +35,7 @@ public interface ReadOnlyExchange {
    *
    * @return all stocks, never null
    */
-  List<Stock> getStocks();
+  List<? extends ReadOnlyStock> getStocks();
 
   /**
    * Returns the top gaining stocks, limited to {@code limit} entries.
@@ -43,7 +43,7 @@ public interface ReadOnlyExchange {
    * @param limit the maximum number of results
    * @return the top gainers, never null
    */
-  List<Stock> getGainers(int limit);
+  List<? extends ReadOnlyStock> getGainers(int limit);
 
   /**
    * Returns the worst performing stocks, limited to {@code limit} entries.
@@ -51,7 +51,7 @@ public interface ReadOnlyExchange {
    * @param limit the maximum number of results
    * @return the top losers, never null
    */
-  List<Stock> getLosers(int limit);
+  List<? extends ReadOnlyStock> getLosers(int limit);
 
   /**
    * Finds all stocks matching the given search term (symbol or company name).
@@ -59,7 +59,7 @@ public interface ReadOnlyExchange {
    * @param searchTerm the search term, case-insensitive
    * @return matching stocks, never null
    */
-  List<Stock> findStocks(String searchTerm);
+  List<? extends ReadOnlyStock> findStocks(String searchTerm);
 
   /**
    * Returns the stock with the given symbol.
@@ -68,7 +68,7 @@ public interface ReadOnlyExchange {
    * @return the matching stock
    * @throws IllegalArgumentException if the symbol does not exist
    */
-  Stock getStock(String symbol);
+  ReadOnlyStock getStock(String symbol);
 
   /**
    * Checks whether a stock with the given symbol exists on the exchange.

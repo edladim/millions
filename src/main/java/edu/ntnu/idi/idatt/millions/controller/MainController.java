@@ -41,12 +41,15 @@ public class MainController {
   }
 
   /**
-   * <p>Advances the exchange by one week, registers current net worth and refreshes the sidebar week display.</p>
+   * <p>Advances the exchange by one week and snapshots the player's net worth.</p>
+   * <p>{@code exchange.advance()} notifies all {@link edu.ntnu.idi.idatt.millions.observer.ExchangeObserver}s,
+   * and {@code player.updateHistoricalNetWorth()} notifies all
+   * {@link edu.ntnu.idi.idatt.millions.observer.PlayerObserver}s — so all views
+   * refresh automatically without a manual push.</p>
    */
   public void advanceWeek() {
     exchange.advance();
     player.updateHistoricalNetWorth();
-    initializeViews(exchange, player);
   }
 
   /**

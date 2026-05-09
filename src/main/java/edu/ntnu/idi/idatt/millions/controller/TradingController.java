@@ -46,7 +46,7 @@ public class TradingController {
 
     view.setOnQuantityChanged(this::updateCostPreview);
 
-    view.setOnBuy(this::handleBuy);
+    view.setOnBuy(qty -> handleBuy(selectedSymbol, qty));
 
     view.getSearchField().textProperty().addListener(
         (_, _, text) -> filterStocks(text)

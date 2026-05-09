@@ -137,6 +137,7 @@ public final class Player implements ReadOnlyPlayer {
    */
   public void updateHistoricalNetWorth() {
     historicalNetWorth.add(getNetWorth());
+    notifyObservers();
   }
 
   /**

@@ -190,7 +190,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    *
    * @param week the current week number to display
    */
-  public void setWeek(int week) {
+  private void setWeek(int week) {
     weekLabel.setText("Week " + week);
   }
 

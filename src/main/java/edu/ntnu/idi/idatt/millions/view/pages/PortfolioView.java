@@ -216,7 +216,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @param player a read-only view of the player whose portfolio data should be displayed
    */
-  public void refreshPortfolioData(ReadOnlyPlayer player) {
+  private void refreshPortfolioData(ReadOnlyPlayer player) {
     ReadOnlyPortfolio portfolio = player.getPortfolio();
 
     netWorthLabel.setText(ViewFormatter.price(player.getNetWorth()));

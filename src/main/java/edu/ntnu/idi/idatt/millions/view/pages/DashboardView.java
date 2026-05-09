@@ -167,7 +167,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @param value the formatted portfolio value
    */
-  public void setPortfolioValue(String value) {
+  private void setPortfolioValue(String value) {
     portfolioValueLabel.setText(value);
   }
 
@@ -177,7 +177,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * @param change     the formatted change text
    * @param isPositive whether the change is positive
    */
-  public void setPortfolioChange(String change, boolean isPositive) {
+  private void setPortfolioChange(String change, boolean isPositive) {
     portfolioChangeLabel.setText("↗ " + change);
     portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
     if (!isPositive) {
@@ -190,7 +190,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @param value the formatted assets value
    */
-  public void setTotalAssets(String value) {
+  private void setTotalAssets(String value) {
     totalAssetsLabel.setText(value);
   }
 
@@ -199,7 +199,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @param value the formatted cost basis value
    */
-  public void setCostBasis(String value) {
+  private void setCostBasis(String value) {
     costBasisLabel.setText(value);
   }
 
@@ -209,7 +209,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * @param value      the formatted profit/loss value
    * @param isPositive whether the value is positive
    */
-  public void setTotalProfit(String value, boolean isPositive) {
+  private void setTotalProfit(String value, boolean isPositive) {
     totalProfitLabel.setText(value);
     totalProfitLabel.getStyleClass().removeAll("stat-card-value-loss");
     if (!isPositive) {
@@ -220,7 +220,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   /**
    * <p>Clears all items from the movers list.</p>
    */
-  public void clearMovers() {
+  private void clearMovers() {
     moversContainer.getChildren().clear();
   }
 

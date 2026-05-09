@@ -91,9 +91,10 @@ public class TradingController {
       Transaction tx = exchange.buy(symbol, quantity, player);
       TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
     } catch (IllegalStateException e) {
-      TransactionDialog.showError("Insufficient funds", e.getMessage());
-    } catch (Exception e) {
       TransactionDialog.showError("Purchase failed", e.getMessage());
+    } catch (Exception e) {
+      TransactionDialog.showError("Unexpected error",
+          "Could not complete purchase: " + e.getMessage());
     }
   }
 

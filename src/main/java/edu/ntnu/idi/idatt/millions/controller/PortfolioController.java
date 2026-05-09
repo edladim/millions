@@ -40,8 +40,11 @@ public class PortfolioController {
     try {
       Transaction tx = exchange.sell(share, player);
       TransactionDialog.showSaleConfirmation(tx, player.getMoney());
-    } catch (Exception e) {
+    } catch (IllegalStateException e) {
       TransactionDialog.showError("Sale failed", e.getMessage());
+    } catch (Exception e) {
+      TransactionDialog.showError("Unexpected error",
+          "Could not complete sale: " + e.getMessage());
     }
   }
 }

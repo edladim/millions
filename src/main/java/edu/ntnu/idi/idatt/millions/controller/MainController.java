@@ -37,7 +37,7 @@ public class MainController {
 
     view.setOnAdvanceWeek(this::advanceWeek);
 
-    notifyAll(exchange, player);
+    notifyViews(exchange, player);
   }
 
   /**
@@ -46,7 +46,7 @@ public class MainController {
   public void advanceWeek() {
     exchange.advance();
     player.updateHistoricalNetWorth();
-    notifyAll(exchange, player);
+    notifyViews(exchange, player);
     view.setWeek(exchange.getWeek());
   }
 
@@ -71,7 +71,7 @@ public class MainController {
    * @param exchange the exchange to push to exchange observers.
    * @param player   the player to push to player observers.
    */
-  private void notifyAll(Exchange exchange, Player player) {
+  private void notifyViews(Exchange exchange, Player player) {
     view.getDashboardView().onExchangeUpdated(exchange);
     view.getTradingView().onExchangeUpdated(exchange);
     view.getDashboardView().onPlayerUpdated(player);

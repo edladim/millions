@@ -60,22 +60,24 @@ public class TradingController {
   private void updateCostPreview() {
     if (selectedSymbol == null) return;
 
+    int qty;
     try {
-      ReadOnlyStock stock = exchange.getStock(selectedSymbol);
-      int qty = Integer.parseInt(view.getQuantityInput());
-
-      BigDecimal gross      = stock.getSalesPrice().multiply(BigDecimal.valueOf(qty));
-      BigDecimal commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
-      BigDecimal total      = gross.add(commission);
-
-      view.setCostPreview(
-          ViewFormatter.price(gross),
-          ViewFormatter.price(commission),
-          ViewFormatter.price(total)
-      );
-    } catch (Exception ignored) {
-      // symbol not yet resolved or spinner in transient state
+      qty = Integer.parseInt(view.getQuantityInput());
+    } catch (NumberFormatException e) {
+      // spinner is mid-edit (empty or partial input)
+      return;
     }
+
+    ReadOnlyStock stock = exchange.getStock(selectedSymbol);
+    BigDecimal gross      = stock.getSalesPrice().multiply(BigDecimal.valueOf(qty));
+    BigDecimal commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal total      = gross.add(commission);
+
+    view.setCostPreview(
+        ViewFormatter.price(gross),
+        ViewFormatter.price(commission),
+        ViewFormatter.price(total)
+    );
   }
 
   /**
@@ -91,9 +93,10 @@ public class TradingController {
       Transaction tx = exchange.buy(symbol, quantity, player);
       TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
     } catch (IllegalStateException e) {
-      TransactionDialog.showError("Insufficient funds", e.getMessage());
-    } catch (Exception e) {
       TransactionDialog.showError("Purchase failed", e.getMessage());
+    } catch (Exception e) {
+      TransactionDialog.showError("Unexpected error",
+          "Could not complete purchase: " + e.getMessage());
     }
   }
 

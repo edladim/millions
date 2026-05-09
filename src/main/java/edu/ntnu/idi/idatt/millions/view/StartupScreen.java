@@ -264,18 +264,8 @@ public class StartupScreen extends StackPane{
       return;
     }
 
-    String capitalText = capitalField.getText().trim();
-    try {
-      double capital = Double.parseDouble(capitalText);
-      if (capital <= 0) throw new NumberFormatException();
-    } catch (NumberFormatException e) {
-      showError("Starting capital must be a positive number.");
-      capitalField.requestFocus();
-      return;
-    }
-
     if (onStart != null) {
-      onStart.accept(name, capitalText);
+      onStart.accept(name, capitalField.getText().trim());
     }
   }
 

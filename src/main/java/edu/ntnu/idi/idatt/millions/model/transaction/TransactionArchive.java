@@ -48,6 +48,15 @@ public final class TransactionArchive {
   }
 
   /**
+   * Returns all transactions in the archive, in insertion order.
+   *
+   * @return an unmodifiable list of all transactions, never {@code null}
+   */
+  public List<Transaction> getAll() {
+    return List.copyOf(transactions);
+  }
+
+  /**
    * Returns all transactions performed in a given week.
    *
    * @param week the week number

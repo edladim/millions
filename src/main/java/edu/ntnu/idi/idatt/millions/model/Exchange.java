@@ -1,5 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
+import edu.ntnu.idi.idatt.millions.model.fluctuator.MomentumFluctuator;
+import edu.ntnu.idi.idatt.millions.model.fluctuator.PriceFluctuator;
 import edu.ntnu.idi.idatt.millions.model.transaction.PurchaseFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
@@ -25,6 +27,7 @@ public final class Exchange implements ReadOnlyExchange {
   private int week;
   private final Map<String, Stock> stockMap;
   private final Random random;
+  private final PriceFluctuator fluctuator;
   private final TransactionFactory purchaseFactory = new PurchaseFactory();
   private final TransactionFactory saleFactory = new SaleFactory();
 
@@ -45,9 +48,10 @@ public final class Exchange implements ReadOnlyExchange {
       throw new IllegalArgumentException("Exchange must contain at least one stock");
     }
 
-    this.stockMap = new HashMap<>();
-    this.random = new Random();
-    this.week = 1;
+    this.stockMap   = new HashMap<>();
+    this.random     = new Random();
+    this.fluctuator = new MomentumFluctuator();
+    this.week       = 1;
 
     for (Stock stock : stocks) {
       Objects.requireNonNull(stock, "Stock cannot be null");
@@ -245,17 +249,11 @@ public final class Exchange implements ReadOnlyExchange {
    */
   public void advance() {
     week++;
+    fluctuator.beginWeek(random);
 
     for (Stock stock : stockMap.values()) {
-      BigDecimal currentPrice = stock.getSalesPrice();
-      double change = (random.nextDouble() - 0.5) * 0.2;
-      BigDecimal multiplier = BigDecimal.valueOf(1 + change);
-      BigDecimal newPrice = currentPrice.multiply(multiplier);
-
-      if (newPrice.compareTo(BigDecimal.ONE) < 0) {
-        newPrice = BigDecimal.ONE;
-      }
-
+      BigDecimal newPrice = fluctuator.nextPrice(
+          stock.getSymbol(), stock.getSalesPrice(), random);
       stock.addNewSalesPrice(newPrice);
     }
 

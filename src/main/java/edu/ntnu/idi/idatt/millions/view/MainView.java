@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
 import javafx.scene.Scene;
+import java.util.Objects;
 import javafx.scene.layout.BorderPane;
 
 /**

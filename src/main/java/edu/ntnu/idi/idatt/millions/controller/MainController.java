@@ -47,7 +47,6 @@ public class MainController {
     exchange.advance();
     player.updateHistoricalNetWorth();
     initializeViews(exchange, player);
-    view.setWeek(exchange.getWeek());
   }
 
   /**

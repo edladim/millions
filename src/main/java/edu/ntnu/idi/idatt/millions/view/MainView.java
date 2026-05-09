@@ -115,14 +115,4 @@ public class MainView {
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
 
-    /**
-   * <p>Updates the displayed week in the sidebar.</p>
-   *
-   * @param week the current week number
-   */
-  public void setWeek(int week) {
-    sidebar.setWeek(week);
-  }
-
-
 }

@@ -69,9 +69,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the chart component
    */
   private StockChartComponent buildPortfolioChart() {
-    portfolioChart = new StockChartComponent("–", "Your Portfolio");
-    portfolioChart.setChartHeight(200);
-    portfolioChart.setPrefHeight(250);
+    portfolioChart = new StockChartComponent("Portfolio value", "");
+    portfolioChart.setYAxisLabel("Value ($)");
+    VBox.setVgrow(portfolioChart, Priority.ALWAYS);
     return portfolioChart;
   }
 

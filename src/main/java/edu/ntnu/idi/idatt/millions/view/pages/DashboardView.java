@@ -12,10 +12,7 @@ import java.math.BigDecimal;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -312,7 +309,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     row.getChildren().add(priceBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");
-    row.setPadding(new Insets(8, 0, 8, 0));
+    row.setPadding(new Insets(8, 8, 8, 0));
     return row;
   }
 

@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.Consumer;
+import javafx.beans.binding.Bindings;
 
 /**
  * <p>
@@ -41,9 +42,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
-    setPrefWidth(260);
-    setMinWidth(260);
-    setMaxWidth(260);
+    setMinWidth(170);
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 
@@ -118,7 +117,12 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     VBox.setVgrow(bottom, Priority.ALWAYS);
     bottom.setAlignment(Pos.BOTTOM_CENTER);
 
-    Button advanceBtn = new Button("Advance Week");
+    Button advanceBtn = new Button();
+    advanceBtn.textProperty().bind(
+        Bindings.when(widthProperty().lessThan(190))
+            .then("Advance")
+            .otherwise("Advance Week")
+    );
     advanceBtn.getStyleClass().add("advance-btn");
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
     advanceBtn.setOnAction(e -> {

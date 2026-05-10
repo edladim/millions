@@ -8,6 +8,7 @@ import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import edu.ntnu.idi.idatt.millions.view.Stylesheets;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -42,9 +43,27 @@ public class SetupController {
   }
 
   /**
+   * <p>Loads bundled Inter font weights so the CSS {@code -fx-font-family: "Inter"}
+   * declaration resolves correctly on all platforms.</p>
+   *
+   * <p>Missing font files are silently ignored — the app will fall back to the
+   * next font in the CSS chain.</p>
+   */
+  private void loadFonts() {
+    String[] weights = {"Regular", "Medium", "SemiBold", "Bold"};
+    for (String w : weights) {
+      var stream = getClass().getResourceAsStream("/fonts/Inter-" + w + ".ttf");
+      if (stream != null) {
+        Font.loadFont(stream, 14);
+      }
+    }
+  }
+
+  /**
    * <p>Displays the startup screen and applies base styles.</p>
    */
   public void show() {
+    loadFonts();
     Scene scene = new Scene(screen, 520, 660);
     scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
 
@@ -148,6 +167,8 @@ public class SetupController {
     primaryStage.setTitle("Millions - " + player.getName());
     primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
+    primaryStage.setMinWidth(820);
+    primaryStage.setMinHeight(580);
     primaryStage.centerOnScreen();
   }
 

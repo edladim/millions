@@ -229,6 +229,67 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
+   * Sells a specified quantity of a stock, drawing from the player's existing
+   * share lots in the order they were acquired.
+   *
+   * <p>If a lot is fully consumed, it is sold whole. If the requested quantity
+   * lands inside a lot, that lot is split: the remaining portion is kept in
+   * the portfolio at its original purchase price, and the sold portion is
+   * committed as a sale transaction.</p>
+   *
+   * @param symbol the stock symbol to sell
+   * @param quantity the quantity to sell, must be positive and not exceed the
+   *                 total quantity owned of {@code symbol}
+   * @param player the player performing the sale
+   * @return the transaction created for the final sale lot
+   *
+   * @throws NullPointerException if any argument is null
+   * @throws IllegalArgumentException if {@code quantity} is not positive
+   * @throws IllegalStateException if the player does not own enough of the stock
+   */
+  public Transaction sell(String symbol, BigDecimal quantity, Player player) {
+    Objects.requireNonNull(symbol, "Symbol cannot be null");
+    Objects.requireNonNull(quantity, "Quantity cannot be null");
+    Objects.requireNonNull(player, "Player cannot be null");
+    if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Quantity must be positive");
+    }
+
+    Portfolio portfolio = player.getPortfolio();
+    List<Share> matching = portfolio.getShares(symbol);
+    BigDecimal totalOwned = matching.stream()
+        .map(Share::getQuantity)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    if (quantity.compareTo(totalOwned) > 0) {
+      throw new IllegalStateException(
+          "Cannot sell more than owned (owned: " + totalOwned + ")");
+    }
+
+    Stock stock = getStock(symbol);
+    BigDecimal remaining = quantity;
+    Transaction lastTx = null;
+    for (Share share : matching) {
+      if (remaining.signum() <= 0) break;
+
+      if (share.getQuantity().compareTo(remaining) <= 0) {
+        lastTx = sell(share, player);
+        remaining = remaining.subtract(share.getQuantity());
+      } else {
+        portfolio.removeShare(share);
+        BigDecimal kept = share.getQuantity().subtract(remaining);
+        portfolio.addShare(new Share(stock, kept, share.getPurchasePrice()));
+
+        Share toSell = new Share(stock, remaining, share.getPurchasePrice());
+        portfolio.addShare(toSell);
+        lastTx = sell(toSell, player);
+        remaining = BigDecimal.ZERO;
+      }
+    }
+    return lastTx;
+  }
+
+  /**
    * Registers an {@link ExchangeObserver} to be notified when the exchange advances.
    *
    * @param observer the observer to add, cannot be null

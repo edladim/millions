@@ -289,6 +289,21 @@
     -fx-background-radius: 8;
 }
 
+.stock-row-selected {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+}
+
+.select-btn.select-btn-active {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+}
+
+.select-btn.select-btn-active:hover {
+    -fx-background-color: -primary-light;
+    -fx-text-fill: white;
+}
+
 /* ═══════════════════════════════════════════════════════
    PORTFOLIO PAGE
    ═══════════════════════════════════════════════════════ */
@@ -407,7 +422,7 @@
 }
 
 .buy-btn {
-    -fx-background-color: -primary;
+    -fx-background-color: -green;
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
@@ -418,7 +433,7 @@
 }
 
 .buy-btn:hover {
-    -fx-background-color: -primary-light;
+    -fx-background-color: #15803d;
 }
 
 .buy-btn:disabled {

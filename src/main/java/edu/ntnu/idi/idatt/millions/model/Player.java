@@ -207,13 +207,13 @@ public final class Player implements ReadOnlyPlayer {
    */
   public PlayerStatus getStatus() {
     BigDecimal returnRate = getReturnRate();
-    int activeWeeks = getActiveWeeks();
+    int weeksPlayed = historicalNetWorth.size();
 
-    if (activeWeeks >= 20 && returnRate.compareTo(SPECULATOR_GROWTH_REQUIREMENT) >= 0) {
+    if (weeksPlayed >= 20 && returnRate.compareTo(SPECULATOR_GROWTH_REQUIREMENT) >= 0) {
       return PlayerStatus.SPECULATOR;
     }
 
-    if (activeWeeks >= 10 && returnRate.compareTo(INVESTOR_GROWTH_REQUIREMENT) >= 0) {
+    if (weeksPlayed >= 10 && returnRate.compareTo(INVESTOR_GROWTH_REQUIREMENT) >= 0) {
       return PlayerStatus.INVESTOR;
     }
 

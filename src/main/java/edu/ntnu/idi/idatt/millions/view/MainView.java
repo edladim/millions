@@ -49,6 +49,7 @@ public class MainView {
     dashboardScroll = wrapInScroll(dashboardView, true);
     portfolioScroll = wrapInScroll(portfolioView, true);
     tradingScroll   = wrapInScroll(tradingView,   true);
+    tradingScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
 
     root.setLeft(sidebar);
     sidebar.prefHeightProperty().bind(root.heightProperty());

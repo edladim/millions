@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.controller;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
+import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
@@ -10,20 +11,26 @@ import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>Controller for the trading page.</p>
- * <p>Handles stock search, live cost preview, and buy order execution.</p>
+ * <p>Handles stock search, live cost preview, and buy/sell order execution
+ * with quantity- or dollar-amount input.</p>
  */
 public class TradingController {
 
   private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.005");
+  private static final int PAGE_SIZE = 7;
 
   private final TradingView view;
   private final Exchange exchange;
   private final Player player;
 
   private String selectedSymbol = null;
+  private List<? extends ReadOnlyStock> currentResults = List.of();
+  private int displayedCount = PAGE_SIZE;
 
   /**
    * <p>Creates a trading controller and wires all view callbacks.</p>
@@ -39,60 +46,162 @@ public class TradingController {
 
     view.setOnRefresh(() -> filterStocks(view.getSearchField().getText()));
 
+    view.setOnLoadMore(() -> {
+      displayedCount += PAGE_SIZE;
+      renderStocks();
+    });
+
     view.setOnSelectStock(symbol -> {
       selectedSymbol = symbol;
+      view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
+      updatePlayerInfo();
       updateCostPreview();
     });
 
-    view.setOnQuantityChanged(this::updateCostPreview);
+    view.setOnInputChanged(this::updateCostPreview);
 
-    view.setOnBuy(qty -> handleBuy(selectedSymbol, qty));
+    view.setOnModeChanged(mode -> {
+      String savedSymbol = selectedSymbol;
+      selectedSymbol = null;
+      view.setActionEnabled(false);
+
+      boolean reselect = savedSymbol != null && (
+          mode == TradingView.Mode.BUY
+              || (mode == TradingView.Mode.SELL && totalOwned(savedSymbol).signum() > 0)
+      );
+
+      view.setHighlightedStock(reselect ? savedSymbol : null);
+      filterStocks(view.getSearchField().getText());
+
+      if (reselect) {
+        selectedSymbol = savedSymbol;
+        view.setCurrentPrice(exchange.getStock(savedSymbol).getSalesPrice());
+        view.setActionEnabled(true);
+        updateCostPreview();
+      } else {
+        view.setCostPreview("$0.00", "$0.00", "$0.00");
+        view.setDerivedLabel("");
+      }
+      updatePlayerInfo();
+    });
+
+    view.setOnAction(this::handleAction);
 
     view.getSearchField().textProperty().addListener(
         (_, _, text) -> filterStocks(text)
     );
+
+    updatePlayerInfo();
+  }
+
+  /**
+   * <p>Computes the effective share quantity from the user's input,
+   * converting from a dollar amount when the panel is in amount mode.</p>
+   *
+   * @param price the current sales price of the selected stock
+   * @return the share quantity to trade, never null
+   */
+  private BigDecimal effectiveQuantity(BigDecimal price) {
+    BigDecimal raw = view.getInputValue();
+    if (raw.signum() <= 0) return BigDecimal.ZERO;
+    if (view.isAmountMode()) {
+      return raw.divide(price, 8, RoundingMode.HALF_UP);
+    }
+    return raw;
   }
 
   /**
    * <p>Recalculates and pushes the cost preview to the view based on the
-   * currently selected stock and spinner quantity.</p>
+   * currently selected stock, input value, and input mode.</p>
    */
   private void updateCostPreview() {
     if (selectedSymbol == null) return;
 
-    int qty;
-    try {
-      qty = Integer.parseInt(view.getQuantityInput());
-    } catch (NumberFormatException e) {
-      // spinner is mid-edit (empty or partial input)
-      return;
-    }
-
     ReadOnlyStock stock = exchange.getStock(selectedSymbol);
-    BigDecimal gross      = stock.getSalesPrice().multiply(BigDecimal.valueOf(qty));
+    BigDecimal price = stock.getSalesPrice();
+    view.setCurrentPrice(price);
+    BigDecimal qty = effectiveQuantity(price);
+    BigDecimal gross      = price.multiply(qty);
     BigDecimal commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal total      = gross.add(commission);
+    BigDecimal total      = view.getMode() == TradingView.Mode.BUY
+        ? gross.add(commission)
+        : gross.subtract(commission);
 
     view.setCostPreview(
         ViewFormatter.price(gross),
         ViewFormatter.price(commission),
         ViewFormatter.price(total)
     );
+
+    if (view.isAmountMode()) {
+      view.setDerivedLabel("≈ " + ViewFormatter.quantity(qty) + " shares");
+    } else {
+      view.setDerivedLabel("≈ " + ViewFormatter.price(gross));
+    }
+  }
+
+  /**
+   * <p>Updates the "Owned: X" hint shown above the input field. Only visible
+   * in Sell mode when a stock is selected.</p>
+   */
+  private void updateOwnedHint() {
+    view.setOwnedQuantity(selectedSymbol == null ? null : totalOwned(selectedSymbol));
+  }
+
+  /**
+   * <p>Refreshes the player info card: cash balance and owned quantity of
+   * the currently selected stock.</p>
+   */
+  private void updatePlayerInfo() {
+    view.setCashBalance(player.getMoney());
+    updateOwnedHint();
+  }
+
+  /**
+   * <p>Sums the player's owned quantity across all share lots for a symbol.</p>
+   *
+   * @param symbol the stock symbol
+   * @return the total quantity owned
+   */
+  private BigDecimal totalOwned(String symbol) {
+    return player.getPortfolio().getShares(symbol).stream()
+        .map(Share::getQuantity)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  /**
+   * <p>Dispatches the action button click to the right handler based on
+   * the current panel mode.</p>
+   *
+   * @param mode the panel mode at the time of click
+   */
+  private void handleAction(TradingView.Mode mode) {
+    if (selectedSymbol == null) return;
+    if (mode == TradingView.Mode.BUY) {
+      handleBuy(selectedSymbol);
+    } else {
+      handleSell(selectedSymbol);
+    }
   }
 
   /**
    * <p>Executes a buy order and shows a confirmation dialog with the full
    * cost breakdown.</p>
    *
-   * @param symbol      the stock symbol to buy.
-   * @param quantityStr the quantity as entered by the user.
+   * @param symbol the stock symbol to buy.
    */
-  private void handleBuy(String symbol, String quantityStr) {
+  private void handleBuy(String symbol) {
     try {
-      BigDecimal quantity = new BigDecimal(quantityStr);
-      Transaction tx = exchange.buy(symbol, quantity, player);
+      ReadOnlyStock stock = exchange.getStock(symbol);
+      BigDecimal qty = effectiveQuantity(stock.getSalesPrice());
+      if (qty.signum() <= 0) {
+        TransactionDialog.showError("Purchase failed", "Quantity must be positive.");
+        return;
+      }
+      Transaction tx = exchange.buy(symbol, qty, player);
       TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
-    } catch (IllegalStateException e) {
+      updatePlayerInfo();
+    } catch (IllegalStateException | IllegalArgumentException e) {
       TransactionDialog.showError("Purchase failed", e.getMessage());
     } catch (Exception e) {
       TransactionDialog.showError("Unexpected error",
@@ -101,21 +210,69 @@ public class TradingController {
   }
 
   /**
-   * <p>Filters the stock list by the given search text.</p>
-   * <p>Shows all stocks when the text is blank, otherwise delegates to
-   * {@link Exchange#findStocks(String)}.</p>
+   * <p>Executes a sell order, drawing across the player's lots of the
+   * selected stock, and shows a confirmation dialog.</p>
+   *
+   * @param symbol the stock symbol to sell.
+   */
+  private void handleSell(String symbol) {
+    try {
+      ReadOnlyStock stock = exchange.getStock(symbol);
+      BigDecimal qty = effectiveQuantity(stock.getSalesPrice());
+      if (qty.signum() <= 0) {
+        TransactionDialog.showError("Sale failed", "Quantity must be positive.");
+        return;
+      }
+      Transaction tx = exchange.sell(symbol, qty, player);
+      TransactionDialog.showSaleConfirmation(tx, player.getMoney());
+      filterStocks(view.getSearchField().getText());
+      updatePlayerInfo();
+    } catch (IllegalStateException | IllegalArgumentException e) {
+      TransactionDialog.showError("Sale failed", e.getMessage());
+    } catch (Exception e) {
+      TransactionDialog.showError("Unexpected error",
+          "Could not complete sale: " + e.getMessage());
+    }
+  }
+
+  /**
+   * <p>Filters the stock list by the given search text and resets pagination.
+   * In Sell mode, the list is further filtered to only stocks the player
+   * currently owns.</p>
    *
    * @param text the search term typed by the user.
    */
   private void filterStocks(String text) {
-    view.clearStocks();
-    List<? extends ReadOnlyStock> results = text.isBlank()
+    List<? extends ReadOnlyStock> base = text.isBlank()
         ? exchange.getStocks()
         : exchange.findStocks(text);
 
-    for (ReadOnlyStock stock : results) {
-      view.addStockRow(stock);
+    if (view.getMode() == TradingView.Mode.SELL) {
+      Set<String> owned = player.getPortfolio().getShares().stream()
+          .map(s -> s.getStock().getSymbol())
+          .collect(Collectors.toSet());
+      currentResults = base.stream()
+          .filter(s -> owned.contains(s.getSymbol()))
+          .toList();
+    } else {
+      currentResults = base;
     }
+
+    displayedCount = PAGE_SIZE;
+    renderStocks();
+  }
+
+  /**
+   * <p>Renders up to {@code displayedCount} rows from {@code currentResults}
+   * and shows or hides the "Load more" label accordingly.</p>
+   */
+  private void renderStocks() {
+    view.clearStocks();
+    int toShow = Math.min(displayedCount, currentResults.size());
+    for (int i = 0; i < toShow; i++) {
+      view.addStockRow(currentResults.get(i));
+    }
+    view.setLoadMoreVisible(toShow < currentResults.size());
   }
 
 }

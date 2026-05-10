@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
@@ -223,7 +224,17 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     netWorthLabel.setText(ViewFormatter.price(player.getNetWorth()));
     cashBalanceLabel.setText(ViewFormatter.price(player.getMoney()));
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
-    statusLabel.setText(player.getStatus().name());
+
+    PlayerStatus status = player.getStatus();
+    String statusName = status.name();
+    statusLabel.setText(statusName.charAt(0) + statusName.substring(1).toLowerCase());
+    statusLabel.getStyleClass().removeAll(
+        "stat-card-value-status-investor", "stat-card-value-status-speculator");
+    if (status == PlayerStatus.INVESTOR) {
+      statusLabel.getStyleClass().add("stat-card-value-status-investor");
+    } else if (status == PlayerStatus.SPECULATOR) {
+      statusLabel.getStyleClass().add("stat-card-value-status-speculator");
+    }
 
     portfolioChart.setData(player.getHistoricalNetWorth());
 

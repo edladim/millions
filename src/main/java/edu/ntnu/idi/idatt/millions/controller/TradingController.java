@@ -121,4 +121,15 @@ public class TradingController {
     }
   }
 
+  public void updateChart() {
+    if (selectedSymbol == null) return;
+    try {
+      ReadOnlyStock stock = exchange.getStock(selectedSymbol);
+      view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
+      view.getStockChart().setData(stock.getHistoricalPrices());
+    } catch (Exception _) {
+
+    }
+  }
+
 }

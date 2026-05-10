@@ -41,6 +41,9 @@ public class TradingController {
 
     view.setOnSelectStock(symbol -> {
       selectedSymbol = symbol;
+      ReadOnlyStock stock = exchange.getStock(symbol);
+      view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
+      view.getStockChart().setData(stock.getHistoricalPrices());
       updateCostPreview();
     });
 

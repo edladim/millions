@@ -1,6 +1,5 @@
 package edu.ntnu.idi.idatt.millions.model;
 
-import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -326,12 +325,8 @@ class PlayerTest {
    * @param weeks  the number of distinct weeks to simulate
    */
   private void simulateActiveWeeks(Player player, int weeks) {
-    Stock stock = new Stock("SIM", "Simulated Corp", new BigDecimal("100"));
-    Share share = new Share(stock, BigDecimal.ONE, new BigDecimal("100"));
-
-    for (int i = 1; i <= weeks; i++) {
-      player.getTransactionArchive()
-          .add(new Purchase(share, i));
+    for (int i = 0; i < weeks; i++) {
+      player.updateHistoricalNetWorth();
     }
   }
 }

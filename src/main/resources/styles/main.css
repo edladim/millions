@@ -14,7 +14,7 @@
     -border:         #e2e8f0;
     -green:          #16a34a;
     -red:            #dc2626;
-    -fx-font-family: "Segoe UI";
+    -fx-font-family: "Inter", "Avenir Next", "SF Pro Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
 }
 
 /* ── Root layout ─────────────────────────────────────── */
@@ -289,6 +289,21 @@
     -fx-background-radius: 8;
 }
 
+.stock-row-selected {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+}
+
+.select-btn.select-btn-active {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+}
+
+.select-btn.select-btn-active:hover {
+    -fx-background-color: -primary-light;
+    -fx-text-fill: white;
+}
+
 /* ═══════════════════════════════════════════════════════
    PORTFOLIO PAGE
    ═══════════════════════════════════════════════════════ */
@@ -357,7 +372,23 @@
 /* Buy panel */
 .buy-panel {
     -fx-background-color: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, -2, 0);
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 0);
+}
+
+.buy-panel-wrapper {
+    -fx-background-color: transparent;
+}
+
+/* Transparent page scroll wrapper */
+.page-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.page-scroll > .viewport {
+    -fx-background-color: transparent;
 }
 
 .buy-stock-symbol {
@@ -391,7 +422,7 @@
 }
 
 .buy-btn {
-    -fx-background-color: -primary;
+    -fx-background-color: -green;
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
@@ -402,7 +433,7 @@
 }
 
 .buy-btn:hover {
-    -fx-background-color: -primary-light;
+    -fx-background-color: #15803d;
 }
 
 .buy-btn:disabled {

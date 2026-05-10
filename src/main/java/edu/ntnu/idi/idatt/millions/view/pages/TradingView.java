@@ -95,9 +95,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     VBox.setVgrow(center, Priority.ALWAYS);
 
     stockChart = new StockChartComponent("–", "No stock selected");
-    stockChart.setPrefHeight(350);
-    stockChart.setMaxHeight(370);
-    VBox.setVgrow(stockChart, Priority.ALWAYS);
+    stockChart.setChartHeight(250);
+    stockChart.setPrefHeight(300);
 
     VBox stockPanel = buildStockListPanel();
     VBox.setVgrow(stockPanel, Priority.ALWAYS);
@@ -115,8 +114,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     VBox panel = new VBox(8);
     panel.setPadding(new Insets(0,24,24,24));
     panel.setMaxWidth(Double.MAX_VALUE);
-    panel.setMaxHeight(550);
-    VBox.setVgrow(panel, Priority.NEVER);
+    VBox.setVgrow(panel, Priority.ALWAYS);
 
     Label title = new Label("Trading");
     title.getStyleClass().add("page-title");
@@ -154,7 +152,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     VBox.setVgrow(tableCard, Priority.ALWAYS);
 
     panel.getChildren().addAll(header, searchField, tableCard);
-    VBox.setVgrow(panel, Priority.NEVER);
+    VBox.setVgrow(panel, Priority.ALWAYS);
     return panel;
   }
 

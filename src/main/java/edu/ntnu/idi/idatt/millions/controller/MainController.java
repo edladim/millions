@@ -33,8 +33,8 @@ public class MainController {
 
     registerObservers();
 
-    this. tradingController = new TradingController(view.getTradingView(), exchange, player);
-    new PortfolioController(view.getPortfolioView(), exchange, player);
+    tradingController = new TradingController(view.getTradingView(), exchange, player);
+                        new PortfolioController(view.getPortfolioView(), exchange, player);
 
     view.setOnAdvanceWeek(this::advanceWeek);
 

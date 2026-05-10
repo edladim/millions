@@ -45,6 +45,7 @@ public final class TransactionDialog {
                     + "Cash left:   " + ViewFormatter.price(cashLeft)
             )
             .hideAfter(Duration.seconds(5))
+            .darkStyle()
             .showInformation();
   }
 
@@ -68,6 +69,7 @@ public final class TransactionDialog {
                     + "Net received: " + ViewFormatter.price(calc.calculateTotal()) + "\n"
                     + "Cash balance: " + ViewFormatter.price(cashBalance))
             .hideAfter(Duration.seconds(5))
+            .darkStyle()
             .showInformation();
   }
 
@@ -83,6 +85,7 @@ public final class TransactionDialog {
             .text(message)
             .position(Pos.TOP_RIGHT)
             .hideAfter(Duration.seconds(6))
+            .darkStyle()
             .showError();
   }
 }

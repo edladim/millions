@@ -161,13 +161,21 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     VBox positiveSection = new VBox(16, moversPositiveContainer);
     positiveSection.getStyleClass().add("stat-card");
     positiveSection.setPadding(new Insets(24));
+    positiveSection.setMaxWidth(Double.MAX_VALUE);
 
     VBox negativeSection = new VBox(16, moversNegativeContainer);
     negativeSection.getStyleClass().add("stat-card");
     negativeSection.setPadding(new Insets(24));
+    negativeSection.setMaxWidth(Double.MAX_VALUE);
 
     HBox section = new HBox(12, positiveSection, negativeSection);
-    return new VBox(12, heading, section);
+    section.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(positiveSection, Priority.ALWAYS);
+    HBox.setHgrow(negativeSection, Priority.ALWAYS);
+
+    VBox fullContainer = new VBox(12, heading, section);
+    fullContainer.setMaxWidth(Double.MAX_VALUE);
+    return fullContainer;
   }
 
   /**
@@ -253,8 +261,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     for (ReadOnlyStock stock : exchange.getGainers(5)) {
       moversPositiveContainer.getChildren().add(buildMoverRow(rank++, stock));
     }
-    for (ReadOnlyStock stick : exchange.getLosers(5)) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(rank++, stick));
+    for (ReadOnlyStock stock : exchange.getLosers(5)) {
+      moversNegativeContainer.getChildren().add(buildMoverRow(rank++, stock));
     }
   }
 
@@ -300,6 +308,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
 
     HBox row = new HBox(12, rankLabel, iconPane, nameBox);
     HBox.setHgrow(nameBox, Priority.ALWAYS);
+    row.setPrefWidth(0);
     row.getChildren().add(priceBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");

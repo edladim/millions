@@ -467,92 +467,92 @@
    TRANSACTION RECEIPT COMPONENT
    ═══════════════════════════════════════════════════════ */
 
-.receipt-root {
+.receipt .receipt-root {
     -fx-background-color: white;
     -fx-background-radius: 16;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 40, 0, 0, 8);
 }
 
 /* Banner */
-.receipt-banner-buy {
+.receipt .receipt-banner-buy {
     -fx-background-color: linear-gradient(to bottom right, #6366f1, #818cf8);
     -fx-background-radius: 16 16 0 0;
 }
 
-.receipt-banner-sell {
+.receipt .receipt-banner-sell {
     -fx-background-color: linear-gradient(to bottom right, #16a34a, #4ade80);
     -fx-background-radius: 16 16 0 0;
 }
 
-.receipt-icon-label {
+.receipt .receipt-icon-label {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
-.receipt-type-label {
+.receipt .receipt-type-label {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
 
-.receipt-stock-label {
+.receipt .receipt-stock-label {
     -fx-font-size: 13px;
     -fx-text-fill: rgba(255,255,255,0.85);
 }
 
 /* Body */
-.receipt-body {
+.receipt .receipt-body {
     -fx-background-color: white;
 }
 
-.receipt-row {
+.receipt .receipt-row {
     -fx-border-color: transparent transparent -border transparent;
     -fx-border-width: 1;
 }
 
-.receipt-row-label {
+.receipt .receipt-row-label {
     -fx-font-size: 13px;
     -fx-text-fill: -text-muted;
 }
 
-.receipt-row-value {
+.receipt .receipt-row-value {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-fill: -text;
 }
 
-.receipt-row-value-highlight {
+.receipt .receipt-row-value-highlight {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-fill: -primary;
 }
 
-.receipt-total-label {
+.receipt .receipt-total-label {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-text-fill: -text;
 }
 
-.receipt-total-value {
+.receipt .receipt-total-value {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: -text;
 }
 
-.receipt-total-value-green {
+.receipt .receipt-total-value-green {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: -green;
 }
 
 /* Footer */
-.receipt-footer {
+.receipt .receipt-footer {
     -fx-background-color: white;
     -fx-background-radius: 0 0 16 16;
 }
 
-.receipt-close-btn {
+.receipt .receipt-close-btn {
     -fx-background-color: -primary;
     -fx-text-fill: white;
     -fx-font-size: 14px;
@@ -563,7 +563,7 @@
     -fx-padding: 13 0 13 0;
 }
 
-.receipt-close-btn:hover {
+.receipt .receipt-close-btn:hover {
     -fx-background-color: -primary-light;
 }
 

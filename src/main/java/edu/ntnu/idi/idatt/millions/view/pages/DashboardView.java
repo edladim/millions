@@ -136,7 +136,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     titleLabel.getStyleClass().add("stats-card-title");
 
     Label valueLabel = new Label(value);
-    valueLabel.getStyleClass().add(isProfit ? "stats-card-value-profit" : "stats-card-value");
+    valueLabel.getStyleClass().add(isProfit ? "stat-card-value-profit" : "stats-card-value-loss");
 
     VBox card = new VBox(12, titleLabel, valueLabel);
     card.getStyleClass().add("stats-card");

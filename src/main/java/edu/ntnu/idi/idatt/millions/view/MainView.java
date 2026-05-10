@@ -73,7 +73,7 @@ public class MainView {
   public Scene createScene() {
     Scene scene = new Scene(root);
     scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
-    scene.getStylesheets().add(Stylesheets.load("/styles/dashboard.css"));
+    //scene.getStylesheets().add(Stylesheets.load("/styles/dashboard.css"));
     root.prefHeightProperty().bind(scene.heightProperty());
     root.minHeightProperty().bind(scene.heightProperty());
     return scene;

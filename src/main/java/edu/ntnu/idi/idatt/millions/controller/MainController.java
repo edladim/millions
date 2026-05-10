@@ -14,6 +14,7 @@ public class MainController {
   private final MainView view;
   private final Player player;
   private final Exchange exchange;
+  private TradingController tradingController;
 
   /**
    * <p>Creates a main controller, registers all observers, and sets up
@@ -32,7 +33,7 @@ public class MainController {
 
     registerObservers();
 
-    new TradingController(view.getTradingView(), exchange, player);
+    this. tradingController = new TradingController(view.getTradingView(), exchange, player);
     new PortfolioController(view.getPortfolioView(), exchange, player);
 
     view.setOnAdvanceWeek(this::advanceWeek);
@@ -50,6 +51,7 @@ public class MainController {
   public void advanceWeek() {
     exchange.advance();
     player.updateHistoricalNetWorth();
+    tradingController.updateChart();
   }
 
   /**

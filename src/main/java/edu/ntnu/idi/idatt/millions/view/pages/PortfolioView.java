@@ -71,7 +71,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private StockChartComponent buildPortfolioChart() {
     portfolioChart = new StockChartComponent("Portfolio value", "");
     portfolioChart.setYAxisLabel("Value ($)");
-    VBox.setVgrow(portfolioChart, Priority.ALWAYS);
+    portfolioChart.setChartHeight(240);
+    portfolioChart.setPrefHeight(300);
     return portfolioChart;
   }
 
@@ -93,27 +94,29 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   /**
    * <p>Builds the summary row containing key portfolio metrics.</p>
    *
+   * <p>Uses an {@link HBox} where every card grows equally so they always
+   * fill the full width of the view.</p>
+   *
    * @return the summary row container
    */
   private HBox buildSummaryRow() {
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
+    VBox netWorthCard   = buildSummaryCard("Net Worth",       ZERO_PRICE, VALUE_STYLE);
+    VBox cashCard       = buildSummaryCard("Cash Balance",    ZERO_PRICE, VALUE_STYLE);
+    VBox portfolioCard  = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
+    VBox statusCard     = buildSummaryCard("Status",          "Novice",   "stat-card-value-status");
 
-    VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
-    VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
-    VBox portfolioCard = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
-    VBox statusCard = buildSummaryCard("Status", "Novice", "stat-card-value-status");
-
-    netWorthLabel = (Label) netWorthCard.getChildren().get(1);
-    cashBalanceLabel = (Label) cashCard.getChildren().get(1);
+    netWorthLabel       = (Label) netWorthCard.getChildren().get(1);
+    cashBalanceLabel    = (Label) cashCard.getChildren().get(1);
     portfolioValueLabel = (Label) portfolioCard.getChildren().get(1);
-    statusLabel = (Label) statusCard.getChildren().get(1);
+    statusLabel         = (Label) statusCard.getChildren().get(1);
 
-    HBox.setHgrow(netWorthCard, Priority.ALWAYS);
-    HBox.setHgrow(cashCard, Priority.ALWAYS);
-    HBox.setHgrow(portfolioCard, Priority.ALWAYS);
-    HBox.setHgrow(statusCard, Priority.ALWAYS);
+    for (VBox card : new VBox[]{netWorthCard, cashCard, portfolioCard, statusCard}) {
+      HBox.setHgrow(card, Priority.ALWAYS);
+      card.setMaxWidth(Double.MAX_VALUE);
+    }
 
     row.getChildren().addAll(netWorthCard, cashCard, portfolioCard, statusCard);
     return row;
@@ -169,10 +172,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), holdingsScroll);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24));
-    section.setPrefHeight(320);
-    section.setMinHeight(320);
-    section.setMaxHeight(320);
-    VBox.setVgrow(section, Priority.NEVER);
+    section.setMinHeight(220);
     return section;
   }
 
@@ -185,14 +185,15 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox header = new HBox();
     header.getStyleClass().add("table-header-row");
     header.setPadding(new Insets(0, 0, 8, 0));
+    header.setMaxWidth(Double.MAX_VALUE);
 
-    Label stock    = makeHeaderCell("Stock",          200);
-    Label quantity = makeHeaderCell("Quantity",       120);
-    Label buyPrice = makeHeaderCell("Buy Price",      140);
-    Label current  = makeHeaderCell("Current Price",  140);
-    Label value    = makeHeaderCell("Value",          140);
-    Label gainLoss = makeHeaderCell("Gain / Loss",    140);
-    Label actions  = makeHeaderCell("",               100);
+    Label stock    = makeHeaderCell("Stock",         120, true);
+    Label quantity = makeHeaderCell("Quantity",       60, true);
+    Label buyPrice = makeHeaderCell("Buy Price",      70, true);
+    Label current  = makeHeaderCell("Current Price",  80, true);
+    Label value    = makeHeaderCell("Value",          70, true);
+    Label gainLoss = makeHeaderCell("Gain / Loss",    80, true);
+    Label actions  = makeHeaderCell("",               70, false);
 
     header.getChildren().addAll(stock, quantity, buyPrice, current, value, gainLoss, actions);
     return header;
@@ -253,51 +254,71 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
     Label stockLabel = new Label(symbol + "\n" + company);
     stockLabel.getStyleClass().add("mover-name");
-    stockLabel.setPrefWidth(200);
-
-    Label qtyLabel = makeDataCell(ViewFormatter.quantity(share.getQuantity()), 120);
+    stockLabel.setMinWidth(120);
+    stockLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(stockLabel, Priority.ALWAYS);
 
     BigDecimal gainOrLoss = share.getGainOrLoss();
     boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
 
-    Label buyPriceLabel  = makeDataCell(ViewFormatter.price(share.getPurchasePrice()),      140);
-    Label currPriceLabel = makeDataCell(ViewFormatter.price(share.getStock().getSalesPrice()), 140);
-    Label valueLabel     = makeDataCell(ViewFormatter.price(share.getCurrentValue()),        140);
-    Label gainLabel      = makeDataCell(ViewFormatter.signedPrice(gainOrLoss),               140);
+    Label qtyLabel       = makeDataCell(ViewFormatter.quantity(share.getQuantity()),            60);
+    Label buyPriceLabel  = makeDataCell(ViewFormatter.price(share.getPurchasePrice()),          70);
+    Label currPriceLabel = makeDataCell(ViewFormatter.price(share.getStock().getSalesPrice()),  80);
+    Label valueLabel     = makeDataCell(ViewFormatter.price(share.getCurrentValue()),           70);
+    Label gainLabel      = makeDataCell(ViewFormatter.signedPrice(gainOrLoss),                  80);
     gainLabel.getStyleClass().add(isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
 
     Button sellBtn = new Button("Sell");
     sellBtn.getStyleClass().add("select-btn");
-    sellBtn.setPrefWidth(90);
+    sellBtn.setPrefWidth(60);
     sellBtn.setOnAction(e -> { if (onSell != null) onSell.accept(share); });
 
     HBox row = new HBox(stockLabel, qtyLabel, buyPriceLabel, currPriceLabel, valueLabel, gainLabel, sellBtn);
     row.setAlignment(Pos.CENTER_LEFT);
+    row.setMaxWidth(Double.MAX_VALUE);
     row.getStyleClass().add("holding-row");
     row.setPadding(new Insets(10, 0, 10, 0));
     return row;
   }
 
-  private Label makeDataCell(String text, double width) {
+  /**
+   * <p>Creates a data cell label. When {@code grow} is {@code true} the cell
+   * expands to fill available horizontal space; otherwise it stays at its
+   * minimum width.</p>
+   *
+   * @param text     the cell text
+   * @param minWidth the minimum width in pixels
+   * @return the data cell label
+   */
+  private Label makeDataCell(String text, double minWidth) {
     Label l = new Label(text);
     l.getStyleClass().add("table-data-cell");
-    l.setPrefWidth(width);
-    l.setMinWidth(width);
+    l.setMinWidth(minWidth);
+    l.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(l, Priority.ALWAYS);
     return l;
   }
 
   /**
-   * <p>Creates a header cell label with a fixed width.</p>
+   * <p>Creates a header cell label. When {@code grow} is {@code true} the cell
+   * expands to fill available horizontal space; when {@code false} it keeps a
+   * fixed preferred width (used for the action column).</p>
    *
-   * @param text  the header text
-   * @param width the fixed width in pixels
+   * @param text     the header text
+   * @param minWidth the minimum width in pixels
+   * @param grow     whether the cell should grow to fill remaining space
    * @return the header label
    */
-  private Label makeHeaderCell(String text, double width) {
+  private Label makeHeaderCell(String text, double minWidth, boolean grow) {
     Label l = new Label(text);
     l.getStyleClass().add("table-header-cell");
-    l.setPrefWidth(width);
-    l.setMinWidth(width);
+    l.setMinWidth(minWidth);
+    if (grow) {
+      l.setMaxWidth(Double.MAX_VALUE);
+      HBox.setHgrow(l, Priority.ALWAYS);
+    } else {
+      l.setPrefWidth(minWidth);
+    }
     return l;
   }
 

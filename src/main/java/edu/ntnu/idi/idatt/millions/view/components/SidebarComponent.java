@@ -41,9 +41,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
-    setPrefWidth(260);
-    setMinWidth(260);
-    setMaxWidth(260);
+    setMinWidth(170);
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 

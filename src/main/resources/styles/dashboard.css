@@ -136,3 +136,72 @@
     -fx-text-fill: #dc2626;
     -fx-font-weight: bold;
 }
+/* ── Load more ───────────────────────────────────────── */
+.load-more-label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0 4 0;
+    -fx-alignment: center;
+}
+
+.load-more-label:hover {
+    -fx-text-fill: #6366f1;
+}
+
+/* ── Buy/Sell mode tabs ──────────────────────────────── */
+.mode-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 0 10 0;
+    -fx-background-radius: 8;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+}
+
+.mode-tab:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.mode-tab-active {
+    -fx-background-color: #e0e7ff;
+    -fx-text-fill: #4f46e5;
+}
+
+.mode-tab-active:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+/* ── Swap button (quantity <-> amount) ─────────────────── */
+.swap-btn {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #6366f1;
+    -fx-padding: 6 8 6 8;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 24;
+}
+
+.swap-btn:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+.swap-btn .ikonli-font-icon {
+    -fx-icon-color: #6366f1;
+}
+
+/* ── Owned hint and derived input value ──────────────── */
+.owned-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #64748b;
+    -fx-font-weight: 600;
+}
+
+.input-derived {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94a3b8;
+    -fx-padding: 0 0 0 4;
+}

@@ -107,9 +107,9 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox totalAssets = buildStatsCard("Total Assets", "4", false);
-    VBox costBasis = buildStatsCard("Cost Basis", "$0.00", false);
-    VBox profitLoss = buildStatsCard("Total Profit/Loss", "$+0.00", true);
+    VBox totalAssets = buildStatsCard("Total Assets", "4");
+    VBox costBasis   = buildStatsCard("Cost Basis",   "$0.00");
+    VBox profitLoss  = buildStatsCard("Total Profit/Loss", "$+0.00");
 
     totalAssetsLabel = (Label) totalAssets.getChildren().get(1);
     costBasisLabel = (Label) costBasis.getChildren().get(1);
@@ -128,18 +128,17 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @param title   the card title
    * @param value   the card value text
-   * @param isProfit whether the value represents profit styling
-   * @return the stats card container
+   * @return the stats-card container
    */
-  private VBox buildStatsCard(String title, String value, boolean isProfit) {
+  private VBox buildStatsCard(String title, String value) {
     Label titleLabel = new Label(title);
-    titleLabel.getStyleClass().add("stats-card-title");
+    titleLabel.getStyleClass().add("stat-card-title");
 
     Label valueLabel = new Label(value);
-    valueLabel.getStyleClass().add(isProfit ? "stats-card-value-profit" : "stats-card-value");
+    valueLabel.getStyleClass().add("stat-card-value");
 
     VBox card = new VBox(12, titleLabel, valueLabel);
-    card.getStyleClass().add("stats-card");
+    card.getStyleClass().add("stat-card");
     card.setPadding(new Insets(24));
     card.setMaxWidth(Double.MAX_VALUE);
     return card;
@@ -211,10 +210,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    */
   private void setTotalProfit(String value, boolean isPositive) {
     totalProfitLabel.setText(value);
-    totalProfitLabel.getStyleClass().removeAll("stat-card-value-loss");
-    if (!isPositive) {
-      totalProfitLabel.getStyleClass().add("stat-card-value-loss");
-    }
+    totalProfitLabel.getStyleClass().removeAll("stat-card-value-profit", "stat-card-value-loss");
+    totalProfitLabel.getStyleClass().add(isPositive ? "stat-card-value-profit" : "stat-card-value-loss");
   }
 
   /**

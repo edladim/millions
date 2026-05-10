@@ -6,6 +6,7 @@ import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
+import edu.ntnu.idi.idatt.millions.view.Stylesheets;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -14,7 +15,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * <p>Controller responsible for the startup flow and initial game setup.</p>
@@ -46,9 +46,7 @@ public class SetupController {
    */
   public void show() {
     Scene scene = new Scene(screen, 520, 660);
-    scene.getStylesheets().add(
-            Objects.requireNonNull(getClass().getResource("/styles/main.css")).toExternalForm()
-    );
+    scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
 
     primaryStage.setScene(scene);
     primaryStage.setTitle("Millions");

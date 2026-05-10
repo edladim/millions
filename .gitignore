@@ -33,4 +33,7 @@ build/
 .vscode/
 
 ### Mac OS ###
-.DS_Storelogs/
+.DS_Store
+
+### Logs ###
+logs/

@@ -38,7 +38,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label totalAssetsLabel;
   private Label costBasisLabel;
   private Label totalProfitLabel;
-  private VBox moversContainer;
+  private VBox moversPositiveContainer;
+  private VBox moversNegativeContainer;
 
   /**
    * <p>Constructs the dashboard view and builds its initial layout.</p>
@@ -154,12 +155,19 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     Label heading = new Label("Biggest Movers This Week");
     heading.getStyleClass().add("section-heading");
 
-    moversContainer = new VBox(8);
+    moversPositiveContainer = new VBox(8);
+    moversNegativeContainer = new VBox(8);
 
-    VBox section = new VBox(16, heading, moversContainer);
-    section.getStyleClass().add("stat-card");
-    section.setPadding(new Insets(24));
-    return section;
+    VBox positiveSection = new VBox(16, moversPositiveContainer);
+    positiveSection.getStyleClass().add("stat-card");
+    positiveSection.setPadding(new Insets(24));
+
+    VBox negativeSection = new VBox(16, moversNegativeContainer);
+    negativeSection.getStyleClass().add("stat-card");
+    negativeSection.setPadding(new Insets(24));
+
+    HBox section = new HBox(12, positiveSection, negativeSection);
+    return new VBox(12, heading, section);
   }
 
   /**
@@ -221,7 +229,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * <p>Clears all items from the movers list.</p>
    */
   private void clearMovers() {
-    moversContainer.getChildren().clear();
+    moversPositiveContainer.getChildren().clear();
+    moversNegativeContainer.getChildren().clear();
   }
 
   @Override
@@ -242,7 +251,10 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     clearMovers();
     int rank = 1;
     for (ReadOnlyStock stock : exchange.getGainers(5)) {
-      moversContainer.getChildren().add(buildMoverRow(rank++, stock));
+      moversPositiveContainer.getChildren().add(buildMoverRow(rank++, stock));
+    }
+    for (ReadOnlyStock stick : exchange.getLosers(5)) {
+      moversNegativeContainer.getChildren().add(buildMoverRow(rank++, stick));
     }
   }
 

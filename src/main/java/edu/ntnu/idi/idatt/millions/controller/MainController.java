@@ -14,7 +14,7 @@ public class MainController {
   private final MainView view;
   private final Player player;
   private final Exchange exchange;
-  private TradingController tradingController;
+  private final TradingController tradingController;
 
   /**
    * <p>Creates a main controller, registers all observers, and sets up

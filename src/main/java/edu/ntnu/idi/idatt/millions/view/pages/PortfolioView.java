@@ -39,8 +39,9 @@ import javafx.scene.layout.VBox;
  */
 public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
 
-  private static final String ZERO_PRICE     = ViewFormatter.price(BigDecimal.ZERO);
-  private static final String VALUE_STYLE    = "stat-card-value";
+  private static final String ZERO_PRICE  = ViewFormatter.price(BigDecimal.ZERO);
+  private static final String VALUE_STYLE = "stat-card-value";
+  private static final int PAGE_SIZE      = 6;
 
   private ReadOnlyPlayer player;
   private Consumer<Share> onSell;
@@ -51,9 +52,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
+  private Label loadMoreHoldingsLabel;
   private VBox transactionContainer;
   private Label emptyTransactionLabel;
+  private Label loadMoreTxLabel;
   private StockChartComponent portfolioChart;
+
+  private int holdingsDisplayCount = PAGE_SIZE;
+  private int txDisplayCount       = PAGE_SIZE;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -178,7 +184,19 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     holdingsScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
     holdingsScroll.getStyleClass().add("stock-scroll");
 
-    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), holdingsScroll);
+    loadMoreHoldingsLabel = new Label("Load more");
+    loadMoreHoldingsLabel.getStyleClass().add("load-more-label");
+    loadMoreHoldingsLabel.setMaxWidth(Double.MAX_VALUE);
+    loadMoreHoldingsLabel.setAlignment(Pos.CENTER);
+    loadMoreHoldingsLabel.setVisible(false);
+    loadMoreHoldingsLabel.setManaged(false);
+    loadMoreHoldingsLabel.setOnMouseClicked(e -> {
+      holdingsDisplayCount += PAGE_SIZE;
+      if (player != null) refreshPortfolioData(player);
+    });
+
+    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(),
+        holdingsScroll, loadMoreHoldingsLabel);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24));
     section.setMinHeight(220);
@@ -268,25 +286,35 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     portfolioChart.setData(player.getHistoricalNetWorth());
 
     holdingsContainer.getChildren().clear();
-
-    if (portfolio.getShares().isEmpty()) {
+    List<Share> shares = portfolio.getShares();
+    if (shares.isEmpty()) {
       holdingsContainer.getChildren().add(emptyLabel);
+      setLoadMoreVisible(loadMoreHoldingsLabel, false);
     } else {
-      for (Share share : portfolio.getShares()) {
-        holdingsContainer.getChildren().add(buildHoldingRow(share));
+      int toShow = Math.min(holdingsDisplayCount, shares.size());
+      for (int i = 0; i < toShow; i++) {
+        holdingsContainer.getChildren().add(buildHoldingRow(shares.get(i)));
       }
+      setLoadMoreVisible(loadMoreHoldingsLabel, toShow < shares.size());
     }
 
     List<Transaction> transactions = player.getTransactions();
     transactionContainer.getChildren().clear();
-
     if (transactions.isEmpty()) {
       transactionContainer.getChildren().add(emptyTransactionLabel);
+      setLoadMoreVisible(loadMoreTxLabel, false);
     } else {
-      for (int i = transactions.size() - 1; i >= 0; i--) {
+      int toShow = Math.min(txDisplayCount, transactions.size());
+      for (int i = transactions.size() - 1; i >= transactions.size() - toShow; i--) {
         transactionContainer.getChildren().add(buildTransactionRow(transactions.get(i)));
       }
+      setLoadMoreVisible(loadMoreTxLabel, toShow < transactions.size());
     }
+  }
+
+  private void setLoadMoreVisible(Label label, boolean visible) {
+    label.setVisible(visible);
+    label.setManaged(visible);
   }
 
   /**
@@ -366,7 +394,19 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     txScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
     txScroll.getStyleClass().add("stock-scroll");
 
-    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), txScroll);
+    loadMoreTxLabel = new Label("Load more");
+    loadMoreTxLabel.getStyleClass().add("load-more-label");
+    loadMoreTxLabel.setMaxWidth(Double.MAX_VALUE);
+    loadMoreTxLabel.setAlignment(Pos.CENTER);
+    loadMoreTxLabel.setVisible(false);
+    loadMoreTxLabel.setManaged(false);
+    loadMoreTxLabel.setOnMouseClicked(e -> {
+      txDisplayCount += PAGE_SIZE;
+      if (player != null) refreshPortfolioData(player);
+    });
+
+    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(),
+        txScroll, loadMoreTxLabel);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24));
     section.setMinHeight(220);

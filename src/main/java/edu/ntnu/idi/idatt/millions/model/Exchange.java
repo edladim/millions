@@ -61,6 +61,8 @@ public final class Exchange implements ReadOnlyExchange {
 
       stockMap.put(stock.getSymbol(), stock);
     }
+
+    preSimulate(30);
   }
 
   /**
@@ -320,6 +322,24 @@ public final class Exchange implements ReadOnlyExchange {
 
     for (ExchangeObserver observer : observers) {
       observer.onExchangeUpdated(this);
+    }
+  }
+
+  /**
+   * Pre-generates price history for all stocks without incrementing the week
+   * counter or notifying observers. Called once during construction so charts
+   * have historical data from the very first frame.
+   *
+   * @param weeks the number of historical weeks to simulate
+   */
+  private void preSimulate(int weeks) {
+    for (int i = 0; i < weeks; i++) {
+      fluctuator.beginWeek(random);
+      for (Stock stock : stockMap.values()) {
+        BigDecimal newPrice = fluctuator.nextPrice(
+            stock.getSymbol(), stock.getSalesPrice(), random);
+        stock.addNewSalesPrice(newPrice);
+      }
     }
   }
 

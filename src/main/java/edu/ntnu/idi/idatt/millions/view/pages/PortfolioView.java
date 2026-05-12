@@ -4,16 +4,21 @@ import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
+import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.function.Consumer;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -46,6 +51,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private Label statusLabel;
   private VBox holdingsContainer;
   private Label emptyLabel;
+  private VBox transactionContainer;
+  private Label emptyTransactionLabel;
   private StockChartComponent portfolioChart;
 
   /**
@@ -60,7 +67,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
             buildHeader(),
             buildPortfolioChart(),
             buildSummaryRow(),
-            buildHoldingsSection()
+            buildHoldingsSection(),
+            buildTransactionHistorySection()
     );
   }
 
@@ -151,11 +159,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the holdings section container
    */
   private VBox buildHoldingsSection() {
-    Label heading = new Label("Holdings");
-    heading.getStyleClass().add("section-heading");
-
-    HBox tableHeader = buildTableHeader();
-
     holdingsContainer = new VBox(4);
 
     emptyLabel = new Label("You don't own any shares yet. Head to Trading to get started.");
@@ -163,6 +166,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     emptyLabel.setMaxWidth(Double.MAX_VALUE);
     emptyLabel.setAlignment(Pos.CENTER);
     holdingsContainer.getChildren().add(emptyLabel);
+
+    Label heading = new Label("Holdings");
+    heading.getStyleClass().add("section-heading");
+
+    HBox tableHeader = buildHoldingsTableHeader();
 
     ScrollPane holdingsScroll = new ScrollPane(holdingsContainer);
     holdingsScroll.setFitToWidth(true);
@@ -178,23 +186,44 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Builds the table header row for the holdings list.</p>
+   * <p>Builds the responsive table header row for the holdings list.
+   * Column labels abbreviate when the container is narrow.</p>
    *
    * @return the table header container
    */
-  private HBox buildTableHeader() {
+  private HBox buildHoldingsTableHeader() {
     HBox header = new HBox();
     header.getStyleClass().add("table-header-row");
     header.setPadding(new Insets(0, 0, 8, 0));
     header.setMaxWidth(Double.MAX_VALUE);
 
-    Label stock    = makeHeaderCell("Stock",         120, true);
-    Label quantity = makeHeaderCell("Quantity",       60, true);
-    Label buyPrice = makeHeaderCell("Buy Price",      70, true);
-    Label current  = makeHeaderCell("Current Price",  80, true);
-    Label value    = makeHeaderCell("Value",          70, true);
-    Label gainLoss = makeHeaderCell("Gain / Loss",    80, true);
-    Label actions  = makeHeaderCell("",               70, false);
+    Label stock = makeHeaderCell("Stock", 80, true);
+    stock.setPrefWidth(150);
+    stock.setMaxWidth(Double.MAX_VALUE);
+
+    Label quantity = makeFixedHeaderCell("Quantity", 75);
+    quantity.textProperty().bind(
+        Bindings.when(holdingsContainer.widthProperty().lessThan(700))
+            .then("QTY").otherwise("Quantity"));
+
+    Label buyPrice = makeFixedHeaderCell("Buy Price", 85);
+    buyPrice.textProperty().bind(
+        Bindings.when(holdingsContainer.widthProperty().lessThan(700))
+            .then("BP").otherwise("Buy Price"));
+
+    Label current = makeFixedHeaderCell("Current Price", 95);
+    current.textProperty().bind(
+        Bindings.when(holdingsContainer.widthProperty().lessThan(700))
+            .then("CP").otherwise("Current Price"));
+
+    Label value    = makeFixedHeaderCell("Value",       80);
+    Label gainLoss = makeFixedHeaderCell("Gain / Loss", 90);
+    gainLoss.textProperty().bind(
+        Bindings.when(holdingsContainer.widthProperty().lessThan(700))
+            .then("G/L").otherwise("Gain / Loss"));
+
+    Label actions = makeHeaderCell("", 45, true);
+    actions.setPrefWidth(90);
 
     header.getChildren().addAll(stock, quantity, buyPrice, current, value, gainLoss, actions);
     return header;
@@ -242,11 +271,21 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
     if (portfolio.getShares().isEmpty()) {
       holdingsContainer.getChildren().add(emptyLabel);
-      return;
+    } else {
+      for (Share share : portfolio.getShares()) {
+        holdingsContainer.getChildren().add(buildHoldingRow(share));
+      }
     }
 
-    for (Share share : portfolio.getShares()) {
-      holdingsContainer.getChildren().add(buildHoldingRow(share));
+    List<Transaction> transactions = player.getTransactions();
+    transactionContainer.getChildren().clear();
+
+    if (transactions.isEmpty()) {
+      transactionContainer.getChildren().add(emptyTransactionLabel);
+    } else {
+      for (int i = transactions.size() - 1; i >= 0; i--) {
+        transactionContainer.getChildren().add(buildTransactionRow(transactions.get(i)));
+      }
     }
   }
 
@@ -265,29 +304,136 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
     Label stockLabel = new Label(symbol + "\n" + company);
     stockLabel.getStyleClass().add("mover-name");
-    stockLabel.setMinWidth(120);
+    stockLabel.setMinWidth(80);
+    stockLabel.setPrefWidth(150);
     stockLabel.setMaxWidth(Double.MAX_VALUE);
+    stockLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
     HBox.setHgrow(stockLabel, Priority.ALWAYS);
 
     BigDecimal gainOrLoss = share.getGainOrLoss();
     boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
 
-    Label qtyLabel       = makeDataCell(ViewFormatter.quantity(share.getQuantity()),            60);
-    Label buyPriceLabel  = makeDataCell(ViewFormatter.price(share.getPurchasePrice()),          70);
-    Label currPriceLabel = makeDataCell(ViewFormatter.price(share.getStock().getSalesPrice()),  80);
-    Label valueLabel     = makeDataCell(ViewFormatter.price(share.getCurrentValue()),           70);
-    Label gainLabel      = makeDataCell(ViewFormatter.signedPrice(gainOrLoss),                  80);
+    Label qtyLabel       = makeFixedDataCell(ViewFormatter.quantity(share.getQuantity()),           75);
+    Label buyPriceLabel  = makeFixedDataCell(ViewFormatter.price(share.getPurchasePrice()),         85);
+    Label currPriceLabel = makeFixedDataCell(ViewFormatter.price(share.getStock().getSalesPrice()), 95);
+    Label valueLabel     = makeFixedDataCell(ViewFormatter.price(share.getCurrentValue()),          80);
+    Label gainLabel      = makeFixedDataCell(ViewFormatter.signedPrice(gainOrLoss),                 90);
     gainLabel.getStyleClass().add(isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
 
-    Button sellBtn = new Button("Sell");
+    Button sellBtn = new Button("Quick Sell");
     sellBtn.getStyleClass().add("select-btn");
-    sellBtn.setPrefWidth(60);
+    sellBtn.setMinWidth(45);
+    sellBtn.setPrefWidth(90);
+    sellBtn.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(sellBtn, Priority.ALWAYS);
+    sellBtn.textProperty().bind(
+        Bindings.when(holdingsContainer.widthProperty().lessThan(700))
+            .then("QS")
+            .otherwise("Quick Sell")
+    );
     sellBtn.setOnAction(e -> { if (onSell != null) onSell.accept(share); });
 
     HBox row = new HBox(stockLabel, qtyLabel, buyPriceLabel, currPriceLabel, valueLabel, gainLabel, sellBtn);
     row.setAlignment(Pos.CENTER_LEFT);
     row.setMaxWidth(Double.MAX_VALUE);
     row.getStyleClass().add("holding-row");
+    row.setPadding(new Insets(10, 0, 10, 0));
+    return row;
+  }
+
+  /**
+   * <p>Builds the transaction history section with table header and list container.</p>
+   *
+   * @return the transaction history section container
+   */
+  private VBox buildTransactionHistorySection() {
+    transactionContainer = new VBox(4);
+
+    emptyTransactionLabel = new Label("No transactions yet. Buy or sell stocks to see your history.");
+    emptyTransactionLabel.getStyleClass().add("empty-label");
+    emptyTransactionLabel.setMaxWidth(Double.MAX_VALUE);
+    emptyTransactionLabel.setAlignment(Pos.CENTER);
+    transactionContainer.getChildren().add(emptyTransactionLabel);
+
+    Label heading = new Label("Transaction History");
+    heading.getStyleClass().add("section-heading");
+
+    HBox tableHeader = buildTransactionTableHeader();
+
+    ScrollPane txScroll = new ScrollPane(transactionContainer);
+    txScroll.setFitToWidth(true);
+    txScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    txScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    txScroll.getStyleClass().add("stock-scroll");
+
+    VBox section = new VBox(0, heading, buildSpacer(16), tableHeader, buildDivider(), txScroll);
+    section.getStyleClass().add("stat-card");
+    section.setPadding(new Insets(24));
+    section.setMinHeight(220);
+    return section;
+  }
+
+  /**
+   * <p>Builds the table header row for the transaction history list.</p>
+   *
+   * @return the table header container
+   */
+  private HBox buildTransactionTableHeader() {
+    HBox header = new HBox();
+    header.getStyleClass().add("table-header-row");
+    header.setPadding(new Insets(0, 0, 8, 0));
+    header.setMaxWidth(Double.MAX_VALUE);
+
+    Label txStock = makeHeaderCell("Stock", 80, true);
+    txStock.setPrefWidth(150);
+    txStock.setMaxWidth(Double.MAX_VALUE);
+
+    header.getChildren().addAll(
+        txStock,
+        makeFixedHeaderCell("Quantity", 70),
+        makeFixedHeaderCell("Price",    80),
+        makeFixedHeaderCell("Value",    80),
+        makeFixedHeaderCell("Type",     80),
+        makeFixedHeaderCell("Week",     70)
+    );
+    return header;
+  }
+
+  /**
+   * <p>Builds a single transaction history row.</p>
+   *
+   * <p>Rows are coloured green for purchases and red for sales.</p>
+   *
+   * @param tx the transaction to display
+   * @return the row container
+   */
+  private HBox buildTransactionRow(Transaction tx) {
+    boolean isBuy = tx instanceof Purchase;
+
+    String symbol  = tx.getShare().getStock().getSymbol();
+    String company = tx.getShare().getStock().getCompany();
+
+    Label stockLabel = new Label(symbol + "\n" + company);
+    stockLabel.getStyleClass().add("mover-name");
+    stockLabel.setMinWidth(80);
+    stockLabel.setPrefWidth(150);
+    stockLabel.setMaxWidth(Double.MAX_VALUE);
+    stockLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+    HBox.setHgrow(stockLabel, Priority.ALWAYS);
+
+    Label qtyLabel   = makeFixedDataCell(ViewFormatter.quantity(tx.getShare().getQuantity()), 70);
+    Label priceLabel = makeFixedDataCell(ViewFormatter.price(tx.getShare().getPurchasePrice()), 80);
+    Label valueLabel = makeFixedDataCell(ViewFormatter.price(tx.getCalculator().calculateGross()), 80);
+
+    Label typeLabel = makeFixedDataCell(isBuy ? "Buy" : "Sell", 80);
+    typeLabel.getStyleClass().add(isBuy ? "tx-type-buy" : "tx-type-sell");
+
+    Label weekLabel = makeFixedDataCell("W" + tx.getWeek(), 70);
+
+    HBox row = new HBox(stockLabel, qtyLabel, priceLabel, valueLabel, typeLabel, weekLabel);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.setMaxWidth(Double.MAX_VALUE);
+    row.getStyleClass().addAll("holding-row", isBuy ? "tx-row-buy" : "tx-row-sell");
     row.setPadding(new Insets(10, 0, 10, 0));
     return row;
   }
@@ -305,6 +451,24 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     Label l = new Label(text);
     l.getStyleClass().add("table-data-cell");
     l.setMinWidth(minWidth);
+    l.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(l, Priority.ALWAYS);
+    return l;
+  }
+
+  /**
+   * <p>Creates a data cell label with a fixed width matching its header column.
+   * Fixed widths prevent columns from shifting when adjacent header text changes.</p>
+   *
+   * @param text  the cell text
+   * @param width the fixed column width in pixels
+   * @return the data cell label
+   */
+  private Label makeFixedDataCell(String text, double width) {
+    Label l = new Label(text);
+    l.getStyleClass().add("table-data-cell");
+    l.setMinWidth(width * 0.5);
+    l.setPrefWidth(width);
     l.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(l, Priority.ALWAYS);
     return l;
@@ -330,6 +494,25 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     } else {
       l.setPrefWidth(minWidth);
     }
+    return l;
+  }
+
+  /**
+   * <p>Creates a header cell with a fixed width that never grows or shrinks.
+   * Using a fixed width on both header and data cells ensures columns remain
+   * perfectly aligned even when responsive text bindings change the label text.</p>
+   *
+   * @param text  the header text
+   * @param width the fixed column width in pixels
+   * @return the header label
+   */
+  private Label makeFixedHeaderCell(String text, double width) {
+    Label l = new Label(text);
+    l.getStyleClass().add("table-header-cell");
+    l.setMinWidth(width * 0.5);
+    l.setPrefWidth(width);
+    l.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(l, Priority.ALWAYS);
     return l;
   }
 

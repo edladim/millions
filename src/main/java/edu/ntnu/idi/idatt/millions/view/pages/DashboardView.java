@@ -109,8 +109,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     row.setMaxWidth(Double.MAX_VALUE);
 
     VBox totalAssets = buildStatsCard("Total Assets", "4");
-    VBox costBasis   = buildStatsCard("Cost Basis",   "$0.00");
-    VBox profitLoss  = buildStatsCard("Total Profit/Loss", "$+0.00");
+    VBox costBasis = buildStatsCard("Cost Basis",   "$0.00");
+    VBox profitLoss = buildStatsCard("Total Profit/Loss", "$+0.00");
 
     totalAssetsLabel = (Label) totalAssets.getChildren().get(1);
     costBasisLabel = (Label) costBasis.getChildren().get(1);

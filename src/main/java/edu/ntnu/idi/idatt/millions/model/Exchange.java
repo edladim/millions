@@ -48,10 +48,10 @@ public final class Exchange implements ReadOnlyExchange {
       throw new IllegalArgumentException("Exchange must contain at least one stock");
     }
 
-    this.stockMap   = new HashMap<>();
-    this.random     = new Random();
+    this.stockMap = new HashMap<>();
+    this.random = new Random();
     this.fluctuator = new MomentumFluctuator();
-    this.week       = 1;
+    this.week = 1;
 
     for (Stock stock : stocks) {
       Objects.requireNonNull(stock, "Stock cannot be null");

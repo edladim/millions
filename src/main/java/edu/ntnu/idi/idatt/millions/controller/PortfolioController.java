@@ -25,7 +25,7 @@ public class PortfolioController {
    */
   public PortfolioController(PortfolioView view, Exchange exchange, Player player) {
     this.exchange = exchange;
-    this.player   = player;
+    this.player = player;
 
     view.setOnSell(this::handleSell);
   }

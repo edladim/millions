@@ -51,21 +51,21 @@ import java.util.Random;
 public final class MomentumFluctuator implements PriceFluctuator {
 
   // Momentum
-  private static final double DECAY        = 0.7;
+  private static final double DECAY = 0.7;
   private static final double MOMENTUM_CAP = 0.15;
 
   // Per-stock base shock and noise (scaled by per-stock volatility)
-  private static final double BASE_SHOCK   = 0.03;
-  private static final double BASE_NOISE   = 0.01;
+  private static final double BASE_SHOCK = 0.03;
+  private static final double BASE_NOISE = 0.01;
 
   // Per-stock fat-tail events
   private static final double FAT_TAIL_PROB = 0.02;
-  private static final double FAT_TAIL_AMP  = 0.15;
+  private static final double FAT_TAIL_AMP = 0.15;
 
   // Market-wide sentiment (computed once per week, shared by all stocks)
-  private static final double MARKET_BASE_AMP   = 0.02;
+  private static final double MARKET_BASE_AMP = 0.02;
   private static final double MARKET_EVENT_PROB = 0.03;
-  private static final double MARKET_EVENT_AMP  = 0.15;
+  private static final double MARKET_EVENT_AMP = 0.15;
 
   // Per-stock volatility multiplier range
   private static final double VOL_MIN = 0.5;

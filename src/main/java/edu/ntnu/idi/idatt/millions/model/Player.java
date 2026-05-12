@@ -211,11 +211,12 @@ public final class Player implements ReadOnlyPlayer {
    * the player has been active in the market.</p>
    *
    * <ul>
-   *   <li>{@link PlayerStatus#NOVICE} is the default starting status</li>
-   *   <li>{@link PlayerStatus#INVESTOR} requires at least 10 active trading
-   *       weeks and at least 20% growth</li>
-   *   <li>{@link PlayerStatus#SPECULATOR} requires at least 20 active trading
-   *       weeks and at least 100% growth</li>
+   *   <li>{@link PlayerStatus#BERNARD_MADOFF} requires at least 200% growth</li>
+   *   <li>{@link PlayerStatus#RAY_DAILO} requires at least 100% growth</li>
+   *   <li>{@link PlayerStatus#INVESTOR} requires at least 20% growth</li>
+   *   <li>{@link PlayerStatus#AVERAGE_JOE} requires at least -20% growth</li>
+   *   <li>{@link PlayerStatus#MAX_MINUS} requires at least -50% growth</li>
+   *   <li>{@link PlayerStatus#BUY_HIGH_BJORN} is below -50% growth</li>
    * </ul>
    *
    * @return the player's current status, never null

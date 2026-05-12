@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
+import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
@@ -11,8 +12,12 @@ import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,7 +49,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private static final int PAGE_SIZE = 6;
 
   private ReadOnlyPlayer player;
-  private Consumer<Share> onSell;
+  private BiConsumer<String, BigDecimal> onSell;
 
   private Label netWorthLabel;
   private Label cashBalanceLabel;
@@ -306,11 +311,16 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
       holdingsContainer.getChildren().add(emptyLabel);
       setLoadMoreVisible(loadMoreHoldingsLabel, false);
     } else {
-      int toShow = Math.min(holdingsDisplayCount, shares.size());
-      for (int i = 0; i < toShow; i++) {
-        holdingsContainer.getChildren().add(buildHoldingRow(shares.get(i)));
+      Map<String, List<Share>> grouped = new LinkedHashMap<>();
+      for (Share s : shares) {
+        grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
       }
-      setLoadMoreVisible(loadMoreHoldingsLabel, toShow < shares.size());
+      List<List<Share>> holdings = new ArrayList<>(grouped.values());
+      int toShow = Math.min(holdingsDisplayCount, holdings.size());
+      for (int i = 0; i < toShow; i++) {
+        holdingsContainer.getChildren().add(buildHoldingRow(holdings.get(i)));
+      }
+      setLoadMoreVisible(loadMoreHoldingsLabel, toShow < holdings.size());
     }
 
     List<Transaction> transactions = player.getTransactions();
@@ -333,17 +343,43 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Registers a handler that runs when the user requests to sell a share.</p>
+   * <p>Registers a handler that runs when the user requests a quick sell.</p>
    *
-   * @param handler the handler receiving the share to sell
+   * <p>The handler receives the stock symbol and the total quantity to sell
+   * (summed across all lots in the aggregated holding row).</p>
+   *
+   * @param handler the handler receiving (symbol, totalQuantity)
    */
-  public void setOnSell(Consumer<Share> handler) {
+  public void setOnSell(BiConsumer<String, BigDecimal> handler) {
     this.onSell = handler;
   }
 
-  private HBox buildHoldingRow(Share share) {
-    String symbol = share.getStock().getSymbol();
-    String company = share.getStock().getCompany();
+  /**
+   * <p>Builds a single aggregated holdings row. All share lots in {@code lots}
+   * must belong to the same stock; their quantities are summed, and the
+   * displayed buy price is the quantity-weighted average across lots.</p>
+   *
+   * @param lots the share lots to aggregate into one row
+   * @return the configured row container
+   */
+  private HBox buildHoldingRow(List<Share> lots) {
+    ReadOnlyStock stock = lots.get(0).getStock();
+    String symbol = stock.getSymbol();
+    String company = stock.getCompany();
+
+    BigDecimal totalQty = lots.stream()
+        .map(Share::getQuantity)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal totalInvestment = lots.stream()
+        .map(Share::getTotalInvestment)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal weightedBuyPrice = totalQty.signum() == 0
+        ? BigDecimal.ZERO
+        : totalInvestment.divide(totalQty, 4, RoundingMode.HALF_UP);
+    BigDecimal currentPrice = stock.getSalesPrice();
+    BigDecimal totalValue = currentPrice.multiply(totalQty);
+    BigDecimal gainOrLoss = totalValue.subtract(totalInvestment);
+    boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
 
     Label stockLabel = new Label(symbol + "\n" + company);
     stockLabel.getStyleClass().add("mover-name");
@@ -353,13 +389,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     stockLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
     HBox.setHgrow(stockLabel, Priority.ALWAYS);
 
-    BigDecimal gainOrLoss = share.getGainOrLoss();
-    boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
-
-    Label qtyLabel = makeFixedDataCell(ViewFormatter.quantity(share.getQuantity()), 75);
-    Label buyPriceLabel = makeFixedDataCell(ViewFormatter.price(share.getPurchasePrice()), 85);
-    Label currPriceLabel = makeFixedDataCell(ViewFormatter.price(share.getStock().getSalesPrice()), 95);
-    Label valueLabel = makeFixedDataCell(ViewFormatter.price(share.getCurrentValue()), 80);
+    Label qtyLabel = makeFixedDataCell(ViewFormatter.quantity(totalQty), 75);
+    Label buyPriceLabel = makeFixedDataCell(ViewFormatter.price(weightedBuyPrice), 85);
+    Label currPriceLabel = makeFixedDataCell(ViewFormatter.price(currentPrice), 95);
+    Label valueLabel = makeFixedDataCell(ViewFormatter.price(totalValue), 80);
     Label gainLabel = makeFixedDataCell(ViewFormatter.signedPrice(gainOrLoss), 90);
     gainLabel.getStyleClass().add(isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
 
@@ -374,7 +407,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
             .then("QS")
             .otherwise("Quick Sell")
     );
-    sellBtn.setOnAction(e -> { if (onSell != null) onSell.accept(share); });
+    sellBtn.setOnAction(e -> { if (onSell != null) onSell.accept(symbol, totalQty); });
 
     HBox row = new HBox(stockLabel, qtyLabel, buyPriceLabel, currPriceLabel, valueLabel, gainLabel, sellBtn);
     row.setAlignment(Pos.CENTER_LEFT);

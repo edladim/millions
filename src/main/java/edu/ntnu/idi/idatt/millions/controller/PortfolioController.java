@@ -2,10 +2,10 @@ package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
+import java.math.BigDecimal;
 
 /**
  * <p>Controller for the portfolio page.</p>
@@ -31,16 +31,18 @@ public class PortfolioController {
   }
 
   /**
-   * <p>Executes a sell order for the given share and shows a confirmation dialog
-   * with the full proceeds breakdown.</p>
+   * <p>Executes a sell order for the full owned quantity of a stock, drawing
+   * across all underlying share lots in FIFO order, and shows a confirmation
+   * dialog with the proceeds breakdown.</p>
    *
-   * @param share the share to sell.
+   * @param symbol   the stock symbol to sell
+   * @param quantity the total quantity to sell across all lots
    */
-  private void handleSell(Share share) {
+  private void handleSell(String symbol, BigDecimal quantity) {
     try {
-      Transaction tx = exchange.sell(share, player);
+      Transaction tx = exchange.sell(symbol, quantity, player);
       TransactionDialog.showSaleConfirmation(tx, player.getMoney());
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException | IllegalArgumentException e) {
       TransactionDialog.showError("Sale failed", e.getMessage());
     } catch (Exception e) {
       TransactionDialog.showError("Unexpected error",

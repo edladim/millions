@@ -59,6 +59,7 @@ public class TradingController {
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices());
       view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
+      view.clearInput();
       updatePlayerInfo();
       updateCostPreview();
     });
@@ -210,7 +211,7 @@ public class TradingController {
     if (view.getMode() == TradingView.Mode.BUY) {
       BigDecimal cashPortion = player.getMoney().multiply(percent);
       BigDecimal divisor = BigDecimal.ONE.add(COMMISSION_RATE);
-      BigDecimal amount = cashPortion.divide(divisor, 2, RoundingMode.HALF_UP);
+      BigDecimal amount = cashPortion.divide(divisor, 3, RoundingMode.DOWN);
       view.setInputAmount(amount, true);
     } else {
       BigDecimal owned = totalOwned(selectedSymbol);

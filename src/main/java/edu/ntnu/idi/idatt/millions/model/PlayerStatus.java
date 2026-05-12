@@ -17,6 +17,6 @@ public enum PlayerStatus {
   MAX_MINUS,
   AVERAGE_JOE,
   INVESTOR,
-  RAY_DAILO,
+  RAY_DALIO,
   BERNARD_MADOFF
 }

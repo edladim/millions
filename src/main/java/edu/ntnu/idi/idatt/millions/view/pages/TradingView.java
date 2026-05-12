@@ -172,11 +172,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     header.getChildren().addAll(
             stockHeader,
-            makeHeaderCell("Price",   70, true),
-            makeHeaderCell("Change",  70, true),
-            makeHeaderCell("High",    60, true),
-            makeHeaderCell("Low",     60, true),
-            makeHeaderCell("",        70, false)
+            makeHeaderCell("Price", 70, true),
+            makeHeaderCell("Change", 70, true),
+            makeHeaderCell("High", 60, true),
+            makeHeaderCell("Low", 60, true),
+            makeHeaderCell("", 70, false)
     );
     return header;
   }
@@ -419,17 +419,17 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @return the stock info card container
    */
   private VBox buildSelectedStockInfo() {
-    buySymbolLabel  = new Label("–");
+    buySymbolLabel = new Label("–");
     buySymbolLabel.getStyleClass().add("buy-stock-symbol");
     buyCompanyLabel = new Label("No stock selected");
     buyCompanyLabel.getStyleClass().add("mover-symbol");
-    buyPriceLabel   = new Label("$0.00");
+    buyPriceLabel = new Label("$0.00");
     buyPriceLabel.getStyleClass().add("buy-stock-price");
-    buyChangeLabel  = new Label("+0.00%");
+    buyChangeLabel = new Label("+0.00%");
     buyChangeLabel.getStyleClass().add("mover-change-positive");
-    buyHighLabel    = new Label("H: $0.00");
+    buyHighLabel = new Label("H: $0.00");
     buyHighLabel.getStyleClass().add("stat-card-title");
-    buyLowLabel     = new Label("L: $0.00");
+    buyLowLabel = new Label("L: $0.00");
     buyLowLabel.getStyleClass().add("stat-card-title");
 
     HBox highLow = new HBox(12, buyHighLabel, buyLowLabel);
@@ -479,7 +479,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     title.getStyleClass().add("stat-card-title");
 
     estimatedCostLabel = makeCostRow("Estimated Cost", "$0.00");
-    commissionLabel    = makeCostRow("Commission (0.5%)", "$0.00");
+    commissionLabel = makeCostRow("Commission (0.5%)", "$0.00");
 
     Region divider = new Region();
     divider.getStyleClass().add("divider");
@@ -551,8 +551,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     Label priceLabel  = makeDataCell(ViewFormatter.price(stock.getSalesPrice()),  70, "table-data-cell");
     Label changeLabel = makeDataCell(ViewFormatter.signedAmount(change),          70,
         isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
-    Label highLabel   = makeDataCell(ViewFormatter.price(stock.getHighestPrice()), 60, "table-data-cell");
-    Label lowLabel    = makeDataCell(ViewFormatter.price(stock.getLowestPrice()),  60, "table-data-cell");
+    Label highLabel = makeDataCell(ViewFormatter.price(stock.getHighestPrice()), 60, "table-data-cell");
+    Label lowLabel = makeDataCell(ViewFormatter.price(stock.getLowestPrice()),  60, "table-data-cell");
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");

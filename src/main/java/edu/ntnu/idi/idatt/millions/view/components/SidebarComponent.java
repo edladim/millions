@@ -173,7 +173,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     switch (page) {
       case DASHBOARD -> dashboardBtn.getStyleClass().add("nav-btn-active");
       case PORTFOLIO -> portfolioBtn.getStyleClass().add("nav-btn-active");
-      case TRADING   -> tradingBtn.getStyleClass().add("nav-btn-active");
+      case TRADING -> tradingBtn.getStyleClass().add("nav-btn-active");
     }
   }
 

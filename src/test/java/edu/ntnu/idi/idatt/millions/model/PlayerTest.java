@@ -247,86 +247,41 @@ class PlayerTest {
   }
 
   /**
-   * Verifies that a new player with no transactions starts as NOVICE.
+   * Verifies status assignment for each return-rate band.
    */
   @Test
-  void getStatus_newPlayer_returnsNovice() {
-    assertEquals(PlayerStatus.NOVICE, player.getStatus());
+  void getStatus_excellentGrowth_returnsBernardMadoff() {
+    player.addMoney(new BigDecimal("20000")); // +200%
+    assertEquals(PlayerStatus.BERNARD_MADOFF, player.getStatus());
   }
 
-  /**
-   * Verifies that a player with at least 10 active weeks and 20% growth
-   * is promoted to INVESTOR status.
-   */
   @Test
-  void getStatus_tenWeeksAndTwentyPercentGrowth_returnsInvestor() {
-    Player investor = new Player("Investor", new BigDecimal("10000"));
-    simulateActiveWeeks(investor, 10);
-    investor.addMoney(new BigDecimal("2000"));
-
-    assertEquals(PlayerStatus.INVESTOR, investor.getStatus());
+  void getStatus_goodGrowth_returnsRayDailo() {
+    player.addMoney(new BigDecimal("10000")); // +100%
+    assertEquals(PlayerStatus.RAY_DAILO, player.getStatus());
   }
 
-  /**
-   * Verifies that a player with at least 20 active weeks and 100% growth
-   * is promoted to SPECULATOR status.
-   */
   @Test
-  void getStatus_twentyWeeksAndHundredPercentGrowth_returnsSpeculator() {
-    Player speculator = new Player("Speculator", new BigDecimal("10000"));
-    simulateActiveWeeks(speculator, 20);
-    speculator.addMoney(new BigDecimal("10000"));
-
-    assertEquals(PlayerStatus.SPECULATOR, speculator.getStatus());
+  void getStatus_alrightGrowth_returnsInvestor() {
+    player.addMoney(new BigDecimal("2000")); // +20%
+    assertEquals(PlayerStatus.INVESTOR, player.getStatus());
   }
 
-  /**
-   * Verifies that a player with enough weeks but insufficient growth
-   * does not advance beyond NOVICE.
-   */
   @Test
-  void getStatus_tenWeeksButInsufficientGrowth_returnsNovice() {
-    Player underperformer = new Player("Underperformer", new BigDecimal("10000"));
-    simulateActiveWeeks(underperformer, 10);
-
-    assertEquals(PlayerStatus.NOVICE, underperformer.getStatus());
+  void getStatus_averageBand_returnsAverageJoe() {
+    player.withdrawMoney(new BigDecimal("1000")); // -10%
+    assertEquals(PlayerStatus.AVERAGE_JOE, player.getStatus());
   }
 
-  /**
-   * Verifies that a player with sufficient growth but too few weeks
-   * does not advance to INVESTOR.
-   */
   @Test
-  void getStatus_twentyPercentGrowthButTooFewWeeks_returnsNovice() {
-    player.addMoney(new BigDecimal("2000"));
-
-    assertEquals(PlayerStatus.NOVICE, player.getStatus());
+  void getStatus_badBand_returnsMaxMinus() {
+    player.withdrawMoney(new BigDecimal("3000")); // -30%
+    assertEquals(PlayerStatus.MAX_MINUS, player.getStatus());
   }
 
-  /**
-   * Verifies that a player meeting INVESTOR requirements but not SPECULATOR
-   * requirements is correctly assigned INVESTOR and not promoted further.
-   */
   @Test
-  void getStatus_investorRequirementsMet_doesNotPromoteToSpeculator() {
-    Player investor = new Player("Investor", new BigDecimal("10000"));
-    simulateActiveWeeks(investor, 10);
-    investor.addMoney(new BigDecimal("2000")); // 20% growth, not 100%
-
-    assertEquals(PlayerStatus.INVESTOR, investor.getStatus());
-    assertNotEquals(PlayerStatus.SPECULATOR, investor.getStatus());
-  }
-
-  /**
-   * Simulates a given number of distinct active trading weeks for a player
-   * by adding one purchase transaction per week directly to the archive.
-   *
-   * @param player the player to simulate activity for
-   * @param weeks  the number of distinct weeks to simulate
-   */
-  private void simulateActiveWeeks(Player player, int weeks) {
-    for (int i = 0; i < weeks; i++) {
-      player.updateHistoricalNetWorth();
-    }
+  void getStatus_worstBand_returnsBuyHighBjorn() {
+    player.withdrawMoney(new BigDecimal("6000")); // -60%
+    assertEquals(PlayerStatus.BUY_HIGH_BJORN, player.getStatus());
   }
 }

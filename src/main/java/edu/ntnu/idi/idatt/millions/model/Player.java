@@ -19,8 +19,12 @@ import java.util.Objects;
  */
 public final class Player implements ReadOnlyPlayer {
 
-  private static final BigDecimal INVESTOR_GROWTH_REQUIREMENT = new BigDecimal("0.20");
-  private static final BigDecimal SPECULATOR_GROWTH_REQUIREMENT = BigDecimal.ONE;
+  private static final BigDecimal WORST_REQIREMENT = new BigDecimal("-0.50");
+  private static final BigDecimal BAD_REQIREMEMENT = new BigDecimal("-0.20");
+  private static final BigDecimal AVRAGE_INVESTOR = BigDecimal.ZERO;
+  private static final BigDecimal ALRIGHT_REQUIREMENT = new BigDecimal("0.20");
+  private static final BigDecimal GOOD_REQUIREMENT = new BigDecimal("1.00");
+  private static final BigDecimal EXCELLENT_REQUIREMENT = new BigDecimal("2.00");
 
   private final List<PlayerObserver> observers = new ArrayList<>();
   private final String name;
@@ -207,28 +211,40 @@ public final class Player implements ReadOnlyPlayer {
    * the player has been active in the market.</p>
    *
    * <ul>
-   *   <li>{@link PlayerStatus#NOVICE} is the default starting status</li>
-   *   <li>{@link PlayerStatus#INVESTOR} requires at least 10 active trading
-   *       weeks and at least 20% growth</li>
-   *   <li>{@link PlayerStatus#SPECULATOR} requires at least 20 active trading
-   *       weeks and at least 100% growth</li>
+   *   <li>{@link PlayerStatus#BERNARD_MADOFF} requires at least 200% growth</li>
+   *   <li>{@link PlayerStatus#RAY_DAILO} requires at least 100% growth</li>
+   *   <li>{@link PlayerStatus#INVESTOR} requires at least 20% growth</li>
+   *   <li>{@link PlayerStatus#AVERAGE_JOE} requires at least -20% growth</li>
+   *   <li>{@link PlayerStatus#MAX_MINUS} requires at least -50% growth</li>
+   *   <li>{@link PlayerStatus#BUY_HIGH_BJORN} is below -50% growth</li>
    * </ul>
    *
    * @return the player's current status, never null
    */
   public PlayerStatus getStatus() {
-    BigDecimal returnRate = getReturnRate();
-    int weeksPlayed = historicalNetWorth.size();
+    BigDecimal r = getReturnRate();
 
-    if (weeksPlayed >= 20 && returnRate.compareTo(SPECULATOR_GROWTH_REQUIREMENT) >= 0) {
-      return PlayerStatus.SPECULATOR;
+    if (r.compareTo(EXCELLENT_REQUIREMENT) >= 0) {
+      return PlayerStatus.BERNARD_MADOFF;
     }
 
-    if (weeksPlayed >= 10 && returnRate.compareTo(INVESTOR_GROWTH_REQUIREMENT) >= 0) {
+    if (r.compareTo(GOOD_REQUIREMENT) >= 0) {
+      return PlayerStatus.RAY_DAILO;
+    }
+
+    if (r.compareTo(ALRIGHT_REQUIREMENT) >= 0) {
       return PlayerStatus.INVESTOR;
     }
 
-    return PlayerStatus.NOVICE;
+    if (r.compareTo(BAD_REQIREMEMENT) >= 0) {
+      return PlayerStatus.AVERAGE_JOE;
+    }
+
+    if (r.compareTo(WORST_REQIREMENT) >= 0) {
+      return PlayerStatus.MAX_MINUS;
+    }
+
+    return PlayerStatus.BUY_HIGH_BJORN;
   }
 
   /**

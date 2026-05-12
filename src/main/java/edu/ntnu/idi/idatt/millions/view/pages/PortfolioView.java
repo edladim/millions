@@ -41,7 +41,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
   private static final String ZERO_PRICE  = ViewFormatter.price(BigDecimal.ZERO);
   private static final String VALUE_STYLE = "stat-card-value";
-  private static final int PAGE_SIZE      = 6;
+  private static final int PAGE_SIZE = 6;
 
   private ReadOnlyPlayer player;
   private Consumer<Share> onSell;
@@ -59,7 +59,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private StockChartComponent portfolioChart;
 
   private int holdingsDisplayCount = PAGE_SIZE;
-  private int txDisplayCount       = PAGE_SIZE;
+  private int txDisplayCount = PAGE_SIZE;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -118,15 +118,15 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox netWorthCard   = buildSummaryCard("Net Worth",       ZERO_PRICE, VALUE_STYLE);
-    VBox cashCard       = buildSummaryCard("Cash Balance",    ZERO_PRICE, VALUE_STYLE);
-    VBox portfolioCard  = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
-    VBox statusCard     = buildSummaryCard("Status",          "Novice",   "stat-card-value-status");
+    VBox netWorthCard = buildSummaryCard("Net Worth", ZERO_PRICE, VALUE_STYLE);
+    VBox cashCard = buildSummaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
+    VBox portfolioCard = buildSummaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
+    VBox statusCard = buildSummaryCard("Status", "Novice",   "stat-card-value-status");
 
-    netWorthLabel       = (Label) netWorthCard.getChildren().get(1);
-    cashBalanceLabel    = (Label) cashCard.getChildren().get(1);
+    netWorthLabel = (Label) netWorthCard.getChildren().get(1);
+    cashBalanceLabel = (Label) cashCard.getChildren().get(1);
     portfolioValueLabel = (Label) portfolioCard.getChildren().get(1);
-    statusLabel         = (Label) statusCard.getChildren().get(1);
+    statusLabel = (Label) statusCard.getChildren().get(1);
 
     for (VBox card : new VBox[]{netWorthCard, cashCard, portfolioCard, statusCard}) {
       HBox.setHgrow(card, Priority.ALWAYS);
@@ -273,15 +273,30 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
 
     PlayerStatus status = player.getStatus();
-    String statusName = status.name();
-    statusLabel.setText(statusName.charAt(0) + statusName.substring(1).toLowerCase());
+    String statusName = status.toString().replace("_", " ");
+    statusLabel.setText(statusName.charAt(0) + statusName.substring(1).toUpperCase());
     statusLabel.getStyleClass().removeAll(
-        "stat-card-value-status-investor", "stat-card-value-status-speculator");
-    if (status == PlayerStatus.INVESTOR) {
+            "stat-card-value-status-worst"
+            , "stat-card-value-status-bad"
+            , "stat-card-value-status-investor"
+            , "stat-card-value-status-average"
+            , "stat-card-value-status-good"
+            , "stat-card-value-status-excellent"
+    );
+    if (status == PlayerStatus.BUY_HIGH_BJORN) {
+      statusLabel.getStyleClass().add("stat-card-value-status-worst");
+    } else if (status == PlayerStatus.MAX_MINUS) {
+      statusLabel.getStyleClass().add("stat-card-value-status-bad");
+    } else if (status == PlayerStatus.AVERAGE_JOE) {
+      statusLabel.getStyleClass().add("stat-card-value-status-average");
+    } else if (status == PlayerStatus.INVESTOR) {
       statusLabel.getStyleClass().add("stat-card-value-status-investor");
-    } else if (status == PlayerStatus.SPECULATOR) {
-      statusLabel.getStyleClass().add("stat-card-value-status-speculator");
+    } else if (status == PlayerStatus.RAY_DAILO) {
+      statusLabel.getStyleClass().add("stat-card-value-status-good");
+    } else if (status == PlayerStatus.BERNARD_MADOFF) {
+      statusLabel.getStyleClass().add("stat-card-value-status-excellent");
     }
+
 
     portfolioChart.setData(player.getHistoricalNetWorth());
 
@@ -327,7 +342,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   private HBox buildHoldingRow(Share share) {
-    String symbol  = share.getStock().getSymbol();
+    String symbol = share.getStock().getSymbol();
     String company = share.getStock().getCompany();
 
     Label stockLabel = new Label(symbol + "\n" + company);
@@ -341,11 +356,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     BigDecimal gainOrLoss = share.getGainOrLoss();
     boolean isPositive = gainOrLoss.compareTo(BigDecimal.ZERO) >= 0;
 
-    Label qtyLabel       = makeFixedDataCell(ViewFormatter.quantity(share.getQuantity()),           75);
-    Label buyPriceLabel  = makeFixedDataCell(ViewFormatter.price(share.getPurchasePrice()),         85);
+    Label qtyLabel = makeFixedDataCell(ViewFormatter.quantity(share.getQuantity()), 75);
+    Label buyPriceLabel = makeFixedDataCell(ViewFormatter.price(share.getPurchasePrice()), 85);
     Label currPriceLabel = makeFixedDataCell(ViewFormatter.price(share.getStock().getSalesPrice()), 95);
-    Label valueLabel     = makeFixedDataCell(ViewFormatter.price(share.getCurrentValue()),          80);
-    Label gainLabel      = makeFixedDataCell(ViewFormatter.signedPrice(gainOrLoss),                 90);
+    Label valueLabel = makeFixedDataCell(ViewFormatter.price(share.getCurrentValue()), 80);
+    Label gainLabel = makeFixedDataCell(ViewFormatter.signedPrice(gainOrLoss), 90);
     gainLabel.getStyleClass().add(isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
 
     Button sellBtn = new Button("Quick Sell");
@@ -431,10 +446,10 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     header.getChildren().addAll(
         txStock,
         makeFixedHeaderCell("Quantity", 70),
-        makeFixedHeaderCell("Price",    80),
-        makeFixedHeaderCell("Value",    80),
-        makeFixedHeaderCell("Type",     80),
-        makeFixedHeaderCell("Week",     70)
+        makeFixedHeaderCell("Price", 80),
+        makeFixedHeaderCell("Value", 80),
+        makeFixedHeaderCell("Type", 80),
+        makeFixedHeaderCell("Week", 70)
     );
     return header;
   }
@@ -450,7 +465,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private HBox buildTransactionRow(Transaction tx) {
     boolean isBuy = tx instanceof Purchase;
 
-    String symbol  = tx.getShare().getStock().getSymbol();
+    String symbol = tx.getShare().getStock().getSymbol();
     String company = tx.getShare().getStock().getCompany();
 
     Label stockLabel = new Label(symbol + "\n" + company);
@@ -461,7 +476,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     stockLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
     HBox.setHgrow(stockLabel, Priority.ALWAYS);
 
-    Label qtyLabel   = makeFixedDataCell(ViewFormatter.quantity(tx.getShare().getQuantity()), 70);
+    Label qtyLabel = makeFixedDataCell(ViewFormatter.quantity(tx.getShare().getQuantity()), 70);
     Label priceLabel = makeFixedDataCell(ViewFormatter.price(tx.getShare().getPurchasePrice()), 80);
     Label valueLabel = makeFixedDataCell(ViewFormatter.price(tx.getCalculator().calculateGross()), 80);
 

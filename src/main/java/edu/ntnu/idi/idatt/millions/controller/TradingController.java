@@ -40,9 +40,9 @@ public class TradingController {
    * @param player   the active player.
    */
   public TradingController(TradingView view, Exchange exchange, Player player) {
-    this.view     = view;
+    this.view = view;
     this.exchange = exchange;
-    this.player   = player;
+    this.player = player;
 
     view.setOnRefresh(() -> filterStocks(view.getSearchField().getText()));
 
@@ -124,9 +124,9 @@ public class TradingController {
     BigDecimal price = stock.getSalesPrice();
     view.setCurrentPrice(price);
     BigDecimal qty = effectiveQuantity(price);
-    BigDecimal gross      = price.multiply(qty);
+    BigDecimal gross = price.multiply(qty);
     BigDecimal commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal total      = view.getMode() == TradingView.Mode.BUY
+    BigDecimal total = view.getMode() == TradingView.Mode.BUY
         ? gross.add(commission)
         : gross.subtract(commission);
 

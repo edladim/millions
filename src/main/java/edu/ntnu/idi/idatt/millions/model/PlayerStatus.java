@@ -8,15 +8,15 @@ package edu.ntnu.idi.idatt.millions.model;
  * the starting capital.</p>
  *
  * <ul>
- *   <li>{@link #NOVICE} is the default starting status</li>
  *   <li>{@link #INVESTOR} requires at least 10 active trading weeks and
  *       at least 20% growth in net worth</li>
- *   <li>{@link #SPECULATOR} requires at least 20 active trading weeks and
- *       at least 100% growth in net worth</li>
  * </ul>
  */
 public enum PlayerStatus {
-  NOVICE,
+  BUY_HIGH_BJORN,
+  MAX_MINUS,
+  AVERAGE_JOE,
   INVESTOR,
-  SPECULATOR
+  RAY_DAILO,
+  BERNARD_MADOFF
 }

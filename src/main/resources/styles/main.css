@@ -174,12 +174,28 @@
     -fx-text-fill: -text-muted;
 }
 
+.stat-card-value-status-excellent {
+    -fx-text-fill: #EDC001;
+}
+
+.stat-card-value-status-good {
+    -fx-text-fill: -green
+}
+
 .stat-card-value-status-investor {
     -fx-text-fill: -primary;
 }
 
-.stat-card-value-status-speculator {
-    -fx-text-fill: -green;
+.stat-card-value-status-average {
+    -fx-text-fill: -text-muted;
+}
+
+.stat-card-value-status-bad {
+    -fx-text-fill: #FF7F7F;
+}
+
+.stat-card-value-status-worst {
+    -fx-text-fill: -red;
 }
 
 /* Portfolio banner */

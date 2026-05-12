@@ -33,7 +33,7 @@ public final class TransactionDialog {
    */
   public static void showPurchaseConfirmation(Transaction tx, BigDecimal cashLeft) {
     TransactionCalculator calc = tx.getCalculator();
-    String symbol   = tx.getShare().getStock().getSymbol();
+    String symbol = tx.getShare().getStock().getSymbol();
     String quantity = ViewFormatter.quantity(tx.getShare().getQuantity());
 
     Notifications.create()
@@ -57,7 +57,7 @@ public final class TransactionDialog {
    */
   public static void showSaleConfirmation(Transaction tx, BigDecimal cashBalance) {
     TransactionCalculator calc = tx.getCalculator();
-    String symbol   = tx.getShare().getStock().getSymbol();
+    String symbol = tx.getShare().getStock().getSymbol();
     String quantity = ViewFormatter.quantity(tx.getShare().getQuantity());
 
     Notifications.create()

@@ -116,7 +116,7 @@ public class SetupController {
       return;
     }
 
-    Player   player   = new Player(name, capital);
+    Player player   = new Player(name, capital);
     Exchange exchange = new Exchange("Global Exchange", stocks);
 
     launchGame(player, exchange);

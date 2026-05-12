@@ -166,8 +166,12 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     header.setPadding(new Insets(0, 0, 8, 0));
     header.setMaxWidth(Double.MAX_VALUE);
 
+    Label stockHeader = makeHeaderCell("Stock", 80, false);
+    stockHeader.setPrefWidth(190);
+    stockHeader.setMaxWidth(190);
+
     header.getChildren().addAll(
-            makeHeaderCell("Stock",  140, true),
+            stockHeader,
             makeHeaderCell("Price",   70, true),
             makeHeaderCell("Change",  70, true),
             makeHeaderCell("High",    60, true),
@@ -540,9 +544,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     HBox.setHgrow(nameBox, Priority.ALWAYS);
     HBox stockCell = new HBox(10, iconPane, nameBox);
     stockCell.setAlignment(Pos.CENTER_LEFT);
-    stockCell.setMinWidth(140);
-    stockCell.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(stockCell, Priority.ALWAYS);
+    stockCell.setMinWidth(80);
+    stockCell.setPrefWidth(190);
+    stockCell.setMaxWidth(190);
 
     Label priceLabel  = makeDataCell(ViewFormatter.price(stock.getSalesPrice()),  70, "table-data-cell");
     Label changeLabel = makeDataCell(ViewFormatter.signedAmount(change),          70,
@@ -552,7 +556,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");
-    selectBtn.setPrefWidth(60);
+    selectBtn.setPrefWidth(70);
+    selectBtn.setMinWidth(65);
 
     HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
     row.setAlignment(Pos.CENTER_LEFT);

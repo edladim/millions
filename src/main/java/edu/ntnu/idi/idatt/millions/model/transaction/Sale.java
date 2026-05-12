@@ -59,9 +59,9 @@ public final class Sale extends Transaction {
 
     BigDecimal totalValue = getCalculator().calculateTotal();
 
-    player.addMoney(totalValue);
-    player.getPortfolio().removeShare(getShare());
     player.getTransactionArchive().add(this);
+    player.getPortfolio().removeShare(getShare());
+    player.addMoney(totalValue);
 
     committed = true;
   }

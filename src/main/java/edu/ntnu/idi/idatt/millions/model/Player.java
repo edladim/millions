@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.model;
 
+import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import java.math.BigDecimal;
@@ -116,6 +117,16 @@ public final class Player implements ReadOnlyPlayer {
    */
   public TransactionArchive getTransactionArchive() {
     return transactionArchive;
+  }
+
+  /**
+   * Returns all transactions in the player's archive, in insertion order.
+   *
+   * @return an unmodifiable list of all transactions
+   */
+  @Override
+  public List<Transaction> getTransactions() {
+    return transactionArchive.getAll();
   }
 
   /**

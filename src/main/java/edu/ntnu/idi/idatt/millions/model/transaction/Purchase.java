@@ -60,9 +60,9 @@ public final class Purchase extends Transaction {
       throw new IllegalStateException("Player has insufficient funds");
     }
 
-    player.withdrawMoney(totalCost);
-    player.getPortfolio().addShare(getShare());
     player.getTransactionArchive().add(this);
+    player.getPortfolio().addShare(getShare());
+    player.withdrawMoney(totalCost);
 
     committed = true;
   }

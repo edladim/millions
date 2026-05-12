@@ -466,8 +466,9 @@
 }
 
 .buy-btn:disabled {
-    -fx-background-color: -border;
-    -fx-text-fill: -text-muted;
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+    -fx-opacity: 1;
     -fx-cursor: default;
 }
 
@@ -794,4 +795,11 @@
 
 .buy-btn.action-btn-sell:hover {
     -fx-background-color: #b91c1c;
+}
+
+.buy-btn.action-btn-sell:disabled {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+    -fx-opacity: 1;
+    -fx-cursor: default;
 }

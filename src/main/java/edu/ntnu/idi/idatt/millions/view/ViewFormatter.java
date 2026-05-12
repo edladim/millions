@@ -37,7 +37,8 @@ public final class ViewFormatter {
    * @return the formatted signed price string
    */
   public static String signedPrice(BigDecimal value) {
-    return (value.compareTo(BigDecimal.ZERO) >= 0 ? "$+" : "$") + scale(value).toPlainString();
+    BigDecimal scaled = scale(value);
+    return (scaled.signum() >= 0 ? "+$" : "-$") + scaled.abs().toPlainString();
   }
 
   /**

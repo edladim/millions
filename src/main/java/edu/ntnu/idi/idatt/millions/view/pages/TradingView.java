@@ -68,6 +68,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Runnable onInputChanged;
   private Consumer<Mode> onModeChanged;
   private Consumer<String> onSelectStock;
+  private Consumer<BigDecimal> onPercentSelected;
   private Runnable onRefresh;
   private Runnable onLoadMore;
 
@@ -290,12 +291,21 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       HBox.setHgrow(btn, Priority.ALWAYS);
     }
 
+    twentyFivePercentButton.setOnAction(e -> {
+      if (onPercentSelected != null) onPercentSelected.accept(new BigDecimal("0.25"));
+    });
+    fiftyPercentButton.setOnAction(e -> {
+      if (onPercentSelected != null) onPercentSelected.accept(new BigDecimal("0.50"));
+    });
+    hundredPercentButton.setOnAction(e -> {
+      if (onPercentSelected != null) onPercentSelected.accept(new BigDecimal("1.00"));
+    });
+
     HBox percentageCard = new HBox(5,  twentyFivePercentButton, fiftyPercentButton, hundredPercentButton);
     percentageCard.setAlignment(Pos.CENTER);
     percentageCard.getStyleClass().add("stat-card");
     percentageCard.setPadding(new Insets(12, 16, 12, 16));
     return percentageCard;
-
   }
 
   /**
@@ -846,6 +856,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     loadMoreLabel.setManaged(visible);
   }
 
+  public void setOnPercentSelected(Consumer<BigDecimal> handler) {
+    this.onPercentSelected = handler;
+  }
+
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
     if (onRefresh != null) onRefresh.run();
@@ -853,6 +867,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
   public StockChartComponent getStockChart() {
     return stockChart;
+  }
+
+  public void setInputAmount(BigDecimal value, boolean asAmount) {
+    if (asAmount != amountMode) toggleInputMode();
+    setSpinnerValue(value);
   }
 
   /**

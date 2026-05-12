@@ -212,7 +212,7 @@ public final class Player implements ReadOnlyPlayer {
    *
    * <ul>
    *   <li>{@link PlayerStatus#BERNARD_MADOFF} requires at least 200% growth</li>
-   *   <li>{@link PlayerStatus#RAY_DAILO} requires at least 100% growth</li>
+   *   <li>{@link PlayerStatus#RAY_DALIO} requires at least 100% growth</li>
    *   <li>{@link PlayerStatus#INVESTOR} requires at least 20% growth</li>
    *   <li>{@link PlayerStatus#AVERAGE_JOE} requires at least -20% growth</li>
    *   <li>{@link PlayerStatus#MAX_MINUS} requires at least -50% growth</li>
@@ -229,7 +229,7 @@ public final class Player implements ReadOnlyPlayer {
     }
 
     if (r.compareTo(GOOD_REQUIREMENT) >= 0) {
-      return PlayerStatus.RAY_DAILO;
+      return PlayerStatus.RAY_DALIO;
     }
 
     if (r.compareTo(ALRIGHT_REQUIREMENT) >= 0) {

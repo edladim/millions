@@ -21,7 +21,7 @@ import java.util.Objects;
  * System.out.println(apple.getSalesPrice()); // 192.30
  * }</pre>
  */
-public final class Stock {
+public final class Stock implements ReadOnlyStock {
   private final String symbol;
   private final String company;
   private final List<BigDecimal> prices = new ArrayList<>();

@@ -75,13 +75,13 @@ class SaleCalculatorTest {
   /**
    * Verifies that tax is calculated correctly when the sale produces a profit.
    *
-   * <p>Profit = gross − purchase value</p>
+   * <p>Profit = gross − commission − purchase value</p>
    * <p>Tax = 30% of profit</p>
    */
   @Test
   void calculateTax_profitScenario_returnsCorrectTax() {
 
-    BigDecimal expected = new BigDecimal("300.0");
+    BigDecimal expected = new BigDecimal("294.0");
 
     BigDecimal result = calculator.calculateTax();
 
@@ -114,11 +114,11 @@ class SaleCalculatorTest {
   @Test
   void calculateTotal_returnsCorrectValue() {
 
-    BigDecimal expected = new BigDecimal("1680.00");
+    BigDecimal expected = new BigDecimal("1686");
 
     BigDecimal result = calculator.calculateTotal();
 
-    assertEquals(expected, result);
+    assertEquals(0, expected.compareTo(result));
   }
 
   /**

@@ -1,0 +1,821 @@
+/* ═══════════════════════════════════════════════════════
+   main.css  –  Millions · Global styles
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Color tokens ────────────────────────────────────── */
+.root {
+    -primary:        #6366f1;
+    -primary-light:  #818cf8;
+    -primary-bg:     #eef2ff;
+    -bg:             #f1f5f9;
+    -surface:        #ffffff;
+    -text:           #0f172a;
+    -text-muted:     #64748b;
+    -border:         #e2e8f0;
+    -green:          #16a34a;
+    -red:            #dc2626;
+    -fx-font-family: "Inter", "Avenir Next", "SF Pro Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+}
+
+/* ── Root layout ─────────────────────────────────────── */
+.main-root {
+    -fx-background-color: -bg;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════════════════════ */
+.sidebar {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 2, 0);
+}
+
+/* Logo */
+.logo-text {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.logo-icon-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+/* Nav buttons */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 16 12 16;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.nav-btn:hover {
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
+}
+
+.nav-btn-active {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.nav-btn-active:hover {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+}
+
+/* Advance week button */
+.advance-btn {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 20 14 20;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.advance-btn:hover {
+    -fx-background-color: -primary-light;
+}
+
+/* Week box */
+.week-box {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 10;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+.week-box-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: -text-muted;
+}
+
+.week-box-value {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary;
+}
+
+.week-box-icon {
+    -fx-font-size: 18px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SHARED PAGE ELEMENTS
+   ═══════════════════════════════════════════════════════ */
+
+/* Page wrapper */
+.dashboard-view {
+    -fx-background-color: -bg;
+}
+
+/* Headers */
+.page-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.page-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-muted;
+}
+
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+/* Cards */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 10, 0, 0, 2);
+}
+
+.stat-card-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+.stat-card-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.stat-card-value-profit {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -green;
+}
+
+.stat-card-value-loss {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -red;
+}
+
+.stat-card-value-status {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+}
+
+.stat-card-value-status-excellent {
+    -fx-text-fill: #EDC001;
+}
+
+.stat-card-value-status-good {
+    -fx-text-fill: -green
+}
+
+.stat-card-value-status-investor {
+    -fx-text-fill: -primary;
+}
+
+.stat-card-value-status-average {
+    -fx-text-fill: -text-muted;
+}
+
+.stat-card-value-status-bad {
+    -fx-text-fill: #FF7F7F;
+}
+
+.stat-card-value-status-worst {
+    -fx-text-fill: -red;
+}
+
+/* Portfolio banner */
+.portfolio-banner {
+    -fx-background-color: linear-gradient(to right, #6366f1, #818cf8);
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.35), 20, 0, 0, 6);
+}
+
+.banner-heading {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255,255,255,0.85);
+}
+
+.banner-value {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.banner-change {
+    -fx-font-size: 15px;
+    -fx-text-fill: rgba(255,255,255,0.9);
+}
+
+.banner-change-negative {
+    -fx-text-fill: #fca5a5;
+}
+
+/* Movers */
+.mover-row {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.mover-row:hover {
+    -fx-background-color: -primary-bg;
+}
+
+.mover-rank        { -fx-font-size: 13px; -fx-text-fill: -text-muted; -fx-font-weight: bold; }
+.mover-icon-letter { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: white; }
+.mover-name        { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
+.mover-symbol      { -fx-font-size: 12px; -fx-text-fill: -text-muted; }
+.mover-price       { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
+
+.mover-change-positive {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -green;
+}
+
+.mover-change-negative {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -red;
+}
+
+/* Divider */
+.divider {
+    -fx-background-color: -border;
+}
+
+/* Empty state */
+.empty-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+    -fx-padding: 24;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABLE STYLES (Portfolio + Trading)
+   ═══════════════════════════════════════════════════════ */
+
+.table-header-cell {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+    -fx-text-transform: uppercase;
+}
+
+.table-data-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text;
+}
+
+.table-data-cell-profit {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -green;
+}
+
+.table-data-cell-loss {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -red;
+}
+
+.holding-row {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 1;
+}
+
+.holding-row:hover {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+}
+
+.stock-row-selected {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+}
+
+.select-btn.select-btn-active {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+}
+
+.select-btn.select-btn-active:hover {
+    -fx-background-color: -primary-light;
+    -fx-text-fill: white;
+}
+
+/* ── Transaction history rows ────────────────────────── */
+.tx-row-buy {
+    -fx-background-color: #f0fdf4;
+    -fx-background-radius: 8;
+}
+
+.tx-row-buy:hover {
+    -fx-background-color: #dcfce7;
+}
+
+.tx-row-sell {
+    -fx-background-color: #fef2f2;
+    -fx-background-radius: 8;
+}
+
+.tx-row-sell:hover {
+    -fx-background-color: #fee2e2;
+}
+
+.tx-type-buy {
+    -fx-text-fill: #16a34a;
+    -fx-font-weight: bold;
+}
+
+.tx-type-sell {
+    -fx-text-fill: #dc2626;
+    -fx-font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PORTFOLIO PAGE
+   ═══════════════════════════════════════════════════════ */
+
+.sell-btn {
+    -fx-background-color: -red;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 6 12 6 12;
+}
+
+.sell-btn:hover {
+    -fx-background-color: #b91c1c;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRADING PAGE
+   ═══════════════════════════════════════════════════════ */
+
+.search-field {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+}
+
+.search-field:focused {
+    -fx-border-color: -primary;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 8, 0, 0, 0);
+}
+
+.stock-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.stock-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.select-btn {
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 6 10 6 10;
+}
+
+.select-btn:hover {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
+}
+
+/* Buy panel */
+.buy-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 0);
+}
+
+.buy-panel-wrapper {
+    -fx-background-color: transparent;
+}
+
+/* Transparent page scroll wrapper */
+.page-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.page-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.buy-stock-symbol {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.buy-stock-price {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.input-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+}
+
+.cost-row {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+    -fx-max-width: infinity;
+}
+
+.cost-row-total {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.buy-btn {
+    -fx-background-color: -green;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 14 0 14 0;
+}
+
+.buy-btn:hover {
+    -fx-background-color: #15803d;
+}
+
+.buy-btn:disabled {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+    -fx-opacity: 1;
+    -fx-cursor: default;
+}
+
+/* ═══════════════════════════════════════════════════════
+   STOCK CHART COMPONENT
+   ═══════════════════════════════════════════════════════ */
+
+.chart-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.chart-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+}
+
+.chart-axis {
+    -fx-tick-label-fill: -text-muted;
+    -fx-font-size: 11px;
+}
+
+.stock-line-chart {
+    -fx-background-color: transparent;
+    -fx-plot-background-color: transparent;
+    -fx-horizontal-grid-lines-visible: true;
+    -fx-vertical-grid-lines-visible: false;
+    -fx-horizontal-zero-line-visible: false;
+}
+
+.stock-line-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.stock-line-chart .axis {
+    -fx-tick-label-fill: #64748b;
+}
+
+/* Green line when trend is up */
+.stock-line-chart.chart-positive .chart-series-line {
+    -fx-stroke: #16a34a;
+    -fx-stroke-width: 2.5px;
+}
+
+/* Red line when trend is down */
+.stock-line-chart.chart-negative .chart-series-line {
+    -fx-stroke: #dc2626;
+    -fx-stroke-width: 2.5px;
+}
+
+.stock-line-chart .chart-legend {
+    -fx-background-color: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRANSACTION RECEIPT COMPONENT
+   ═══════════════════════════════════════════════════════ */
+
+.notification-bar > .pane {
+    -fx-background-color: #1e1e1e;
+    -fx-background-radius: 12;
+    -fx-padding: 14;
+    -fx-border-color: #4caf50;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+.notification-bar > .pane .title {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.notification-bar > .pane .content {
+    -fx-text-fill: #cfcfcf;
+    -fx-font-size: 12px;
+}
+
+.notification-bar.error > .pane {
+    -fx-border-color: #ff5555;
+}
+/* ═══════════════════════════════════════════════════════
+   STARTUP SCREEN
+   ═══════════════════════════════════════════════════════ */
+
+.startup-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.startup-bg {
+    -fx-background-color: linear-gradient(to bottom right, #eef2ff, #f1f5f9);
+}
+
+/* ── Card ────────────────────────────────────────────── */
+.startup-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.18), 48, 0, 0, 12);
+}
+
+/* ── Header banner ───────────────────────────────────── */
+.startup-header {
+    -fx-background-color: linear-gradient(to bottom right, #6366f1, #818cf8);
+    -fx-background-radius: 20 20 0 0;
+}
+
+.startup-logo-icon {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.startup-title {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.startup-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: rgba(255,255,255,0.82);
+}
+
+/* Feature pills */
+.startup-pill {
+    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-background-radius: 20;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 5 12 5 12;
+}
+
+.startup-pill-text {
+    -fx-text-fill: white;
+}
+
+.startup-pill-icon {
+    -fx-icon-color: white;
+}
+
+/* ── Body / form ─────────────────────────────────────── */
+.startup-body {
+    -fx-background-color: white;
+    -fx-background-radius: 0 0 20 20;
+}
+
+.startup-field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.startup-field {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 11 14 11 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: #0f172a;
+}
+
+.startup-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #6366f1;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 8, 0, 0, 0);
+}
+
+/* File row */
+.startup-file-row {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 10;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+.startup-file-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}
+
+.startup-file-label-selected {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.startup-browse-btn {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #6366f1;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 7 14 7 14;
+}
+
+.startup-browse-btn:hover {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+}
+
+.startup-hint {
+    -fx-font-size: 11px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* Start button */
+.startup-start-btn {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 14 0 14 0;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.4), 16, 0, 0, 4);
+}
+
+.startup-start-btn:hover {
+    -fx-background-color: #818cf8;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.5), 20, 0, 0, 6);
+}
+
+.startup-start-btn:pressed {
+    -fx-background-color: #4f46e5;
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.3), 8, 0, 0, 2);
+}
+
+/* Error */
+.startup-error {
+    -fx-font-size: 13px;
+    -fx-text-fill: #dc2626;
+    -fx-background-color: #fef2f2;
+    -fx-background-radius: 8;
+    -fx-border-color: #fecaca;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-padding: 10 14 10 14;
+}
+
+
+/* ── Load more ───────────────────────────────────────── */
+.load-more-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0 4 0;
+    -fx-alignment: center;
+}
+
+.load-more-label:hover {
+    -fx-text-fill: -primary;
+}
+
+/* ── Buy/Sell mode tabs ──────────────────────────────── */
+.mode-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 0 10 0;
+    -fx-background-radius: 8;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.mode-tab:hover {
+    -fx-background-color: -bg;
+}
+
+.mode-tab-active {
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
+}
+
+.mode-tab-active:hover {
+    -fx-background-color: -primary-bg;
+}
+
+/* ── Owned hint ───────────────────────────────────────── */
+.owned-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+    -fx-font-weight: 600;
+}
+
+/* ── Swap button (quantity <-> amount) ─────────────────── */
+.swap-btn {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #6366f1;
+    -fx-padding: 6 8 6 8;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 24;
+}
+
+.swap-btn:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+.swap-btn .ikonli-font-icon {
+    -fx-icon-color: #6366f1;
+}
+
+/* ── Stronger shadow for cards inside buy panel ──────── */
+.buy-panel .stat-card {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 0, 4);
+}
+
+/* ── Action button: sell modifier (keeps .buy-btn size) ── */
+.buy-btn.action-btn-sell {
+    -fx-background-color: -red;
+}
+
+.buy-btn.action-btn-sell:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.buy-btn.action-btn-sell:disabled {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+    -fx-opacity: 1;
+    -fx-cursor: default;
+}

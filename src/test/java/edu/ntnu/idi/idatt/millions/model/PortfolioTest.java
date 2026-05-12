@@ -52,7 +52,7 @@ class PortfolioTest {
    */
   @Test
   void addShare_addsShareSuccessfully() {
-    assertTrue(portfolio.addShare(share1));
+    portfolio.addShare(share1);
     assertEquals(1, portfolio.size());
     assertTrue(portfolio.contains(share1));
   }
@@ -185,9 +185,9 @@ class PortfolioTest {
    */
   @Test
   void constructor_withShares_initializesPortfolio() {
-    Portfolio portfolio = new Portfolio(List.of(share1, share2));
+    Portfolio portfolioWithShares = new Portfolio(List.of(share1, share2));
 
-    assertEquals(2, portfolio.size());
+    assertEquals(2, portfolioWithShares.size());
   }
 
   /**
@@ -247,10 +247,9 @@ class PortfolioTest {
     portfolio.addShare(share2);
     portfolio.addShare(share3);
 
-    BigDecimal expectedNetWorth = new BigDecimal("3009.00");
+    BigDecimal expectedNetWorth = new BigDecimal("3018.9");
 
-
-    assertEquals(expectedNetWorth, portfolio.getNetWorth());
+    assertEquals(0, expectedNetWorth.compareTo(portfolio.getNetWorth()));
   }
 
 }

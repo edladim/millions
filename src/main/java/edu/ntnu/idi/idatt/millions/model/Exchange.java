@@ -1,10 +1,14 @@
 package edu.ntnu.idi.idatt.millions.model;
 
-import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
-import edu.ntnu.idi.idatt.millions.model.transaction.Sale;
+import edu.ntnu.idi.idatt.millions.model.fluctuator.MomentumFluctuator;
+import edu.ntnu.idi.idatt.millions.model.fluctuator.PriceFluctuator;
+import edu.ntnu.idi.idatt.millions.model.transaction.PurchaseFactory;
+import edu.ntnu.idi.idatt.millions.model.transaction.SaleFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
-
+import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -17,12 +21,16 @@ import java.util.*;
  * <p>The exchange also tracks the current trading week and updates stock
  * prices when advancing to the next week.</p>
  */
-public final class Exchange {
+public final class Exchange implements ReadOnlyExchange {
 
+  private final List<ExchangeObserver> observers = new ArrayList<>();
   private final String name;
   private int week;
   private final Map<String, Stock> stockMap;
   private final Random random;
+  private final PriceFluctuator fluctuator;
+  private final TransactionFactory purchaseFactory = new PurchaseFactory();
+  private final TransactionFactory saleFactory = new SaleFactory();
 
   /**
    * Creates a new exchange.
@@ -43,6 +51,7 @@ public final class Exchange {
 
     this.stockMap = new HashMap<>();
     this.random = new Random();
+    this.fluctuator = new MomentumFluctuator();
     this.week = 1;
 
     for (Stock stock : stocks) {
@@ -53,6 +62,8 @@ public final class Exchange {
 
       stockMap.put(stock.getSymbol(), stock);
     }
+
+    preSimulate(30);
   }
 
   /**
@@ -133,7 +144,7 @@ public final class Exchange {
 
     return stockMap.values().stream()
         .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) > 0)
-        .sorted(Comparator.comparing(Stock::getLatestPriceChange).reversed())
+        .sorted(Comparator.comparingDouble(Exchange::percentChange).reversed())
         .limit(limit)
         .toList();
   }
@@ -155,7 +166,7 @@ public final class Exchange {
 
     return stockMap.values().stream()
         .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) < 0)
-        .sorted(Comparator.comparing(Stock::getLatestPriceChange))
+        .sorted(Comparator.comparingDouble(Exchange::percentChange))
         .limit(limit)
         .toList();
   }
@@ -201,8 +212,7 @@ public final class Exchange {
 
     Stock stock = getStock(symbol);
     Share share = new Share(stock, quantity, stock.getSalesPrice());
-
-    return new Purchase(share, week);
+    return purchaseFactory.createAndCommit(share, week, player);
   }
 
   /**
@@ -218,29 +228,133 @@ public final class Exchange {
     Objects.requireNonNull(share, "Share cannot be null");
     Objects.requireNonNull(player, "Player cannot be null");
 
-    return new Sale(share, week);
+    return saleFactory.createAndCommit(share, week, player);
+  }
+
+  /**
+   * Sells a specified quantity of a stock, drawing from the player's existing
+   * share lots in the order they were acquired.
+   *
+   * <p>If a lot is fully consumed, it is sold whole. If the requested quantity
+   * lands inside a lot, that lot is split: the remaining portion is kept in
+   * the portfolio at its original purchase price, and the sold portion is
+   * committed as a sale transaction.</p>
+   *
+   * @param symbol the stock symbol to sell
+   * @param quantity the quantity to sell, must be positive and not exceed the
+   *                 total quantity owned of {@code symbol}
+   * @param player the player performing the sale
+   * @return the transaction created for the final sale lot
+   *
+   * @throws NullPointerException if any argument is null
+   * @throws IllegalArgumentException if {@code quantity} is not positive
+   * @throws IllegalStateException if the player does not own enough of the stock
+   */
+  public Transaction sell(String symbol, BigDecimal quantity, Player player) {
+    Objects.requireNonNull(symbol, "Symbol cannot be null");
+    Objects.requireNonNull(quantity, "Quantity cannot be null");
+    Objects.requireNonNull(player, "Player cannot be null");
+    if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Quantity must be positive");
+    }
+
+    Portfolio portfolio = player.getPortfolio();
+    List<Share> matching = portfolio.getShares(symbol);
+    BigDecimal totalOwned = matching.stream()
+        .map(Share::getQuantity)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    if (quantity.compareTo(totalOwned) > 0) {
+      throw new IllegalStateException(
+          "Cannot sell more than owned (owned: " + totalOwned + ")");
+    }
+
+    Stock stock = getStock(symbol);
+    BigDecimal remaining = quantity;
+    Transaction lastTx = null;
+    for (Share share : matching) {
+      if (remaining.signum() <= 0) break;
+
+      if (share.getQuantity().compareTo(remaining) <= 0) {
+        lastTx = sell(share, player);
+        remaining = remaining.subtract(share.getQuantity());
+      } else {
+        portfolio.removeShare(share);
+        BigDecimal kept = share.getQuantity().subtract(remaining);
+        portfolio.addShare(new Share(stock, kept, share.getPurchasePrice()));
+
+        Share toSell = new Share(stock, remaining, share.getPurchasePrice());
+        portfolio.addShare(toSell);
+        lastTx = sell(toSell, player);
+        remaining = BigDecimal.ZERO;
+      }
+    }
+    return lastTx;
+  }
+
+  /**
+   * Registers an {@link ExchangeObserver} to be notified when the exchange advances.
+   *
+   * @param observer the observer to add, cannot be null
+   * @throws NullPointerException if {@code observer} is null
+   */
+  public void addObserver(ExchangeObserver observer) {
+    Objects.requireNonNull(observer, "Observer cannot be null");
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
   }
 
   /**
    * Advances the exchange to the next trading week.
    *
-   * <p>This increments the week number and updates stock prices.
-   * Prices change randomly but remain positive.</p>
+   * <p>This increments the week number, updates stock prices randomly,
+   * and notifies all registered {@link ExchangeObserver}s.</p>
    */
   public void advance() {
     week++;
+    fluctuator.beginWeek(random);
 
     for (Stock stock : stockMap.values()) {
-      BigDecimal currentPrice = stock.getSalesPrice();
-      double change = (random.nextDouble() - 0.5) * 0.2;
-      BigDecimal multiplier = BigDecimal.valueOf(1 + change);
-      BigDecimal newPrice = currentPrice.multiply(multiplier);
-
-      if (newPrice.compareTo(BigDecimal.ONE) < 0) {
-        newPrice = BigDecimal.ONE;
-      }
-
+      BigDecimal newPrice = fluctuator.nextPrice(
+          stock.getSymbol(), stock.getSalesPrice(), random);
       stock.addNewSalesPrice(newPrice);
+    }
+
+    for (ExchangeObserver observer : observers) {
+      observer.onExchangeUpdated(this);
+    }
+  }
+
+  /**
+   * Returns the percentage price change for a stock as a {@code double}, used
+   * for sorting gainers and losers by relative move rather than absolute dollar change.
+   *
+   * @param stock the stock to evaluate
+   * @return percentage change, or {@code 0.0} if the previous price was zero
+   */
+  private static double percentChange(Stock stock) {
+    BigDecimal change = stock.getLatestPriceChange();
+    BigDecimal prev   = stock.getSalesPrice().subtract(change);
+    if (prev.signum() == 0) return 0.0;
+    return change.divide(prev, 8, RoundingMode.HALF_UP).doubleValue();
+  }
+
+  /**
+   * Pre-generates price history for all stocks without incrementing the week
+   * counter or notifying observers. Called once during construction so charts
+   * have historical data from the very first frame.
+   *
+   * @param weeks the number of historical weeks to simulate
+   */
+  private void preSimulate(int weeks) {
+    for (int i = 0; i < weeks; i++) {
+      fluctuator.beginWeek(random);
+      for (Stock stock : stockMap.values()) {
+        BigDecimal newPrice = fluctuator.nextPrice(
+            stock.getSymbol(), stock.getSalesPrice(), random);
+        stock.addNewSalesPrice(newPrice);
+      }
     }
   }
 

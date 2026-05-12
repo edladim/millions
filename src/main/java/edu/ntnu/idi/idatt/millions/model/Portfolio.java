@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleCalculator;
+import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -19,8 +20,9 @@ import java.util.Objects;
  *   <li>The internal collection cannot be modified externally</li>
  * </ul>
  */
-public final class Portfolio {
+public final class Portfolio implements ReadOnlyPortfolio {
 
+  private final List<PortfolioObserver> observers = new ArrayList<>();
   private final List<Share> shares = new ArrayList<>();
 
   /**
@@ -50,13 +52,12 @@ public final class Portfolio {
    * Adds a share to the portfolio.
    *
    * @param share the share to add, cannot be null
-   * @return {@code true} if the share was added successfully,
-   *         {@code false} if the share already exists in the portfolio
    * @throws NullPointerException if {@code share} is null
    */
-  public boolean addShare(Share share) {
+  public void addShare(Share share) {
     Objects.requireNonNull(share, "Share cannot be null");
-    return shares.add(share);
+    shares.add(share);
+    notifyObservers();
   }
 
   /**
@@ -69,7 +70,11 @@ public final class Portfolio {
    */
   public boolean removeShare(Share share) {
     Objects.requireNonNull(share, "Share cannot be null");
-    return shares.remove(share);
+    boolean removed = shares.remove(share);
+    if (removed) {
+      notifyObservers();
+    }
+    return removed;
   }
 
   /**
@@ -190,6 +195,25 @@ public final class Portfolio {
             .map(SaleCalculator::new)
             .map(SaleCalculator::calculateTotal)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+  }
+
+  /**
+   * Registers a {@link PortfolioObserver} to be notified on portfolio changes.
+   *
+   * @param observer the observer to add, cannot be null
+   * @throws NullPointerException if {@code observer} is null
+   */
+  public void addObserver(PortfolioObserver observer) {
+    Objects.requireNonNull(observer, "Observer cannot be null");
+    if (!observers.contains(observer)) {
+      observers.add(observer);
+    }
+  }
+
+  private void notifyObservers() {
+    for (PortfolioObserver observer : observers) {
+      observer.onPortfolioUpdated(this);
+    }
   }
 
 }

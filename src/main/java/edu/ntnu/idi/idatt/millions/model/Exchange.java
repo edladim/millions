@@ -8,6 +8,7 @@ import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -61,6 +62,8 @@ public final class Exchange implements ReadOnlyExchange {
 
       stockMap.put(stock.getSymbol(), stock);
     }
+
+    preSimulate(30);
   }
 
   /**
@@ -141,7 +144,7 @@ public final class Exchange implements ReadOnlyExchange {
 
     return stockMap.values().stream()
         .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) > 0)
-        .sorted(Comparator.comparing(Stock::getLatestPriceChange).reversed())
+        .sorted(Comparator.comparingDouble(Exchange::percentChange).reversed())
         .limit(limit)
         .toList();
   }
@@ -163,7 +166,7 @@ public final class Exchange implements ReadOnlyExchange {
 
     return stockMap.values().stream()
         .filter(stock -> stock.getLatestPriceChange().compareTo(BigDecimal.ZERO) < 0)
-        .sorted(Comparator.comparing(Stock::getLatestPriceChange))
+        .sorted(Comparator.comparingDouble(Exchange::percentChange))
         .limit(limit)
         .toList();
   }
@@ -320,6 +323,38 @@ public final class Exchange implements ReadOnlyExchange {
 
     for (ExchangeObserver observer : observers) {
       observer.onExchangeUpdated(this);
+    }
+  }
+
+  /**
+   * Returns the percentage price change for a stock as a {@code double}, used
+   * for sorting gainers and losers by relative move rather than absolute dollar change.
+   *
+   * @param stock the stock to evaluate
+   * @return percentage change, or {@code 0.0} if the previous price was zero
+   */
+  private static double percentChange(Stock stock) {
+    BigDecimal change = stock.getLatestPriceChange();
+    BigDecimal prev   = stock.getSalesPrice().subtract(change);
+    if (prev.signum() == 0) return 0.0;
+    return change.divide(prev, 8, RoundingMode.HALF_UP).doubleValue();
+  }
+
+  /**
+   * Pre-generates price history for all stocks without incrementing the week
+   * counter or notifying observers. Called once during construction so charts
+   * have historical data from the very first frame.
+   *
+   * @param weeks the number of historical weeks to simulate
+   */
+  private void preSimulate(int weeks) {
+    for (int i = 0; i < weeks; i++) {
+      fluctuator.beginWeek(random);
+      for (Stock stock : stockMap.values()) {
+        BigDecimal newPrice = fluctuator.nextPrice(
+            stock.getSymbol(), stock.getSalesPrice(), random);
+        stock.addNewSalesPrice(newPrice);
+      }
     }
   }
 

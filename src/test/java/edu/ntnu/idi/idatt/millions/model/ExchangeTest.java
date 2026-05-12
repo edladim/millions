@@ -322,8 +322,8 @@ class ExchangeTest {
    */
   @Test
   void getGainers_returnsTopGainersSortedDescending() {
-    apple.addNewSalesPrice(new BigDecimal("200"));  // change = +50
-    google.addNewSalesPrice(new BigDecimal("210")); // change = +10
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("1.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("1.10")));
 
     List<Stock> gainers = exchange.getGainers(2);
 
@@ -335,8 +335,8 @@ class ExchangeTest {
   /** Verifies that getGainers respects the limit parameter. */
   @Test
   void getGainers_limitIsRespected() {
-    apple.addNewSalesPrice(new BigDecimal("200"));
-    google.addNewSalesPrice(new BigDecimal("210"));
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("1.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("1.10")));
 
     List<Stock> gainers = exchange.getGainers(1);
 
@@ -347,8 +347,8 @@ class ExchangeTest {
   /** Verifies that getGainers excludes stocks with no positive price change. */
   @Test
   void getGainers_excludesNonGainers() {
-    apple.addNewSalesPrice(new BigDecimal("200"));
-    google.addNewSalesPrice(new BigDecimal("180"));
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("1.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("0.90")));
 
     List<Stock> gainers = exchange.getGainers(2);
 
@@ -360,8 +360,8 @@ class ExchangeTest {
   /** Verifies that getGainers returns an empty list when no stocks have gained. */
   @Test
   void getGainers_noGainers_returnsEmptyList() {
-    apple.addNewSalesPrice(new BigDecimal("100"));
-    google.addNewSalesPrice(new BigDecimal("180"));
+    apple.addNewSalesPrice(apple.getSalesPrice());
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("0.90")));
 
     assertTrue(exchange.getGainers(2).isEmpty());
   }
@@ -379,8 +379,8 @@ class ExchangeTest {
    */
   @Test
   void getLosers_returnsTopLosersSortedAscending() {
-    apple.addNewSalesPrice(new BigDecimal("100"));  // change = -50
-    google.addNewSalesPrice(new BigDecimal("190")); // change = -10
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("0.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("0.90")));
 
     List<Stock> losers = exchange.getLosers(2);
 
@@ -392,8 +392,8 @@ class ExchangeTest {
   /** Verifies that getLosers respects the limit parameter. */
   @Test
   void getLosers_limitIsRespected() {
-    apple.addNewSalesPrice(new BigDecimal("100"));
-    google.addNewSalesPrice(new BigDecimal("190"));
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("0.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("0.90")));
 
     List<Stock> losers = exchange.getLosers(1);
 
@@ -404,8 +404,8 @@ class ExchangeTest {
   /** Verifies that getLosers excludes stocks with no negative price change. */
   @Test
   void getLosers_excludesNonLosers() {
-    apple.addNewSalesPrice(new BigDecimal("200"));
-    google.addNewSalesPrice(new BigDecimal("190"));
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("1.50")));
+    google.addNewSalesPrice(google.getSalesPrice().multiply(new BigDecimal("0.90")));
 
     List<Stock> losers = exchange.getLosers(2);
 
@@ -417,8 +417,8 @@ class ExchangeTest {
   /** Verifies that getLosers returns an empty list when no stocks have lost value. */
   @Test
   void getLosers_noLosers_returnsEmptyList() {
-    apple.addNewSalesPrice(new BigDecimal("200"));
-    google.addNewSalesPrice(new BigDecimal("200"));
+    apple.addNewSalesPrice(apple.getSalesPrice().multiply(new BigDecimal("1.50")));
+    google.addNewSalesPrice(google.getSalesPrice());
 
     assertTrue(exchange.getLosers(2).isEmpty());
   }

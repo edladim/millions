@@ -79,6 +79,7 @@ public class MainController {
   private void initializeViews(Exchange exchange, Player player) {
     view.getSidebar().onExchangeUpdated(exchange);
     view.getDashboardView().onExchangeUpdated(exchange);
+    tradingController.selectDefault();
     view.getTradingView().onExchangeUpdated(exchange);
     view.getDashboardView().onPlayerUpdated(player);
     view.getPortfolioView().onPlayerUpdated(player);

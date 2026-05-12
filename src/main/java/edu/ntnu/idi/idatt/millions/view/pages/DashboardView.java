@@ -344,8 +344,13 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     BigDecimal profit = player.getProfit();
     boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 
+    long distinctStocks = portfolio.getShares().stream()
+        .map(s -> s.getStock().getSymbol())
+        .distinct()
+        .count();
+
     setPortfolioValue(ViewFormatter.price(player.getNetWorth()));
-    setTotalAssets(String.valueOf(portfolio.size()));
+    setTotalAssets(String.valueOf(distinctStocks));
     setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
     setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
 

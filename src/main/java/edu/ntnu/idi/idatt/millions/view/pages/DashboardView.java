@@ -9,6 +9,7 @@ import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import java.math.BigDecimal;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -25,13 +26,19 @@ import javafx.scene.shape.Circle;
  * </p>
  *
  * <p>
- * The view exposes setters for updating the displayed values and a method for
- * clearing the movers list.
+ * The view implements {@link ExchangeObserver}, {@link PlayerObserver}, and
+ * {@link PortfolioObserver} to refresh its sections whenever the underlying
+ * models change. Movers support paginated "Load more" with a cap of
+ * {@value #MAX_MOVERS} entries per section.
  * </p>
  */
 public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
 
+  private static final int MOVERS_PAGE_SIZE = 5;
+  private static final int MAX_MOVERS       = 20;
+
   private ReadOnlyPlayer player;
+  private ReadOnlyExchange currentExchange;
 
   private Label portfolioValueLabel;
   private Label portfolioChangeLabel;
@@ -40,6 +47,10 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label totalProfitLabel;
   private VBox moversPositiveContainer;
   private VBox moversNegativeContainer;
+  private Label loadMoreGainersLabel;
+  private Label loadMoreLosersLabel;
+  private int gainersDisplayCount = MOVERS_PAGE_SIZE;
+  private int losersDisplayCount  = MOVERS_PAGE_SIZE;
 
   /**
    * <p>Constructs the dashboard view and builds its initial layout.</p>
@@ -63,7 +74,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * @return the header container
    */
   private VBox buildHeader() {
-    Label title = new Label("DashBoard");
+    Label title = new Label("Dashboard");
     title.getStyleClass().add("page-title");
 
     Label subtitle = new Label("Welcome back to your investment game");
@@ -88,14 +99,13 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     portfolioValueLabel = new Label("$0.00");
     portfolioValueLabel.getStyleClass().add("banner-value");
 
-    portfolioChangeLabel = new Label("↗ +0.00% ($+0.00)");
+    portfolioChangeLabel = new Label("↗ +0.00% (+$0.00)");
     portfolioChangeLabel.getStyleClass().add("banner-change");
 
     content.getChildren().addAll(heading, portfolioValueLabel, portfolioChangeLabel);
 
     StackPane wrapper = new StackPane(content);
     wrapper.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(wrapper, Priority.ALWAYS);
     return wrapper;
   }
 
@@ -108,35 +118,44 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox totalAssets = buildStatsCard("Total Assets", "4");
-    VBox costBasis   = buildStatsCard("Cost Basis",   "$0.00");
-    VBox profitLoss  = buildStatsCard("Total Profit/Loss", "$+0.00");
+    totalAssetsLabel = makeStatValueLabel("0");
+    costBasisLabel   = makeStatValueLabel("$0.00");
+    totalProfitLabel = makeStatValueLabel("+$0.00");
 
-    totalAssetsLabel = (Label) totalAssets.getChildren().get(1);
-    costBasisLabel = (Label) costBasis.getChildren().get(1);
-    totalProfitLabel = (Label) profitLoss.getChildren().get(1);
+    VBox totalAssets = buildStatsCard("Total Assets",      totalAssetsLabel);
+    VBox costBasis   = buildStatsCard("Cost Basis",        costBasisLabel);
+    VBox profitLoss  = buildStatsCard("Total Profit/Loss", totalProfitLabel);
 
     HBox.setHgrow(totalAssets, Priority.ALWAYS);
-    HBox.setHgrow(costBasis, Priority.ALWAYS);
-    HBox.setHgrow(profitLoss, Priority.ALWAYS);
+    HBox.setHgrow(costBasis,   Priority.ALWAYS);
+    HBox.setHgrow(profitLoss,  Priority.ALWAYS);
 
     row.getChildren().addAll(totalAssets, costBasis, profitLoss);
     return row;
   }
 
   /**
-   * <p>Builds a single statistics card.</p>
+   * <p>Creates a value label for a statistics card with the correct style applied.</p>
    *
-   * @param title   the card title
-   * @param value   the card value text
+   * @param text the initial display text
+   * @return the configured value label
+   */
+  private Label makeStatValueLabel(String text) {
+    Label l = new Label(text);
+    l.getStyleClass().add("stat-card-value");
+    return l;
+  }
+
+  /**
+   * <p>Builds a single statistics card with a pre-constructed value label.</p>
+   *
+   * @param title      the card title
+   * @param valueLabel the label that will display the dynamic value
    * @return the stats-card container
    */
-  private VBox buildStatsCard(String title, String value) {
+  private VBox buildStatsCard(String title, Label valueLabel) {
     Label titleLabel = new Label(title);
     titleLabel.getStyleClass().add("stat-card-title");
-
-    Label valueLabel = new Label(value);
-    valueLabel.getStyleClass().add("stat-card-value");
 
     VBox card = new VBox(12, titleLabel, valueLabel);
     card.getStyleClass().add("stat-card");
@@ -157,24 +176,63 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     moversPositiveContainer = new VBox(8);
     moversNegativeContainer = new VBox(8);
 
-    VBox positiveSection = new VBox(16, moversPositiveContainer);
+    loadMoreGainersLabel = buildLoadMoreLabel(() -> {
+      gainersDisplayCount = Math.min(gainersDisplayCount + MOVERS_PAGE_SIZE, MAX_MOVERS);
+      refreshMovers();
+    });
+
+    loadMoreLosersLabel = buildLoadMoreLabel(() -> {
+      losersDisplayCount = Math.min(losersDisplayCount + MOVERS_PAGE_SIZE, MAX_MOVERS);
+      refreshMovers();
+    });
+
+    VBox positiveSection = new VBox(8, moversPositiveContainer, loadMoreGainersLabel);
     positiveSection.getStyleClass().add("stat-card");
     positiveSection.setPadding(new Insets(24));
     positiveSection.setMaxWidth(Double.MAX_VALUE);
 
-    VBox negativeSection = new VBox(16, moversNegativeContainer);
+    VBox negativeSection = new VBox(8, moversNegativeContainer, loadMoreLosersLabel);
     negativeSection.getStyleClass().add("stat-card");
     negativeSection.setPadding(new Insets(24));
     negativeSection.setMaxWidth(Double.MAX_VALUE);
 
     HBox section = new HBox(12, positiveSection, negativeSection);
     section.setMaxWidth(Double.MAX_VALUE);
+    section.setFillHeight(false);
     HBox.setHgrow(positiveSection, Priority.ALWAYS);
     HBox.setHgrow(negativeSection, Priority.ALWAYS);
 
     VBox fullContainer = new VBox(12, heading, section);
     fullContainer.setMaxWidth(Double.MAX_VALUE);
     return fullContainer;
+  }
+
+  /**
+   * <p>Creates a "Load more" label with a click handler.</p>
+   *
+   * @param onLoad the action to run when clicked
+   * @return the configured label
+   */
+  private Label buildLoadMoreLabel(Runnable onLoad) {
+    Label label = new Label("Load more");
+    label.getStyleClass().add("load-more-label");
+    label.setMaxWidth(Double.MAX_VALUE);
+    label.setAlignment(Pos.CENTER);
+    label.setVisible(false);
+    label.setManaged(false);
+    label.setOnMouseClicked(e -> onLoad.run());
+    return label;
+  }
+
+  /**
+   * <p>Shows or hides a label without consuming layout space when hidden.</p>
+   *
+   * @param label   the label to toggle
+   * @param visible {@code true} to show
+   */
+  private void setLoadMoreVisible(Label label, boolean visible) {
+    label.setVisible(visible);
+    label.setManaged(visible);
   }
 
   /**
@@ -193,7 +251,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * @param isPositive whether the change is positive
    */
   private void setPortfolioChange(String change, boolean isPositive) {
-    portfolioChangeLabel.setText("↗ " + change);
+    portfolioChangeLabel.setText((isPositive ? "↗ " : "↘ ") + change);
     portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
     if (!isPositive) {
       portfolioChangeLabel.getStyleClass().add("banner-change-negative");
@@ -230,14 +288,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     totalProfitLabel.getStyleClass().add(isPositive ? "stat-card-value-profit" : "stat-card-value-loss");
   }
 
-  /**
-   * <p>Clears all items from the movers list.</p>
-   */
-  private void clearMovers() {
-    moversPositiveContainer.getChildren().clear();
-    moversNegativeContainer.getChildren().clear();
-  }
-
   @Override
   public void onPlayerUpdated(ReadOnlyPlayer player) {
     this.player = player;
@@ -253,22 +303,48 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
 
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
-    clearMovers();
-    int rank = 1;
-    for (ReadOnlyStock stock : exchange.getGainers(5)) {
-      moversPositiveContainer.getChildren().add(buildMoverRow(rank++, stock));
-    }
-    for (ReadOnlyStock stock : exchange.getLosers(5)) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(rank++, stock));
-    }
+    this.currentExchange = exchange;
+    gainersDisplayCount  = MOVERS_PAGE_SIZE;
+    losersDisplayCount   = MOVERS_PAGE_SIZE;
+    refreshMovers();
   }
 
+  /**
+   * <p>Renders the movers lists up to the current display counts and toggles
+   * the "Load more" labels accordingly. Gainers and losers each start their
+   * rank numbering at #1.</p>
+   */
+  private void refreshMovers() {
+    moversPositiveContainer.getChildren().clear();
+    moversNegativeContainer.getChildren().clear();
+
+    List<? extends ReadOnlyStock> gainers = currentExchange.getGainers(gainersDisplayCount + 1);
+    int toShowG = Math.min(gainersDisplayCount, gainers.size());
+    for (int i = 0; i < toShowG; i++) {
+      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, gainers.get(i)));
+    }
+    setLoadMoreVisible(loadMoreGainersLabel,
+        gainers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
+
+    List<? extends ReadOnlyStock> losers = currentExchange.getLosers(losersDisplayCount + 1);
+    int toShowL = Math.min(losersDisplayCount, losers.size());
+    for (int i = 0; i < toShowL; i++) {
+      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, losers.get(i)));
+    }
+    setLoadMoreVisible(loadMoreLosersLabel,
+        losers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
+  }
+
+  /**
+   * <p>Recalculates and pushes all player and portfolio statistics to the
+   * banner and stats cards. Called whenever the player or portfolio changes.</p>
+   */
   private void refreshStats() {
     ReadOnlyPortfolio portfolio = player.getPortfolio();
     BigDecimal profit = player.getProfit();
     boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 
-    setPortfolioValue(ViewFormatter.price(portfolio.getTotalValue()));
+    setPortfolioValue(ViewFormatter.price(player.getNetWorth()));
     setTotalAssets(String.valueOf(portfolio.size()));
     setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
     setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
@@ -278,6 +354,14 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     setPortfolioChange(changeStr, isPositive);
   }
 
+  /**
+   * <p>Builds a single row in a movers list showing rank, icon, company name,
+   * current price, and percentage change.</p>
+   *
+   * @param rank  the display rank number (1-based)
+   * @param stock the stock to display
+   * @return the configured row container
+   */
   private HBox buildMoverRow(int rank, ReadOnlyStock stock) {
     Label rankLabel = new Label("#" + rank);
     rankLabel.getStyleClass().add("mover-rank");
@@ -298,7 +382,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
     Label priceLabel = new Label(ViewFormatter.price(stock.getSalesPrice()));
     priceLabel.getStyleClass().add("mover-price");
-    Label changeLabel = new Label(ViewFormatter.changeArrow(change));
+    Label changeLabel = new Label(ViewFormatter.changeArrowPercent(change, stock.getSalesPrice()));
     changeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     VBox priceBox = new VBox(2, priceLabel, changeLabel);
     priceBox.setAlignment(Pos.CENTER_RIGHT);

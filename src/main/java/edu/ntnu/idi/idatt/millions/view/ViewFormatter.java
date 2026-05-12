@@ -88,6 +88,24 @@ public final class ViewFormatter {
   }
 
   /**
+   * <p>Computes the percentage change from {@code currentPrice} and formats it
+   * with a directional arrow, e.g. {@code "↗ +5.42%"} or {@code "↘ -3.17%"}.</p>
+   *
+   * <p>Uses {@code change / (currentPrice - change) × 100} to derive the rate
+   * from the absolute delta and the current price.</p>
+   *
+   * @param change       the absolute price change (latest minus previous)
+   * @param currentPrice the current (latest) price
+   * @return the formatted percentage-change string with directional arrow
+   */
+  public static String changeArrowPercent(BigDecimal change, BigDecimal currentPrice) {
+    BigDecimal prev = currentPrice.subtract(change);
+    BigDecimal pct = prev.signum() == 0 ? BigDecimal.ZERO
+        : change.divide(prev, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+    return changeArrow(pct);
+  }
+
+  /**
    * <p>Converts a decimal return rate to a signed percentage string,
    * e.g. {@code 0.20} becomes {@code "+20.00%"}.</p>
    *

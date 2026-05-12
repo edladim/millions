@@ -259,6 +259,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       if (onAction != null) onAction.accept(currentMode);
     });
 
+    HBox percentageCard = buildPercentageCard();
+
     panel.getChildren().addAll(
             modeToggle,
             panelTitle,
@@ -266,6 +268,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
             playerInfoCard,
             inputHeader,
             inputSpinner,
+            percentageCard,
             derivedLabel,
             costCard,
             buildSpacer(4),
@@ -274,6 +277,25 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     VBox.setVgrow(costCard, Priority.NEVER);
     return panel;
+  }
+
+  private HBox buildPercentageCard() {
+    Button twentyFivePercentButton = new Button("25%");
+    Button fiftyPercentButton = new Button("50%");
+    Button hundredPercentButton = new Button("100%");
+
+    for (Button btn : new Button[]{twentyFivePercentButton, fiftyPercentButton, hundredPercentButton}) {
+      btn.getStyleClass().add("mode-tab");
+      btn.setMaxWidth(Double.MAX_VALUE);
+      HBox.setHgrow(btn, Priority.ALWAYS);
+    }
+
+    HBox percentageCard = new HBox(5,  twentyFivePercentButton, fiftyPercentButton, hundredPercentButton);
+    percentageCard.setAlignment(Pos.CENTER);
+    percentageCard.getStyleClass().add("stat-card");
+    percentageCard.setPadding(new Insets(12, 16, 12, 16));
+    return percentageCard;
+
   }
 
   /**

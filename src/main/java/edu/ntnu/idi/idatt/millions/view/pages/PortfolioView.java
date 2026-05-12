@@ -273,15 +273,30 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     portfolioValueLabel.setText(ViewFormatter.price(portfolio.getTotalValue()));
 
     PlayerStatus status = player.getStatus();
-    String statusName = status.name();
-    statusLabel.setText(statusName.charAt(0) + statusName.substring(1).toLowerCase());
+    String statusName = status.toString().replace("_", " ");
+    statusLabel.setText(statusName.charAt(0) + statusName.substring(1).toUpperCase());
     statusLabel.getStyleClass().removeAll(
-        "stat-card-value-status-investor", "stat-card-value-status-speculator");
-    if (status == PlayerStatus.INVESTOR) {
+            "stat-card-value-status-worst"
+            , "stat-card-value-status-bad"
+            , "stat-card-value-status-investor"
+            , "stat-card-value-status-average"
+            , "stat-card-value-status-good"
+            , "stat-card-value-status-excellent"
+    );
+    if (status == PlayerStatus.BUY_HIGH_BJORN) {
+      statusLabel.getStyleClass().add("stat-card-value-status-worst");
+    } else if (status == PlayerStatus.MAX_MINUS) {
+      statusLabel.getStyleClass().add("stat-card-value-status-bad");
+    } else if (status == PlayerStatus.AVERAGE_JOE) {
+      statusLabel.getStyleClass().add("stat-card-value-status-average");
+    } else if (status == PlayerStatus.INVESTOR) {
       statusLabel.getStyleClass().add("stat-card-value-status-investor");
-    } else if (status == PlayerStatus.SPECULATOR) {
-      statusLabel.getStyleClass().add("stat-card-value-status-speculator");
+    } else if (status == PlayerStatus.RAY_DAILO) {
+      statusLabel.getStyleClass().add("stat-card-value-status-good");
+    } else if (status == PlayerStatus.BERNARD_MADOFF) {
+      statusLabel.getStyleClass().add("stat-card-value-status-excellent");
     }
+
 
     portfolioChart.setData(player.getHistoricalNetWorth());
 

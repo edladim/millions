@@ -99,6 +99,8 @@ public class TradingController {
         (_, _, text) -> filterStocks(text)
     );
 
+    view.setOnPercentSelected(this::handlePercent);
+
     updatePlayerInfo();
   }
 
@@ -199,6 +201,21 @@ public class TradingController {
       handleBuy(selectedSymbol);
     } else {
       handleSell(selectedSymbol);
+    }
+  }
+
+  private void handlePercent(BigDecimal percent) {
+    if (selectedSymbol == null) return;
+
+    if (view.getMode() == TradingView.Mode.BUY) {
+      BigDecimal cashPortion = player.getMoney().multiply(percent);
+      BigDecimal divisor = BigDecimal.ONE.add(COMMISSION_RATE);
+      BigDecimal amount = cashPortion.divide(divisor, 2, RoundingMode.HALF_UP);
+      view.setInputAmount(amount, true);
+    } else {
+      BigDecimal owned = totalOwned(selectedSymbol);
+      BigDecimal quantity = owned.multiply(percent);
+      view.setInputAmount(quantity, false);
     }
   }
 

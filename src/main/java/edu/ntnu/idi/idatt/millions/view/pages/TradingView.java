@@ -222,7 +222,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     inputSpinner = new Spinner<>();
     SpinnerValueFactory.DoubleSpinnerValueFactory spinnerFactory =
-        new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1_000_000_000.0, 0.0, 1.0);
+        new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1_000_000_000.0, 1.0, 1.0);
     spinnerFactory.setConverter(new javafx.util.StringConverter<>() {
       @Override public String toString(Double v) {
         if (v == null || v == 0.0) return "";
@@ -548,8 +548,12 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     stockCell.setPrefWidth(190);
     stockCell.setMaxWidth(190);
 
+    BigDecimal prevPrice = stock.getSalesPrice().subtract(change);
+    BigDecimal changePct = prevPrice.signum() == 0 ? BigDecimal.ZERO
+        : change.divide(prevPrice, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+
     Label priceLabel  = makeDataCell(ViewFormatter.price(stock.getSalesPrice()),  70, "table-data-cell");
-    Label changeLabel = makeDataCell(ViewFormatter.signedAmount(change),          70,
+    Label changeLabel = makeDataCell(ViewFormatter.percent(changePct),            70,
         isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
     Label highLabel = makeDataCell(ViewFormatter.price(stock.getHighestPrice()), 60, "table-data-cell");
     Label lowLabel = makeDataCell(ViewFormatter.price(stock.getLowestPrice()),  60, "table-data-cell");
@@ -599,7 +603,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    *
    * @param stock the read-only stock that was selected
    */
-  private void selectStock(ReadOnlyStock stock) {
+  public void selectStock(ReadOnlyStock stock) {
     BigDecimal change = stock.getLatestPriceChange();
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 

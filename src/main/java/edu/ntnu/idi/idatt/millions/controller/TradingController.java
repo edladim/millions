@@ -29,6 +29,7 @@ public class TradingController {
   private final Player player;
 
   private String selectedSymbol = null;
+  private String lastBuySymbol = null;
   private List<? extends ReadOnlyStock> currentResults = List.of();
   private int displayedCount = PAGE_SIZE;
 
@@ -53,6 +54,7 @@ public class TradingController {
 
     view.setOnSelectStock(symbol -> {
       selectedSymbol = symbol;
+      lastBuySymbol  = symbol;
       ReadOnlyStock stock = exchange.getStock(symbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices());
@@ -68,18 +70,21 @@ public class TradingController {
       selectedSymbol = null;
       view.setActionEnabled(false);
 
-      boolean reselect = savedSymbol != null && (
+      // When switching back to Buy, fall back to the last stock shown in the panel
+      String symbolToUse = savedSymbol != null ? savedSymbol
+          : (mode == TradingView.Mode.BUY ? lastBuySymbol : null);
+
+      boolean reselect = symbolToUse != null && (
           mode == TradingView.Mode.BUY
-              || (mode == TradingView.Mode.SELL && totalOwned(savedSymbol).signum() > 0)
+              || totalOwned(symbolToUse).signum() > 0
       );
 
-      view.setHighlightedStock(reselect ? savedSymbol : null);
+      view.setHighlightedStock(reselect ? symbolToUse : null);
       filterStocks(view.getSearchField().getText());
 
       if (reselect) {
-        selectedSymbol = savedSymbol;
-        view.setCurrentPrice(exchange.getStock(savedSymbol).getSalesPrice());
-        view.setActionEnabled(true);
+        selectedSymbol = symbolToUse;
+        view.setCurrentPrice(exchange.getStock(symbolToUse).getSalesPrice());
         updateCostPreview();
       } else {
         view.setCostPreview("$0.00", "$0.00", "$0.00");
@@ -141,6 +146,16 @@ public class TradingController {
     } else {
       view.setDerivedLabel("≈ " + ViewFormatter.price(gross));
     }
+
+    boolean canProceed = qty.signum() > 0;
+    if (canProceed) {
+      if (view.getMode() == TradingView.Mode.BUY) {
+        canProceed = total.compareTo(player.getMoney()) <= 0;
+      } else {
+        canProceed = qty.compareTo(totalOwned(selectedSymbol)) <= 0;
+      }
+    }
+    view.setActionEnabled(canProceed);
   }
 
   /**
@@ -276,6 +291,21 @@ public class TradingController {
       view.addStockRow(currentResults.get(i));
     }
     view.setLoadMoreVisible(toShow < currentResults.size());
+  }
+
+  /**
+   * <p>Selects the first available stock by default so the chart and buy panel
+   * are populated on startup without requiring user interaction.</p>
+   */
+  public void selectDefault() {
+    List<? extends ReadOnlyStock> stocks = exchange.getStocks();
+    if (stocks.isEmpty()) return;
+    ReadOnlyStock first = stocks.get(0);
+    selectedSymbol = first.getSymbol();
+    lastBuySymbol  = first.getSymbol();
+    view.setHighlightedStock(first.getSymbol());
+    view.setCurrentPrice(first.getSalesPrice());
+    view.selectStock(first);
   }
 
   public void updateChart() {

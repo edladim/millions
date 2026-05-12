@@ -37,7 +37,8 @@ public final class ViewFormatter {
    * @return the formatted signed price string
    */
   public static String signedPrice(BigDecimal value) {
-    return (value.compareTo(BigDecimal.ZERO) >= 0 ? "$+" : "$") + scale(value).toPlainString();
+    BigDecimal scaled = scale(value);
+    return (scaled.signum() >= 0 ? "+$" : "-$") + scaled.abs().toPlainString();
   }
 
   /**
@@ -84,6 +85,24 @@ public final class ViewFormatter {
   public static String priceChangeArrow(BigDecimal value) {
     boolean positive = value.compareTo(BigDecimal.ZERO) >= 0;
     return (positive ? "↗ " : "↘ ") + signedAmount(value);
+  }
+
+  /**
+   * <p>Computes the percentage change from {@code currentPrice} and formats it
+   * with a directional arrow, e.g. {@code "↗ +5.42%"} or {@code "↘ -3.17%"}.</p>
+   *
+   * <p>Uses {@code change / (currentPrice - change) × 100} to derive the rate
+   * from the absolute delta and the current price.</p>
+   *
+   * @param change       the absolute price change (latest minus previous)
+   * @param currentPrice the current (latest) price
+   * @return the formatted percentage-change string with directional arrow
+   */
+  public static String changeArrowPercent(BigDecimal change, BigDecimal currentPrice) {
+    BigDecimal prev = currentPrice.subtract(change);
+    BigDecimal pct = prev.signum() == 0 ? BigDecimal.ZERO
+        : change.divide(prev, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+    return changeArrow(pct);
   }
 
   /**

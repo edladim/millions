@@ -10,7 +10,7 @@ public class EndGameOverlay extends StackPane {
 
   private final VBox card;
   private final Label title;
-  private final Label stats;
+  private final Label finalStats;
   private final Button newGameBtn;
   private final Button exitBtn;
 
@@ -20,7 +20,7 @@ public class EndGameOverlay extends StackPane {
     setPickOnBounds(true);
 
     title = new Label("Game Over");
-    stats = new Label();
+    finalStats = new Label();
     newGameBtn = new Button("New Game");
     exitBtn = new Button("Exit");
 
@@ -28,5 +28,24 @@ public class EndGameOverlay extends StackPane {
 
     getChildren().add(card);
     StackPane.setAlignment(card, Pos.CENTER);
+  }
+
+  public void show(String stats) {
+    finalStats.setText(stats);
+    setVisible(true);
+    setManaged(true);
+  }
+
+  public void hide() {
+    setVisible(false);
+    setManaged(false);
+  }
+
+  public void setOnNewGame(Runnable onNewGame) {
+    newGameBtn.setOnAction(e -> onNewGame.run());
+  }
+
+  public void setOnExit(Runnable onExit) {
+    exitBtn.setOnAction(e -> onExit.run());
   }
 }

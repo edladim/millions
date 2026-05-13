@@ -51,7 +51,7 @@ public class MainView {
     tradingView = new TradingView();
     endGameOverlay = new EndGameOverlay();
 
-    rootStack.getChildren().addAll(endGameOverlay,root);
+    rootStack.getChildren().addAll(root, endGameOverlay);
 
     dashboardScroll = wrapInScroll(dashboardView, true);
     portfolioScroll = wrapInScroll(portfolioView, true);

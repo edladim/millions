@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,15 +34,45 @@ public class EndGameOverlay extends StackPane {
     setManaged(false);
     setPickOnBounds(true);
 
+    StackPane bg = new StackPane();
+    bg.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+    bg.getStyleClass().add("endgame-overlay");
+    bg.setMouseTransparent(true);
+
+    card = new VBox(0);
+    card.getStyleClass().add("startup-card");
+    card.setMaxWidth(550);
+    card.setMinWidth(550);
+
     title = new Label("Game Over");
+    title.getStyleClass().add("startup-title");
+    Label subtitle = new Label("Your final results");
+    subtitle.getStyleClass().add("startup-subtitle");
+
+    VBox header = new VBox(10, title, subtitle);
+    header.setAlignment(Pos.CENTER);
+    header.setPadding(new Insets(44, 40, 36, 40));
+    header.getStyleClass().add("startup-header");
+
     finalStats = new Label();
-    newGameBtn = new Button("New Game");
+    finalStats.getStyleClass().add("startup-hint");
+    finalStats.setWrapText(true);
+
+    newGameBtn = new Button("New Game  →");
+    newGameBtn.getStyleClass().add("startup-start-btn");
+    newGameBtn.setMaxWidth(Double.MAX_VALUE);
+
     exitBtn = new Button("Exit");
+    exitBtn.getStyleClass().add("startup-browse-btn");
+    exitBtn.setMaxWidth(Double.MAX_VALUE);
 
-    card = new VBox(12, title, finalStats, newGameBtn, exitBtn);
-    card.getStyleClass().add("endgame-card");
+    VBox body = new VBox(20, finalStats, newGameBtn, exitBtn);
+    body.setPadding(new Insets(32, 40, 36, 40));
+    body.getStyleClass().add("startup-body");
 
-    getChildren().add(card);
+    card.getChildren().addAll(header, body);
+
+    getChildren().addAll(bg, card);
     StackPane.setAlignment(card, Pos.CENTER);
   }
 

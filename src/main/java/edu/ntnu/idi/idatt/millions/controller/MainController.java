@@ -15,6 +15,7 @@ public class MainController {
   private final Player player;
   private final Exchange exchange;
   private final TradingController tradingController;
+  private boolean gameOver = false;
 
   /**
    * <p>Creates a main controller, registers all observers, and sets up
@@ -47,11 +48,18 @@ public class MainController {
    * and {@code player.updateHistoricalNetWorth()} notifies all
    * {@link edu.ntnu.idi.idatt.millions.observer.PlayerObserver}s — so all views
    * refresh automatically without a manual push.</p>
+   * <p>When the exchange reaches week 500, the game ends and the end-game overlay is shown.</p>
    */
   public void advanceWeek() {
+    if (gameOver) return;
     exchange.advance();
     player.updateHistoricalNetWorth();
     tradingController.updateChart();
+
+    if (exchange.getWeek() >= 500) {
+      gameOver = true;
+      endGame();
+    }
   }
 
   /**

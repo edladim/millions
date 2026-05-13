@@ -819,3 +819,16 @@
     -fx-opacity: 1;
     -fx-cursor: default;
 }
+
+/* ── End Game Overlay ── */
+.endgame-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+}
+
+.endgame-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 6);
+    -fx-min-width: 360;
+}

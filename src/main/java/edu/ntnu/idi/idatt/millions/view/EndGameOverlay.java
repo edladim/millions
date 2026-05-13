@@ -15,6 +15,7 @@ public class EndGameOverlay extends StackPane {
   private final Button exitBtn;
 
   public EndGameOverlay() {
+    getStyleClass().add("endgame-overlay");
     setVisible(false);
     setManaged(false);
     setPickOnBounds(true);
@@ -25,6 +26,7 @@ public class EndGameOverlay extends StackPane {
     exitBtn = new Button("Exit");
 
     card = new VBox(12, title, finalStats, newGameBtn, exitBtn);
+    card.getStyleClass().add("endgame-card");
 
     getChildren().add(card);
     StackPane.setAlignment(card, Pos.CENTER);

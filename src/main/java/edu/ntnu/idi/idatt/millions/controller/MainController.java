@@ -18,6 +18,7 @@ public class MainController {
   private final Exchange exchange;
   private final TradingController tradingController;
   private boolean gameOver = false;
+  private double millionsScore;
 
   /**
    * <p>Creates a main controller, registers all observers, and sets up
@@ -103,12 +104,11 @@ public class MainController {
    */
   private void endGame() {
     double ratio = player.getReturnRate().add(BigDecimal.ONE).doubleValue();
-    double millionsScore = 1000 * Math.log10(ratio);
+    millionsScore = 1000 * Math.log10(ratio);
     String statsText = "Net Worth: " + player.getNetWorth() + "\n"
             + "Profit: " + player.getProfit() + "\n"
-            + "Return Rate: " + player.getReturnRate() + "\n"
+            + "Return Rate: " + player.getReturnRate().toPlainString() + "\n"
             + "Weeks played: " + exchange.getWeek() + "\n"
-            + "Trades counted: " + "\n"
             + "Millions Score: " + millionsScore;
 
 

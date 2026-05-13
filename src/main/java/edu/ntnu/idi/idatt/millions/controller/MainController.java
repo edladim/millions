@@ -85,7 +85,12 @@ public class MainController {
     view.getPortfolioView().onPlayerUpdated(player);
   }
 
-
+  /**
+   * <p>Ends the game and displays the end-game overlay.</p>
+   *
+   * <p>Builds a summary of the player's final stats and delegates the
+   * overlay display to the main view.</p>
+   */
   private void endGame() {
     String statsText = "...";
     view.showEndGame(statsText);

@@ -128,6 +128,11 @@ public class MainView {
     return scene;
   }
 
+  /**
+   * <p>Displays the end-game overlay with the provided stats text.</p>
+   *
+   * @param statsText the formatted stats to show in the overlay
+   */
   public void showEndGame(String statsText) {
     endGameOverlay.show(statsText);
   }
@@ -167,7 +172,18 @@ public class MainView {
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
 
+  /**
+   * <p>Registers a handler that runs when the user starts a new game
+   * from the end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
   public void setOnNewGame(Runnable handler) { endGameOverlay.setOnNewGame(handler); }
 
+  /**
+   * <p>Registers a handler that runs when the user exits from the end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
   public void setOnEndGame(Runnable handler) { endGameOverlay.setOnExit(handler); }
 }

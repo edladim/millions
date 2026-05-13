@@ -138,6 +138,12 @@
     -fx-text-fill: -text;
 }
 
+.section-subheading {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+}
+
 /* Cards */
 .stat-card {
     -fx-background-color: white;

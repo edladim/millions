@@ -850,3 +850,69 @@
     -fx-font-size: 14px;
     -fx-text-fill: #475569;
 }
+
+/* ── Retire Alert ── */
+.retire-alert .dialog-pane {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0, 0, 4);
+}
+
+.retire-alert .header-panel {
+    -fx-background-color: #eef2ff;
+    -fx-background-radius: 12 12 0 0;
+    -fx-padding: 20 24 20 24;
+}
+
+.retire-alert .header-panel .label {
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.retire-alert .content.label {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 13px;
+    -fx-padding: 16 24 16 24;
+}
+
+.retire-alert .button-bar {
+    -fx-padding: 12 24 20 24;
+}
+
+.retire-alert .button-bar .button {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 10 20 10 20;
+}
+
+
+.retire-alert .button-bar .button:default {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+}
+
+.retire-alert .button-bar .button:hover {
+    -fx-background-color: #818cf8;
+}
+
+.retire-alert .button-bar .cancel-button {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #0f172a;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.retire-alert .button-bar .cancel-button:hover {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #6366f1;
+}

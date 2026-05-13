@@ -24,7 +24,7 @@ public class EndGameOverlay extends StackPane {
     newGameBtn = new Button("New Game");
     exitBtn = new Button("Exit");
 
-    card = new VBox(12, title, stats, newGameBtn, exitBtn);
+    card = new VBox(12, title, finalStats, newGameBtn, exitBtn);
 
     getChildren().add(card);
     StackPane.setAlignment(card, Pos.CENTER);

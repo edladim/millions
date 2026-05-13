@@ -59,7 +59,7 @@ public class MainController {
     player.updateHistoricalNetWorth();
     tradingController.updateChart();
 
-    if (exchange.getWeek() >= 2) {
+    if (exchange.getWeek() >= 520) {
       gameOver = true;
       endGame();
     }

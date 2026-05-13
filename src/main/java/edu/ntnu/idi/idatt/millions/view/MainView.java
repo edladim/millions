@@ -128,6 +128,10 @@ public class MainView {
     return scene;
   }
 
+  public void showEndGame(String statsText) {
+    endGameOverlay.show(statsText);
+  }
+
   /**
    * <p>Returns the dashboard view.</p>
    *
@@ -163,4 +167,7 @@ public class MainView {
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
 
+  public void setOnNewGame(Runnable handler) { endGameOverlay.setOnNewGame(handler); }
+
+  public void setOnEndGame(Runnable handler) { endGameOverlay.setOnExit(handler); }
 }

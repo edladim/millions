@@ -84,4 +84,10 @@ public class MainController {
     view.getDashboardView().onPlayerUpdated(player);
     view.getPortfolioView().onPlayerUpdated(player);
   }
+
+
+  private void endGame() {
+    String statsText = "...";
+    view.showEndGame(statsText);
+  }
 }

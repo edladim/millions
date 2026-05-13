@@ -157,6 +157,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       ButtonType yes = new ButtonType("Retire", ButtonBar.ButtonData.OK_DONE);
       ButtonType no = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
       alert.getButtonTypes().setAll(yes, no);
+      
 
       Optional<ButtonType> result = alert.showAndWait();
       if (result.isPresent() && result.get().equals(yes)) {

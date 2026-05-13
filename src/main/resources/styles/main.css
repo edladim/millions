@@ -896,23 +896,23 @@
 
 
 .retire-alert .button-bar .button:default {
-    -fx-background-color: #6366f1;
+    -fx-background-color: -red;
     -fx-text-fill: white;
 }
 
-.retire-alert .button-bar .button:hover {
-    -fx-background-color: #818cf8;
+.retire-alert .button-bar .button:default:hover {
+    -fx-background-color: #ff5555;
 }
 
 .retire-alert .button-bar .cancel-button {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #0f172a;
+    -fx-background-color: -primary;
+    -fx-text-fill: #eef2ff;
     -fx-border-color: #e2e8f0;
     -fx-border-width: 1;
     -fx-border-radius: 8;
 }
 
 .retire-alert .button-bar .cancel-button:hover {
-    -fx-background-color: #eef2ff;
-    -fx-text-fill: #6366f1;
+    -fx-background-color: #818cf8;
+    -fx-text-fill: #eef2ff;
 }

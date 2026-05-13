@@ -4,6 +4,9 @@ import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * <p>Top-level controller that wires the game models to all views.</p>
  * <p>Registers observers, creates sub-controllers for each page, and
@@ -15,6 +18,8 @@ public class MainController {
   private final Player player;
   private final Exchange exchange;
   private final TradingController tradingController;
+  private boolean gameOver = false;
+  private double millionsScore;
 
   /**
    * <p>Creates a main controller, registers all observers, and sets up
@@ -47,11 +52,18 @@ public class MainController {
    * and {@code player.updateHistoricalNetWorth()} notifies all
    * {@link edu.ntnu.idi.idatt.millions.observer.PlayerObserver}s — so all views
    * refresh automatically without a manual push.</p>
+   * <p>When the exchange reaches week 500, the game ends and the end-game overlay is shown.</p>
    */
   public void advanceWeek() {
+    if (gameOver) return;
     exchange.advance();
     player.updateHistoricalNetWorth();
     tradingController.updateChart();
+
+    if (exchange.getWeek() >= 520) {
+      gameOver = true;
+      endGame();
+    }
   }
 
   /**
@@ -83,5 +95,33 @@ public class MainController {
     view.getTradingView().onExchangeUpdated(exchange);
     view.getDashboardView().onPlayerUpdated(player);
     view.getPortfolioView().onPlayerUpdated(player);
+  }
+
+  /**
+   * <p>Ends the game and displays the end-game overlay.</p>
+   *
+   * <p>Builds a summary of the player's final stats and delegates the
+   * overlay display to the main view.</p>
+   */
+  private void endGame() {
+    double ratio = player.getReturnRate().add(BigDecimal.ONE).doubleValue();
+    millionsScore = 1000 * Math.log10(ratio);
+
+    BigDecimal netWorthRounded = player.getNetWorth().setScale(0, RoundingMode.HALF_UP);
+    BigDecimal profitRounded = player.getProfit().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal returnRateRounded = player.getReturnRate().setScale(4, RoundingMode.HALF_UP);
+    long millionsScoreRounded = Math.round(millionsScore);
+
+    millionsScore = 1000 * Math.log10(ratio);
+    String statsText = "Net Worth: " + netWorthRounded + "\n"
+            + "Profit: " + profitRounded + "\n"
+            + "Return Rate: " + returnRateRounded + "\n"
+            + "Weeks played: " + exchange.getWeek() + "\n"
+            + "Millions Score: " + millionsScoreRounded;
+
+
+
+
+    view.showEndGame(statsText);
   }
 }

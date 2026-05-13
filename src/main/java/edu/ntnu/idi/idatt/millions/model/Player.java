@@ -73,6 +73,10 @@ public final class Player implements ReadOnlyPlayer {
     return money;
   }
 
+  public BigDecimal getStartingMoney() {
+    return startingMoney;
+  }
+
   /**
    * Adds money to the player's balance.
    *

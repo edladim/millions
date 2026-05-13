@@ -825,3 +825,13 @@
     -fx-opacity: 1;
     -fx-cursor: default;
 }
+
+/* ── End Game Overlay ── */
+.endgame-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+}
+
+.endgame-stats {
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+}

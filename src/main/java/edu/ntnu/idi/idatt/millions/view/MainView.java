@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 /**
  * <p>
@@ -23,8 +24,10 @@ import javafx.scene.layout.Region;
  */
 public class MainView {
 
+  private final StackPane rootStack;
   private final BorderPane root;
   private final SidebarComponent sidebar;
+  private final EndGameOverlay endGameOverlay;
 
   private final DashboardView dashboardView;
   private final PortfolioView portfolioView;
@@ -40,11 +43,15 @@ public class MainView {
    * <p>Constructs the main view and initializes child views.</p>
    */
   public MainView() {
+    rootStack = new StackPane();
     root = new BorderPane();
     sidebar = new SidebarComponent();
     dashboardView = new DashboardView();
     portfolioView = new PortfolioView();
     tradingView = new TradingView();
+    endGameOverlay = new EndGameOverlay();
+
+    rootStack.getChildren().addAll(root, endGameOverlay);
 
     dashboardScroll = wrapInScroll(dashboardView, true);
     portfolioScroll = wrapInScroll(portfolioView, true);
@@ -106,7 +113,7 @@ public class MainView {
    * @return the initialized scene
    */
   public Scene createScene() {
-    Scene scene = new Scene(root);
+    Scene scene = new Scene(rootStack);
     scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
     root.prefHeightProperty().bind(scene.heightProperty());
     root.minHeightProperty().bind(scene.heightProperty());
@@ -119,6 +126,15 @@ public class MainView {
     sidebar.maxWidthProperty().bind(sidebarWidth);
 
     return scene;
+  }
+
+  /**
+   * <p>Displays the end-game overlay with the provided stats text.</p>
+   *
+   * @param statsText the formatted stats to show in the overlay
+   */
+  public void showEndGame(String statsText) {
+    endGameOverlay.show(statsText);
   }
 
   /**
@@ -156,4 +172,18 @@ public class MainView {
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
 
+  /**
+   * <p>Registers a handler that runs when the user starts a new game
+   * from the end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
+  public void setOnNewGame(Runnable handler) { endGameOverlay.setOnNewGame(handler); }
+
+  /**
+   * <p>Registers a handler that runs when the user exits from the end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
+  public void setOnEndGame(Runnable handler) { endGameOverlay.setOnExit(handler); }
 }

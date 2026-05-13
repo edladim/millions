@@ -390,7 +390,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    *
    * @param mode the new mode
    */
-  private void setMode(Mode mode) {
+  public void setMode(Mode mode) {
     if (currentMode == mode) return;
     currentMode = mode;
 
@@ -645,6 +645,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param stock the read-only stock that was selected
    */
   public void selectStock(ReadOnlyStock stock) {
+    if (!stock.getSymbol().equals(highlightedSymbol)) {
+      setSpinnerValue(BigDecimal.ONE);
+    }
+
     BigDecimal change = stock.getLatestPriceChange();
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 

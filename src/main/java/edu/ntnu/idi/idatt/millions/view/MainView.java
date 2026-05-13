@@ -72,6 +72,15 @@ public class MainView {
   }
 
   /**
+   * <p>Programmatically navigates to the given page.</p>
+   *
+   * @param page the page to show
+   */
+  public void navigateTo(Page page) {
+    showPage(page);
+  }
+
+  /**
    * <p>Displays the requested page in the center region.</p>
    *
    * @param page the page to show

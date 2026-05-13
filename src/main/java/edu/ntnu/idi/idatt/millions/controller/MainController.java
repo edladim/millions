@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.controller;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.view.MainView;
+import edu.ntnu.idi.idatt.millions.view.Page;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,6 +41,11 @@ public class MainController {
 
     tradingController = new TradingController(view.getTradingView(), exchange, player);
                         new PortfolioController(view.getPortfolioView(), exchange, player);
+
+    view.getDashboardView().setOnStockClicked(symbol -> {
+      view.navigateTo(Page.TRADING);
+      tradingController.focusStock(symbol);
+    });
 
     view.setOnAdvanceWeek(this::advanceWeek);
 

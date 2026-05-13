@@ -10,6 +10,7 @@ import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -51,6 +52,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label loadMoreLosersLabel;
   private int gainersDisplayCount = MOVERS_PAGE_SIZE;
   private int losersDisplayCount  = MOVERS_PAGE_SIZE;
+
+  private Consumer<String> onStockClicked;
 
   /**
    * <p>Constructs the dashboard view and builds its initial layout.</p>
@@ -405,7 +408,19 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");
     row.setPadding(new Insets(8, 8, 8, 0));
+    row.setOnMouseClicked(e -> {
+      if (onStockClicked != null) onStockClicked.accept(stock.getSymbol());
+    });
     return row;
+  }
+
+  /**
+   * <p>Registers a handler invoked when the user clicks one of the mover rows.</p>
+   *
+   * @param handler receives the ticker symbol of the clicked stock
+   */
+  public void setOnStockClicked(Consumer<String> handler) {
+    this.onStockClicked = handler;
   }
 
 }

@@ -186,12 +186,18 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
       refreshMovers();
     });
 
-    VBox positiveSection = new VBox(8, moversPositiveContainer, loadMoreGainersLabel);
+    Label topHeading = new Label("Top Performers");
+    topHeading.getStyleClass().add("section-subheading");
+
+    Label worstHeading = new Label("Worst Performers");
+    worstHeading.getStyleClass().add("section-subheading");
+
+    VBox positiveSection = new VBox(8, topHeading, moversPositiveContainer, loadMoreGainersLabel);
     positiveSection.getStyleClass().add("stat-card");
     positiveSection.setPadding(new Insets(24));
     positiveSection.setMaxWidth(Double.MAX_VALUE);
 
-    VBox negativeSection = new VBox(8, moversNegativeContainer, loadMoreLosersLabel);
+    VBox negativeSection = new VBox(8, worstHeading, moversNegativeContainer, loadMoreLosersLabel);
     negativeSection.getStyleClass().add("stat-card");
     negativeSection.setPadding(new Insets(24));
     negativeSection.setMaxWidth(Double.MAX_VALUE);
@@ -318,21 +324,21 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     moversPositiveContainer.getChildren().clear();
     moversNegativeContainer.getChildren().clear();
 
-    List<? extends ReadOnlyStock> gainers = currentExchange.getGainers(gainersDisplayCount + 1);
-    int toShowG = Math.min(gainersDisplayCount, gainers.size());
+    List<? extends ReadOnlyStock> topPerformers = currentExchange.getTopPerformers(gainersDisplayCount + 1);
+    int toShowG = Math.min(gainersDisplayCount, topPerformers.size());
     for (int i = 0; i < toShowG; i++) {
-      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, gainers.get(i)));
+      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, topPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreGainersLabel,
-        gainers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
+        topPerformers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
 
-    List<? extends ReadOnlyStock> losers = currentExchange.getLosers(losersDisplayCount + 1);
-    int toShowL = Math.min(losersDisplayCount, losers.size());
+    List<? extends ReadOnlyStock> bottomPerformers = currentExchange.getBottomPerformers(losersDisplayCount + 1);
+    int toShowL = Math.min(losersDisplayCount, bottomPerformers.size());
     for (int i = 0; i < toShowL; i++) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, losers.get(i)));
+      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, bottomPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreLosersLabel,
-        losers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
+        bottomPerformers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
   }
 
   /**

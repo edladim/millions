@@ -172,6 +172,42 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
+   * Returns the top-performing stocks this week, sorted by percentage change
+   * descending. All stocks are eligible regardless of the sign of their change.
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of top performers, never null, may be empty
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  public List<Stock> getTopPerformers(int limit) {
+    if (limit <= 0) {
+      throw new IllegalArgumentException("Limit must be positive");
+    }
+    return stockMap.values().stream()
+        .sorted(Comparator.comparingDouble(Exchange::percentChange).reversed())
+        .limit(limit)
+        .toList();
+  }
+
+  /**
+   * Returns the worst-performing stocks this week, sorted by percentage change
+   * ascending. All stocks are eligible regardless of the sign of their change.
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of worst performers, never null, may be empty
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  public List<Stock> getBottomPerformers(int limit) {
+    if (limit <= 0) {
+      throw new IllegalArgumentException("Limit must be positive");
+    }
+    return stockMap.values().stream()
+        .sorted(Comparator.comparingDouble(Exchange::percentChange))
+        .limit(limit)
+        .toList();
+  }
+
+  /**
    * Finds all stocks matching a search term.
    *
    * <p>The search checks both the symbol and company name and is

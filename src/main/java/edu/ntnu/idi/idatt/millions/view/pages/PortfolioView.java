@@ -296,7 +296,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
       statusLabel.getStyleClass().add("stat-card-value-status-average");
     } else if (status == PlayerStatus.INVESTOR) {
       statusLabel.getStyleClass().add("stat-card-value-status-investor");
-    } else if (status == PlayerStatus.RAY_DAILO) {
+    } else if (status == PlayerStatus.RAY_DALIO) {
       statusLabel.getStyleClass().add("stat-card-value-status-good");
     } else if (status == PlayerStatus.BERNARD_MADOFF) {
       statusLabel.getStyleClass().add("stat-card-value-status-excellent");

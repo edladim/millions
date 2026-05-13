@@ -57,8 +57,9 @@ public class TradingController {
       lastBuySymbol  = symbol;
       ReadOnlyStock stock = exchange.getStock(symbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
+      view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
       view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
+      view.clearInput();
       updatePlayerInfo();
       updateCostPreview();
     });
@@ -98,6 +99,8 @@ public class TradingController {
     view.getSearchField().textProperty().addListener(
         (_, _, text) -> filterStocks(text)
     );
+
+    view.setOnPercentSelected(this::handlePercent);
 
     updatePlayerInfo();
   }
@@ -199,6 +202,21 @@ public class TradingController {
       handleBuy(selectedSymbol);
     } else {
       handleSell(selectedSymbol);
+    }
+  }
+
+  private void handlePercent(BigDecimal percent) {
+    if (selectedSymbol == null) return;
+
+    if (view.getMode() == TradingView.Mode.BUY) {
+      BigDecimal cashPortion = player.getMoney().multiply(percent);
+      BigDecimal divisor = BigDecimal.ONE.add(COMMISSION_RATE);
+      BigDecimal amount = cashPortion.divide(divisor, 3, RoundingMode.DOWN);
+      view.setInputAmount(amount, true);
+    } else {
+      BigDecimal owned = totalOwned(selectedSymbol);
+      BigDecimal quantity = owned.multiply(percent);
+      view.setInputAmount(quantity, false);
     }
   }
 
@@ -308,12 +326,15 @@ public class TradingController {
     view.selectStock(first);
   }
 
+  /**
+   * <p>Refreshes the buy panel and chart for the currently selected stock.
+   * Called after the exchange advances a week so that the displayed price,
+   * percentage change, and historical chart reflect the new market state.</p>
+   */
   public void updateChart() {
     if (selectedSymbol == null) return;
     try {
-      ReadOnlyStock stock = exchange.getStock(selectedSymbol);
-      view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
+      view.selectStock(exchange.getStock(selectedSymbol));
     } catch (Exception _) {
 
     }

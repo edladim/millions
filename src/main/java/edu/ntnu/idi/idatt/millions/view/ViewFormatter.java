@@ -127,6 +127,31 @@ public final class ViewFormatter {
     return scale(quantity).toPlainString();
   }
 
+  /**
+   * <p>Formats a game week as a full year-and-week label, e.g.
+   * {@code "Year 2, Week 1"} for week 53 (52 weeks per year, both 1-based).</p>
+   *
+   * @param week the total game week number (1-based)
+   * @return the formatted year-and-week string
+   */
+  public static String weekAsYearWeek(int week) {
+    int year       = (week - 1) / 52 + 1;
+    int weekOfYear = (week - 1) % 52 + 1;
+    return "Year " + year + ", Week " + weekOfYear;
+  }
+
+  /**
+   * <p>Formats a game week as a short label showing only the total week
+   * number, e.g. {@code "Week 53"}. Used when there is not enough space
+   * for the full year-and-week format.</p>
+   *
+   * @param week the total game week number (1-based)
+   * @return the formatted short week string
+   */
+  public static String weekAsShort(int week) {
+    return "Week " + week;
+  }
+
   private static BigDecimal scale(BigDecimal value) {
     return value.setScale(2, RoundingMode.HALF_UP);
   }

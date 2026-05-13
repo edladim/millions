@@ -54,6 +54,28 @@ public interface ReadOnlyExchange {
   List<? extends ReadOnlyStock> getLosers(int limit);
 
   /**
+   * Returns the top-performing stocks this week, sorted by percentage change
+   * descending. Unlike {@link #getGainers}, all stocks are eligible regardless
+   * of whether their change is positive or negative.
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of top performers, never null
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  List<? extends ReadOnlyStock> getTopPerformers(int limit);
+
+  /**
+   * Returns the worst-performing stocks this week, sorted by percentage change
+   * ascending. Unlike {@link #getLosers}, all stocks are eligible regardless
+   * of whether their change is positive or negative.
+   *
+   * @param limit the maximum number of stocks to return
+   * @return an unmodifiable list of worst performers, never null
+   * @throws IllegalArgumentException if {@code limit} is not positive
+   */
+  List<? extends ReadOnlyStock> getBottomPerformers(int limit);
+
+  /**
    * Finds all stocks matching the given search term (symbol or company name).
    *
    * @param searchTerm the search term, case-insensitive

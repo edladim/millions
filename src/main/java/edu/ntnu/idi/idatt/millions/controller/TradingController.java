@@ -57,7 +57,7 @@ public class TradingController {
       lastBuySymbol  = symbol;
       ReadOnlyStock stock = exchange.getStock(symbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
+      view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
       view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
       view.clearInput();
       updatePlayerInfo();
@@ -331,7 +331,7 @@ public class TradingController {
     try {
       ReadOnlyStock stock = exchange.getStock(selectedSymbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
+      view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
     } catch (Exception _) {
 
     }

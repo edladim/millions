@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.view.components;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.Page;
+import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +16,7 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 
 /**
  * <p>
@@ -33,6 +35,9 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Button portfolioBtn;
   private Button tradingBtn;
   private Label weekLabel;
+
+  private final SimpleStringProperty fullWeekText  = new SimpleStringProperty(ViewFormatter.weekAsYearWeek(1));
+  private final SimpleStringProperty shortWeekText = new SimpleStringProperty(ViewFormatter.weekAsShort(1));
 
   private Runnable onAdvanceWeek;
   private Consumer<Page> onNavigate;
@@ -144,13 +149,20 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     Label currentWeekLabel = new Label("Current Week");
     currentWeekLabel.getStyleClass().add("week-box-title");
 
-    weekLabel = new Label("Week 1");
+    weekLabel = new Label();
     weekLabel.getStyleClass().add("week-box-value");
+    weekLabel.textProperty().bind(
+        Bindings.when(widthProperty().lessThan(200))
+            .then(shortWeekText)
+            .otherwise(fullWeekText)
+    );
 
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
     weekIcon.getStyleClass().add("week-box-color");
 
     VBox textBox = new VBox(2, currentWeekLabel, weekLabel);
+    textBox.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(textBox, Priority.ALWAYS);
 
     HBox weekBox = new HBox(10, weekIcon, textBox);
     weekBox.setAlignment(Pos.CENTER_LEFT);
@@ -190,12 +202,15 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Updates the displayed week number in the sidebar.</p>
+   * <p>Updates the displayed week number in the sidebar, converting the raw
+   * week counter into a year-and-week label (52 weeks per year, both starting
+   * at 1). For example, week 53 is displayed as {@code "Year 2, Week 1"}.</p>
    *
-   * @param week the current week number to display
+   * @param week the current game week number (1-based)
    */
   private void setWeek(int week) {
-    weekLabel.setText("Week " + week);
+    fullWeekText.set(ViewFormatter.weekAsYearWeek(week));
+    shortWeekText.set(ViewFormatter.weekAsShort(week));
   }
 
   /**

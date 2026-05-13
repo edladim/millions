@@ -642,7 +642,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     buySymbolLabel.setText(stock.getSymbol());
     buyCompanyLabel.setText(stock.getCompany());
     buyPriceLabel.setText(ViewFormatter.price(stock.getSalesPrice()));
-    buyChangeLabel.setText(ViewFormatter.priceChangeArrow(change));
+    buyChangeLabel.setText(ViewFormatter.changeArrowPercent(change, stock.getSalesPrice()));
     buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
     buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     buyHighLabel.setText("H: " + ViewFormatter.price(stock.getHighestPrice()));

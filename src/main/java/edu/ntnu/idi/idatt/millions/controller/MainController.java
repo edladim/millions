@@ -4,6 +4,8 @@ import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 
+import java.math.BigDecimal;
+
 /**
  * <p>Top-level controller that wires the game models to all views.</p>
  * <p>Registers observers, creates sub-controllers for each page, and
@@ -56,7 +58,7 @@ public class MainController {
     player.updateHistoricalNetWorth();
     tradingController.updateChart();
 
-    if (exchange.getWeek() >= 500) {
+    if (exchange.getWeek() >= 2) {
       gameOver = true;
       endGame();
     }
@@ -100,7 +102,16 @@ public class MainController {
    * overlay display to the main view.</p>
    */
   private void endGame() {
-    String statsText = "...";
+    double ratio = player.getReturnRate().add(BigDecimal.ONE).doubleValue();
+    double millionsScore = 1000 * Math.log10(ratio);
+    String statsText = "Net Worth: " + player.getNetWorth() + "\n"
+            + "Profit: " + player.getProfit() + "\n"
+            + "Return Rate: " + player.getReturnRate() + "\n"
+            + "Weeks played: " + exchange.getWeek() + "\n"
+            + "Trades counted: " + "\n"
+            + "Millions Score: " + millionsScore;
+
+
     view.showEndGame(statsText);
   }
 }

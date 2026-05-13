@@ -21,7 +21,7 @@ public class EndGameOverlay extends StackPane {
 
   private final VBox card;
   private final Label title;
-  private final Label finalStats;
+  private final VBox statsBox;
   private final Button newGameBtn;
   private final Button exitBtn;
 
@@ -54,9 +54,7 @@ public class EndGameOverlay extends StackPane {
     header.setPadding(new Insets(44, 40, 36, 40));
     header.getStyleClass().add("startup-header");
 
-    finalStats = new Label();
-    finalStats.getStyleClass().add("startup-hint");
-    finalStats.setWrapText(true);
+    statsBox = new VBox(10);
 
     newGameBtn = new Button("New Game  →");
     newGameBtn.getStyleClass().add("startup-start-btn");
@@ -66,7 +64,7 @@ public class EndGameOverlay extends StackPane {
     exitBtn.getStyleClass().add("startup-browse-btn");
     exitBtn.setMaxWidth(Double.MAX_VALUE);
 
-    VBox body = new VBox(20, finalStats, newGameBtn, exitBtn);
+    VBox body = new VBox(20, statsBox, newGameBtn, exitBtn);
     body.setPadding(new Insets(32, 40, 36, 40));
     body.getStyleClass().add("startup-body");
 
@@ -76,13 +74,32 @@ public class EndGameOverlay extends StackPane {
     StackPane.setAlignment(card, Pos.CENTER);
   }
 
+  private VBox buildStatsCard(String label, String value) {
+    Label title = new Label(label);
+    title.getStyleClass().add("stat-card-title");
+
+    Label val = new Label(value);
+    val.getStyleClass().add("stat-card-value");
+
+    VBox card = new VBox(6, title, val);
+    card.getStyleClass().add("stat-card");
+    card.setPadding(new Insets(12, 16, 12, 16));
+    return card;
+  }
+
   /**
    * <p>Displays the overlay and updates the stats text.</p>
    *
    * @param stats the formatted stats to show
    */
   public void show(String stats) {
-    finalStats.setText(stats);
+    statsBox.getChildren().clear();
+    for (String line : stats.split("\n")) {
+      String[] parts = line.split(":");
+      if (parts.length >= 2) {
+        statsBox.getChildren().add(buildStatsCard(parts[0].trim(), parts[1].trim()));
+      }
+    }
     setVisible(true);
     setManaged(true);
   }

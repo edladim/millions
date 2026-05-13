@@ -825,10 +825,7 @@
     -fx-background-color: rgba(0, 0, 0, 0.45);
 }
 
-.endgame-card {
-    -fx-background-color: white;
-    -fx-background-radius: 16;
-    -fx-padding: 24 28 24 28;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 24, 0, 0, 8);
-    -fx-min-width: 360;
+.endgame-stats {
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
 }

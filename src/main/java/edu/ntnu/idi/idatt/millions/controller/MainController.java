@@ -5,6 +5,7 @@ import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * <p>Top-level controller that wires the game models to all views.</p>
@@ -105,11 +106,20 @@ public class MainController {
   private void endGame() {
     double ratio = player.getReturnRate().add(BigDecimal.ONE).doubleValue();
     millionsScore = 1000 * Math.log10(ratio);
-    String statsText = "Net Worth: " + player.getNetWorth() + "\n"
-            + "Profit: " + player.getProfit() + "\n"
-            + "Return Rate: " + player.getReturnRate().toPlainString() + "\n"
+
+    BigDecimal netWorthRounded = player.getNetWorth().setScale(0, RoundingMode.HALF_UP);
+    BigDecimal profitRounded = player.getProfit().setScale(2, RoundingMode.HALF_UP);
+    BigDecimal returnRateRounded = player.getReturnRate().setScale(4, RoundingMode.HALF_UP);
+    long millionsScoreRounded = Math.round(millionsScore);
+
+    millionsScore = 1000 * Math.log10(ratio);
+    String statsText = "Net Worth: " + netWorthRounded + "\n"
+            + "Profit: " + profitRounded + "\n"
+            + "Return Rate: " + returnRateRounded + "\n"
             + "Weeks played: " + exchange.getWeek() + "\n"
-            + "Millions Score: " + millionsScore;
+            + "Millions Score: " + millionsScoreRounded;
+
+
 
 
     view.showEndGame(statsText);

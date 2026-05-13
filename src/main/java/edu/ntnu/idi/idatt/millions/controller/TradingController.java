@@ -326,12 +326,15 @@ public class TradingController {
     view.selectStock(first);
   }
 
+  /**
+   * <p>Refreshes the buy panel and chart for the currently selected stock.
+   * Called after the exchange advances a week so that the displayed price,
+   * percentage change, and historical chart reflect the new market state.</p>
+   */
   public void updateChart() {
     if (selectedSymbol == null) return;
     try {
-      ReadOnlyStock stock = exchange.getStock(selectedSymbol);
-      view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
+      view.selectStock(exchange.getStock(selectedSymbol));
     } catch (Exception _) {
 
     }

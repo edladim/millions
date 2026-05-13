@@ -4,16 +4,17 @@ import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.Page;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.Stylesheets;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,6 +41,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private final SimpleStringProperty shortWeekText = new SimpleStringProperty(ViewFormatter.weekAsShort(1));
 
   private Runnable onAdvanceWeek;
+  private Runnable onSellAllEndGame;
   private Consumer<Page> onNavigate;
 
   /**
@@ -134,9 +136,38 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
     });
 
+    Button sellAllBtn = new Button();
+    sellAllBtn.textProperty().bind(
+            Bindings.when(widthProperty().lessThan(190))
+                    .then("Retire")
+                    .otherwise("Retire")
+    );
+    sellAllBtn.getStyleClass().add("sell-all-btn");
+    sellAllBtn.setMaxWidth(Double.MAX_VALUE);
+    sellAllBtn.setOnAction(e -> {
+      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      alert.setTitle("Confirm retirement");
+      alert.setHeaderText("Are you sure you want to retire?");
+      alert.setContentText("This will sell all your shares and end the game.");
+
+      alert.getDialogPane().getStylesheets()
+          .add(Stylesheets.load("/styles/main.css"));
+      alert.getDialogPane().getStyleClass().add("retire-alert");
+
+      ButtonType yes = new ButtonType("Retire", ButtonBar.ButtonData.OK_DONE);
+      ButtonType no = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+      alert.getButtonTypes().setAll(yes, no);
+      
+
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.isPresent() && result.get().equals(yes)) {
+        if (onSellAllEndGame != null) onSellAllEndGame.run();
+      }
+    });
+
     HBox weekBox = buildWeekBox();
 
-    bottom.getChildren().addAll(advanceBtn, weekBox);
+    bottom.getChildren().addAll(advanceBtn, sellAllBtn, weekBox);
     return bottom;
   }
 
@@ -229,6 +260,10 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   public void setOnNavigate(Consumer<Page> handler) {
     this.onNavigate = handler;
+  }
+
+  public void setOnSellAllEndGame(Runnable handler) {
+    this.onSellAllEndGame = handler;
   }
 
   @Override

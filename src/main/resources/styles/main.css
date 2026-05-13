@@ -412,7 +412,7 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-border-color: transparent;
-    -fx-padding: 6 10 6 10;
+    -fx-padding: 6 6 6 6;
 }
 
 .select-btn:hover {

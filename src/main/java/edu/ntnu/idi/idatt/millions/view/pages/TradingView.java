@@ -113,7 +113,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   private VBox buildStockListPanel() {
     VBox panel = new VBox(8);
-    panel.setPadding(new Insets(0,24,24,24));
+    panel.setPadding(new Insets(0,0,0,0));
     panel.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(panel, Priority.ALWAYS);
 
@@ -592,8 +592,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");
-    selectBtn.setPrefWidth(70);
-    selectBtn.setMinWidth(65);
+    selectBtn.setPrefWidth(80);
+    selectBtn.setMinWidth(80);
 
     HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
     row.setAlignment(Pos.CENTER_LEFT);
@@ -604,19 +604,28 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     if (stock.getSymbol().equals(highlightedSymbol)) {
       row.getStyleClass().add("stock-row-selected");
       selectBtn.getStyleClass().add("select-btn-active");
+      selectBtn.setText("Selected");
       selectedRow = row;
       selectedButton = selectBtn;
     }
 
-    selectBtn.setOnAction(e -> {
+    Runnable activate = () -> {
       if (selectedRow != null) selectedRow.getStyleClass().remove("stock-row-selected");
-      if (selectedButton != null) selectedButton.getStyleClass().remove("select-btn-active");
+      if (selectedButton != null) {
+        selectedButton.getStyleClass().remove("select-btn-active");
+        selectedButton.setText("Select");
+      }
       row.getStyleClass().add("stock-row-selected");
       selectBtn.getStyleClass().add("select-btn-active");
+      selectBtn.setText("Selected");
       selectedRow = row;
       selectedButton = selectBtn;
       selectStock(stock);
-    });
+    };
+
+    selectBtn.setOnAction(e -> activate.run());
+    row.setOnMouseClicked(e -> activate.run());
+    row.setStyle("-fx-cursor: hand;");
 
     stockListContainer.getChildren().add(row);
   }

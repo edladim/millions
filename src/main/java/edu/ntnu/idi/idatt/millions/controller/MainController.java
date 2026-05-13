@@ -2,10 +2,12 @@ package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
+import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 
 /**
  * <p>Top-level controller that wires the game models to all views.</p>
@@ -43,6 +45,8 @@ public class MainController {
 
     view.setOnAdvanceWeek(this::advanceWeek);
 
+    view.setOnSellAllEndGame(this::sellAllEndGame);
+
     initializeViews(exchange, player);
   }
 
@@ -64,6 +68,13 @@ public class MainController {
       gameOver = true;
       endGame();
     }
+  }
+
+  public void sellAllEndGame() {
+    for (Share share : new ArrayList<>(player.getPortfolio().getShares())) {
+      exchange.sell(share, player);
+    }
+    endGame();
   }
 
   /**
@@ -118,9 +129,6 @@ public class MainController {
             + "Return Rate: " + returnRateRounded + "\n"
             + "Weeks played: " + exchange.getWeek() + "\n"
             + "Millions Score: " + millionsScoreRounded;
-
-
-
 
     view.showEndGame(statsText);
   }

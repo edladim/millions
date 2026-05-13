@@ -40,6 +40,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private final SimpleStringProperty shortWeekText = new SimpleStringProperty(ViewFormatter.weekAsShort(1));
 
   private Runnable onAdvanceWeek;
+  private Runnable onSellAllEndGame;
   private Consumer<Page> onNavigate;
 
   /**
@@ -134,9 +135,21 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
     });
 
+    Button sellAllBtn = new Button();
+    sellAllBtn.textProperty().bind(
+            Bindings.when(widthProperty().lessThan(190))
+                    .then("Retire")
+                    .otherwise("Retire")
+    );
+    sellAllBtn.getStyleClass().add("sell-all-btn");
+    sellAllBtn.setMaxWidth(Double.MAX_VALUE);
+    sellAllBtn.setOnAction(e -> {
+      if (onSellAllEndGame != null) onSellAllEndGame.run();
+    });
+
     HBox weekBox = buildWeekBox();
 
-    bottom.getChildren().addAll(advanceBtn, weekBox);
+    bottom.getChildren().addAll(advanceBtn, sellAllBtn, weekBox);
     return bottom;
   }
 
@@ -229,6 +242,10 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   public void setOnNavigate(Consumer<Page> handler) {
     this.onNavigate = handler;
+  }
+
+  public void setOnSellAllEndGame(Runnable handler) {
+    this.onSellAllEndGame = handler;
   }
 
   @Override

@@ -87,6 +87,21 @@
     -fx-background-color: -primary-light;
 }
 
+.sell-all-btn {
+    -fx-background-color: -red;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 20 14 20;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.sell-all-btn:hover {
+    -fx-background-color: #b91c1c;
+}
+
 /* Week box */
 .week-box {
     -fx-background-color: -primary-bg;

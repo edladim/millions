@@ -38,6 +38,7 @@ public class MainView {
   private final ScrollPane tradingScroll;
 
   private Runnable onAdvanceWeek;
+  private Runnable onSellAllEndGame;
 
   /**
    * <p>Constructs the main view and initializes child views.</p>
@@ -68,6 +69,10 @@ public class MainView {
 
     sidebar.setOnAdvanceWeek(() -> {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
+    });
+
+    sidebar.setOnSellAllEndGame(() -> {
+      if (onSellAllEndGame != null) onSellAllEndGame.run();
     });
   }
 
@@ -171,6 +176,10 @@ public class MainView {
    * @param handler the action to run
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
+
+  public void setOnSellAllEndGame(Runnable handler) {
+    this.onSellAllEndGame = handler;
+  }
 
   /**
    * <p>Registers a handler that runs when the user starts a new game

@@ -25,6 +25,8 @@ public class GameController {
   private final Player player;
   private final Exchange exchange;
   private final TradingController tradingController;
+  private final PortfolioController portfolioController;
+  private final DashboardController dashboardController;
   private boolean gameOver = false;
 
   /**
@@ -43,14 +45,13 @@ public class GameController {
     exchange.addObserver(view.getSidebar());
     view.getSidebar().onExchangeUpdated(exchange);
 
-    tradingController = new TradingController(view.getTradingView(), exchange, player);
-
-    new PortfolioController(view.getPortfolioView(), exchange, player);
-
-    new DashboardController(view.getDashboardView(), exchange, player, symbol -> {
-      view.navigateTo(Page.TRADING);
-      tradingController.focusStock(symbol);
-    });
+    tradingController   = new TradingController(view.getTradingView(), exchange, player);
+    portfolioController = new PortfolioController(view.getPortfolioView(), exchange, player);
+    dashboardController = new DashboardController(view.getDashboardView(), exchange, player,
+        symbol -> {
+          view.navigateTo(Page.TRADING);
+          tradingController.focusStock(symbol);
+        });
 
     view.setOnAdvanceWeek(this::advanceWeek);
     view.setOnRetire(this::retire);
@@ -69,8 +70,9 @@ public class GameController {
     for (Share share : new ArrayList<>(player.getPortfolio().getShares())) {
       try {
         exchange.sell(share, player);
-      } catch (Exception _) {
-        // Skip individual failures during bulk liquidation
+      } catch (IllegalStateException | IllegalArgumentException _) {
+        // Expected: a lot cannot be sold right now.
+        // Skip it and let the rest of the liquidation proceed.
       }
     }
     gameOver = true;

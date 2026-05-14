@@ -59,7 +59,6 @@ public class TradingController {
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
       view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
-      view.clearInput();
       updatePlayerInfo();
       updateCostPreview();
     });
@@ -324,6 +323,24 @@ public class TradingController {
     view.setHighlightedStock(first.getSymbol());
     view.setCurrentPrice(first.getSalesPrice());
     view.selectStock(first);
+  }
+
+  /**
+   * <p>Focuses a stock by symbol: switches to Buy mode, populates the search
+   * field with the symbol so the list is filtered, and selects the stock so
+   * the chart and buy panel update.</p>
+   *
+   * @param symbol the ticker symbol to focus
+   */
+  public void focusStock(String symbol) {
+    if (symbol == null || !exchange.hasStock(symbol)) return;
+    view.setMode(TradingView.Mode.BUY);
+    view.getSearchField().setText(symbol);
+    selectedSymbol = symbol;
+    lastBuySymbol  = symbol;
+    view.setHighlightedStock(symbol);
+    filterStocks(symbol);
+    view.selectStock(exchange.getStock(symbol));
   }
 
   /**

@@ -328,15 +328,16 @@ public class TradingController {
    * <p>Selects the first available stock by default so the chart and buy panel
    * are populated on startup without requiring user interaction. Called from
    * the constructor.</p>
+   *
+   * <p>The actual selection state is updated by {@link #handleStockSelected},
+   * which is fired as a callback from {@code view.selectStock(...)}. This
+   * method only performs the view-side calls that precede that callback.</p>
    */
   private void selectDefault() {
     List<? extends ReadOnlyStock> stocks = exchange.getStocks();
     if (stocks.isEmpty()) return;
     ReadOnlyStock first = stocks.get(0);
-    selectedSymbol = first.getSymbol();
-    lastBuySymbol  = first.getSymbol();
     view.setHighlightedStock(first.getSymbol());
-    view.setCurrentPrice(first.getSalesPrice());
     view.selectStock(first);
   }
 
@@ -345,14 +346,15 @@ public class TradingController {
    * field with the symbol so the list is filtered, and selects the stock so
    * the chart and buy panel update.</p>
    *
+   * <p>The actual selection state is updated by {@link #handleStockSelected},
+   * which is fired as a callback from {@code view.selectStock(...)}.</p>
+   *
    * @param symbol the ticker symbol to focus
    */
   public void focusStock(String symbol) {
     if (symbol == null || !exchange.hasStock(symbol)) return;
     view.setMode(TradingView.Mode.BUY);
     view.getSearchField().setText(symbol);
-    selectedSymbol = symbol;
-    lastBuySymbol  = symbol;
     view.setHighlightedStock(symbol);
     filterStocks(symbol);
     view.selectStock(exchange.getStock(symbol));
@@ -369,8 +371,9 @@ public class TradingController {
       ReadOnlyStock stock = exchange.getStock(selectedSymbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
-    } catch (Exception _) {
-
+    } catch (IllegalArgumentException _) {
+      // Expected: the previously-selected symbol is no longer in the exchange.
+      // The list-refresh that runs alongside will drop the stale highlight.
     }
   }
 

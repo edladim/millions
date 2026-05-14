@@ -104,7 +104,7 @@ public class GameController {
    * <p>Computes the final score and asks the view to render the end-game overlay.</p>
    */
   private void endGame() {
-    long score = ScoreCalculator.compute(player.getReturnRate());
+    long score = ScoreCalculator.compute(player.getReturnRate(), exchange.getWeek());
     view.showEndGame(
         player.getNetWorth(),
         player.getProfit(),

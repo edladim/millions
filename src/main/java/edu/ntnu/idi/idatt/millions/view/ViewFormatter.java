@@ -127,6 +127,27 @@ public final class ViewFormatter {
     return scale(quantity).toPlainString();
   }
 
+  /**
+   * <p>Formats a value as a whole-dollar price with no decimals,
+   * e.g. {@code "$1234"}.</p>
+   *
+   * @param value the monetary value to format
+   * @return the formatted whole-dollar string
+   */
+  public static String wholePrice(BigDecimal value) {
+    return "$" + value.setScale(0, RoundingMode.HALF_UP).toPlainString();
+  }
+
+  /**
+   * <p>Formats a game week as a plain label, e.g. {@code "Week 53"}.</p>
+   *
+   * @param week the total game week number (1-based)
+   * @return the formatted week string
+   */
+  public static String week(int week) {
+    return "Week " + week;
+  }
+
   private static BigDecimal scale(BigDecimal value) {
     return value.setScale(2, RoundingMode.HALF_UP);
   }

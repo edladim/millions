@@ -4,12 +4,14 @@ import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
 import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
+import java.math.BigDecimal;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 /**
  * <p>
@@ -23,8 +25,10 @@ import javafx.scene.layout.Region;
  */
 public class MainView {
 
+  private final StackPane rootStack;
   private final BorderPane root;
   private final SidebarComponent sidebar;
+  private final EndGameOverlay endGameOverlay;
 
   private final DashboardView dashboardView;
   private final PortfolioView portfolioView;
@@ -35,16 +39,21 @@ public class MainView {
   private final ScrollPane tradingScroll;
 
   private Runnable onAdvanceWeek;
+  private Runnable onRetire;
 
   /**
    * <p>Constructs the main view and initializes child views.</p>
    */
   public MainView() {
+    rootStack = new StackPane();
     root = new BorderPane();
     sidebar = new SidebarComponent();
     dashboardView = new DashboardView();
     portfolioView = new PortfolioView();
     tradingView = new TradingView();
+    endGameOverlay = new EndGameOverlay();
+
+    rootStack.getChildren().addAll(root, endGameOverlay);
 
     dashboardScroll = wrapInScroll(dashboardView, true);
     portfolioScroll = wrapInScroll(portfolioView, true);
@@ -62,6 +71,19 @@ public class MainView {
     sidebar.setOnAdvanceWeek(() -> {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
     });
+
+    sidebar.setOnRetire(() -> {
+      if (onRetire != null) onRetire.run();
+    });
+  }
+
+  /**
+   * <p>Programmatically navigates to the given page.</p>
+   *
+   * @param page the page to show
+   */
+  public void navigateTo(Page page) {
+    showPage(page);
   }
 
   /**
@@ -106,7 +128,7 @@ public class MainView {
    * @return the initialized scene
    */
   public Scene createScene() {
-    Scene scene = new Scene(root);
+    Scene scene = new Scene(rootStack);
     scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
     root.prefHeightProperty().bind(scene.heightProperty());
     root.minHeightProperty().bind(scene.heightProperty());
@@ -119,6 +141,31 @@ public class MainView {
     sidebar.maxWidthProperty().bind(sidebarWidth);
 
     return scene;
+  }
+
+  /**
+   * <p>Displays the end-game overlay with the player's final stats.</p>
+   *
+   * <p>Builds the stats text using {@link ViewFormatter} so all formatting
+   * stays in the view layer, then delegates to the overlay for display.</p>
+   *
+   * @param netWorth   the player's final net worth
+   * @param profit     the player's total profit
+   * @param returnRate the player's return rate as a decimal (e.g. 0.20 for 20%)
+   * @param weeks      number of weeks played
+   * @param score      the computed Millions Score
+   */
+  public void showEndGame(BigDecimal netWorth,
+                          BigDecimal profit,
+                          BigDecimal returnRate,
+                          int weeks,
+                          long score) {
+    String statsText = "Net Worth: " + ViewFormatter.wholePrice(netWorth) + "\n"
+        + "Profit: " + ViewFormatter.price(profit) + "\n"
+        + "Return Rate: " + ViewFormatter.rateAsPercent(returnRate) + "\n"
+        + "Weeks played: " + weeks + "\n"
+        + "Millions Score: " + score;
+    endGameOverlay.show(statsText);
   }
 
   /**
@@ -155,5 +202,28 @@ public class MainView {
    * @param handler the action to run
    */
   public void setOnAdvanceWeek(Runnable handler) { this.onAdvanceWeek = handler; }
+
+  /**
+   * <p>Registers a handler that runs when the user confirms retirement.</p>
+   *
+   * @param handler the action to run
+   */
+  public void setOnRetire(Runnable handler) { this.onRetire = handler; }
+
+  /**
+   * <p>Registers a handler that runs when the user clicks "New Game" on the
+   * end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
+  public void setOnNewGame(Runnable handler) { endGameOverlay.setOnNewGame(handler); }
+
+  /**
+   * <p>Registers a handler that runs when the user clicks "Exit" on the
+   * end-game overlay.</p>
+   *
+   * @param handler the action to run
+   */
+  public void setOnExit(Runnable handler) { endGameOverlay.setOnExit(handler); }
 
 }

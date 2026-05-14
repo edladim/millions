@@ -10,6 +10,7 @@ import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -51,6 +52,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label loadMoreLosersLabel;
   private int gainersDisplayCount = MOVERS_PAGE_SIZE;
   private int losersDisplayCount  = MOVERS_PAGE_SIZE;
+  private Consumer<String> onStockClicked;
 
   /**
    * <p>Constructs the dashboard view and builds its initial layout.</p>
@@ -186,12 +188,18 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
       refreshMovers();
     });
 
-    VBox positiveSection = new VBox(8, moversPositiveContainer, loadMoreGainersLabel);
+    Label topHeading = new Label("Top Performers");
+    topHeading.getStyleClass().add("section-subheading");
+
+    Label worstHeading = new Label("Worst Performers");
+    worstHeading.getStyleClass().add("section-subheading");
+
+    VBox positiveSection = new VBox(8, topHeading, moversPositiveContainer, loadMoreGainersLabel);
     positiveSection.getStyleClass().add("stat-card");
     positiveSection.setPadding(new Insets(24));
     positiveSection.setMaxWidth(Double.MAX_VALUE);
 
-    VBox negativeSection = new VBox(8, moversNegativeContainer, loadMoreLosersLabel);
+    VBox negativeSection = new VBox(8, worstHeading, moversNegativeContainer, loadMoreLosersLabel);
     negativeSection.getStyleClass().add("stat-card");
     negativeSection.setPadding(new Insets(24));
     negativeSection.setMaxWidth(Double.MAX_VALUE);
@@ -318,21 +326,21 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     moversPositiveContainer.getChildren().clear();
     moversNegativeContainer.getChildren().clear();
 
-    List<? extends ReadOnlyStock> gainers = currentExchange.getGainers(gainersDisplayCount + 1);
-    int toShowG = Math.min(gainersDisplayCount, gainers.size());
+    List<? extends ReadOnlyStock> topPerformers = currentExchange.getTopPerformers(gainersDisplayCount + 1);
+    int toShowG = Math.min(gainersDisplayCount, topPerformers.size());
     for (int i = 0; i < toShowG; i++) {
-      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, gainers.get(i)));
+      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, topPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreGainersLabel,
-        gainers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
+        topPerformers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
 
-    List<? extends ReadOnlyStock> losers = currentExchange.getLosers(losersDisplayCount + 1);
-    int toShowL = Math.min(losersDisplayCount, losers.size());
+    List<? extends ReadOnlyStock> bottomPerformers = currentExchange.getBottomPerformers(losersDisplayCount + 1);
+    int toShowL = Math.min(losersDisplayCount, bottomPerformers.size());
     for (int i = 0; i < toShowL; i++) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, losers.get(i)));
+      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, bottomPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreLosersLabel,
-        losers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
+        bottomPerformers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
   }
 
   /**
@@ -399,7 +407,20 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");
     row.setPadding(new Insets(8, 8, 8, 0));
+    row.setStyle("-fx-cursor: hand;");
+    row.setOnMouseClicked(e -> {
+      if (onStockClicked != null) onStockClicked.accept(stock.getSymbol());
+    });
     return row;
+  }
+
+  /**
+   * <p>Registers a handler invoked when the user clicks a mover row.</p>
+   *
+   * @param handler callback receiving the clicked stock's symbol
+   */
+  public void setOnStockClicked(Consumer<String> handler) {
+    this.onStockClicked = handler;
   }
 
 }

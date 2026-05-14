@@ -7,6 +7,7 @@ import edu.ntnu.idi.idatt.millions.model.Stock;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import edu.ntnu.idi.idatt.millions.view.Stylesheets;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
@@ -27,10 +28,12 @@ public class SetupController {
   private static final String DEFAULT_STOCK_FILE = "/StockData.csv";
   private final Stage primaryStage;
   private final StartupScreen screen;
+  private final Scene startupScene;
   private File selectedFile = null;
 
   /**
-   * <p>Creates a setup controller bound to the primary stage.</p>
+   * <p>Creates a setup controller bound to the primary stage and caches the
+   * startup scene so it can be reused when the player returns from a game.</p>
    *
    * @param primaryStage application window to control.
    */
@@ -40,6 +43,9 @@ public class SetupController {
 
     screen.setOnBrowse(this::handleBrowse);
     screen.setOnStart(this::handleStart);
+
+    this.startupScene = new Scene(screen, 520, 660);
+    this.startupScene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
   }
 
   /**
@@ -64,10 +70,7 @@ public class SetupController {
    */
   public void show() {
     loadFonts();
-    Scene scene = new Scene(screen, 520, 660);
-    scene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
-
-    primaryStage.setScene(scene);
+    primaryStage.setScene(startupScene);
     primaryStage.setTitle("Millions");
     primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
@@ -161,7 +164,10 @@ public class SetupController {
    */
   private void launchGame(Player player, Exchange exchange) {
     MainView mainView = new MainView();
-    new MainController(mainView, player, exchange);
+    new GameController(mainView, player, exchange);
+
+    mainView.setOnNewGame(this::show);
+    mainView.setOnExit(Platform::exit);
 
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());

@@ -68,6 +68,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Runnable onInputChanged;
   private Consumer<Mode> onModeChanged;
   private Consumer<String> onSelectStock;
+  private Consumer<BigDecimal> onPercentSelected;
   private Runnable onRefresh;
   private Runnable onLoadMore;
 
@@ -112,7 +113,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   private VBox buildStockListPanel() {
     VBox panel = new VBox(8);
-    panel.setPadding(new Insets(0,24,24,24));
+    panel.setPadding(new Insets(0,0,0,0));
     panel.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(panel, Priority.ALWAYS);
 
@@ -259,6 +260,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       if (onAction != null) onAction.accept(currentMode);
     });
 
+    HBox percentageCard = buildPercentageCard();
+
     panel.getChildren().addAll(
             modeToggle,
             panelTitle,
@@ -266,6 +269,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
             playerInfoCard,
             inputHeader,
             inputSpinner,
+            percentageCard,
             derivedLabel,
             costCard,
             buildSpacer(4),
@@ -274,6 +278,44 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     VBox.setVgrow(costCard, Priority.NEVER);
     return panel;
+  }
+
+  /**
+   * <p>Builds a row of quick-select buttons that fill the input with 25%,
+   * 50%, or 100% of the player's available capacity (cash for buy, owned
+   * shares for sell).</p>
+   *
+   * @return the percentage-card container
+   */
+  private HBox buildPercentageCard() {
+    Button twentyFivePercentButton = new Button("25%");
+    Button fiftyPercentButton = new Button("50%");
+    Button hundredPercentButton = new Button("100%");
+
+    for (Button btn : new Button[]{twentyFivePercentButton, fiftyPercentButton, hundredPercentButton}) {
+      btn.getStyleClass().add("mode-tab");
+      btn.setMaxWidth(Double.MAX_VALUE);
+      HBox.setHgrow(btn, Priority.ALWAYS);
+    }
+
+    twentyFivePercentButton.setOnAction(e -> firePercent(new BigDecimal("0.25")));
+    fiftyPercentButton.setOnAction(e -> firePercent(new BigDecimal("0.50")));
+    hundredPercentButton.setOnAction(e -> firePercent(new BigDecimal("1.00")));
+
+    HBox percentageCard = new HBox(5, twentyFivePercentButton, fiftyPercentButton, hundredPercentButton);
+    percentageCard.setAlignment(Pos.CENTER);
+    percentageCard.getStyleClass().add("stat-card");
+    percentageCard.setPadding(new Insets(12, 16, 12, 16));
+    return percentageCard;
+  }
+
+  /**
+   * <p>Notifies the percent-selected handler, if any.</p>
+   *
+   * @param percent the selected percentage as a decimal (e.g. {@code 0.25})
+   */
+  private void firePercent(BigDecimal percent) {
+    if (onPercentSelected != null) onPercentSelected.accept(percent);
   }
 
   /**
@@ -358,7 +400,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    *
    * @param mode the new mode
    */
-  private void setMode(Mode mode) {
+  public void setMode(Mode mode) {
     if (currentMode == mode) return;
     currentMode = mode;
 
@@ -560,8 +602,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     Button selectBtn = new Button("Select");
     selectBtn.getStyleClass().add("select-btn");
-    selectBtn.setPrefWidth(70);
-    selectBtn.setMinWidth(65);
+    selectBtn.setPrefWidth(80);
+    selectBtn.setMinWidth(80);
 
     HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
     row.setAlignment(Pos.CENTER_LEFT);
@@ -572,19 +614,28 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     if (stock.getSymbol().equals(highlightedSymbol)) {
       row.getStyleClass().add("stock-row-selected");
       selectBtn.getStyleClass().add("select-btn-active");
+      selectBtn.setText("Selected");
       selectedRow = row;
       selectedButton = selectBtn;
     }
 
-    selectBtn.setOnAction(e -> {
+    Runnable activate = () -> {
       if (selectedRow != null) selectedRow.getStyleClass().remove("stock-row-selected");
-      if (selectedButton != null) selectedButton.getStyleClass().remove("select-btn-active");
+      if (selectedButton != null) {
+        selectedButton.getStyleClass().remove("select-btn-active");
+        selectedButton.setText("Select");
+      }
       row.getStyleClass().add("stock-row-selected");
       selectBtn.getStyleClass().add("select-btn-active");
+      selectBtn.setText("Selected");
       selectedRow = row;
       selectedButton = selectBtn;
       selectStock(stock);
-    });
+    };
+
+    selectBtn.setOnAction(e -> activate.run());
+    row.setOnMouseClicked(e -> activate.run());
+    row.setStyle("-fx-cursor: hand;");
 
     stockListContainer.getChildren().add(row);
   }
@@ -610,7 +661,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     buySymbolLabel.setText(stock.getSymbol());
     buyCompanyLabel.setText(stock.getCompany());
     buyPriceLabel.setText(ViewFormatter.price(stock.getSalesPrice()));
-    buyChangeLabel.setText(ViewFormatter.priceChangeArrow(change));
+    buyChangeLabel.setText(ViewFormatter.changeArrowPercent(change, stock.getSalesPrice()));
     buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
     buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     buyHighLabel.setText("H: " + ViewFormatter.price(stock.getHighestPrice()));
@@ -812,6 +863,29 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   public void setOnLoadMore(Runnable handler) {
     this.onLoadMore = handler;
+  }
+
+  /**
+   * <p>Registers a handler that runs when a percentage button (25/50/100%)
+   * is clicked. The handler receives the selected percentage as a decimal.</p>
+   *
+   * @param handler the consumer that receives the selected percentage
+   */
+  public void setOnPercentSelected(Consumer<BigDecimal> handler) {
+    this.onPercentSelected = handler;
+  }
+
+  /**
+   * <p>Fills the input with the given value, toggling between quantity- and
+   * amount-mode if needed to match {@code asAmount}.</p>
+   *
+   * @param value    the value to set in the input
+   * @param asAmount {@code true} to interpret the value as a dollar amount,
+   *                 {@code false} to interpret it as a share quantity
+   */
+  public void setInputAmount(BigDecimal value, boolean asAmount) {
+    if (asAmount != amountMode) toggleInputMode();
+    setSpinnerValue(value);
   }
 
   /**

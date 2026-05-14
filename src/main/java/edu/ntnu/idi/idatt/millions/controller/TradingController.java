@@ -4,7 +4,7 @@ import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.model.Share;
-import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.CostPreviewCalculator;
 import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
@@ -16,12 +16,14 @@ import java.util.stream.Collectors;
 
 /**
  * <p>Controller for the trading page.</p>
- * <p>Handles stock search, live cost preview, and buy/sell order execution
- * with quantity- or dollar-amount input.</p>
+ * <p>Owns the wiring between the {@link TradingView} and the underlying
+ * models: registers the view as an exchange observer, fires an initial push so
+ * the chart and stock list populate on startup, and handles stock search,
+ * live cost preview, and buy/sell order execution with quantity- or
+ * dollar-amount input.</p>
  */
 public class TradingController {
 
-  private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.005");
   private static final int PAGE_SIZE = 7;
 
   private final TradingView view;
@@ -34,7 +36,8 @@ public class TradingController {
   private int displayedCount = PAGE_SIZE;
 
   /**
-   * <p>Creates a trading controller and wires all view callbacks.</p>
+   * <p>Creates a trading controller, registers the view as an exchange
+   * observer, and wires all view callbacks.</p>
    *
    * @param view     the trading view to control.
    * @param exchange the exchange model.
@@ -45,61 +48,116 @@ public class TradingController {
     this.exchange = exchange;
     this.player = player;
 
-    view.setOnRefresh(() -> filterStocks(view.getSearchField().getText()));
+    exchange.addObserver(view);
 
-    view.setOnLoadMore(() -> {
-      displayedCount += PAGE_SIZE;
-      renderStocks();
-    });
-
-    view.setOnSelectStock(symbol -> {
-      selectedSymbol = symbol;
-      lastBuySymbol  = symbol;
-      ReadOnlyStock stock = exchange.getStock(symbol);
-      view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
-      view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
-      updatePlayerInfo();
-      updateCostPreview();
-    });
-
+    view.setOnRefresh(this::onExchangeRefresh);
+    view.setOnLoadMore(this::loadMoreStocks);
+    view.setOnSelectStock(this::handleStockSelected);
     view.setOnInputChanged(this::updateCostPreview);
-
-    view.setOnModeChanged(mode -> {
-      String savedSymbol = selectedSymbol;
-      selectedSymbol = null;
-      view.setActionEnabled(false);
-
-      // When switching back to Buy, fall back to the last stock shown in the panel
-      String symbolToUse = savedSymbol != null ? savedSymbol
-          : (mode == TradingView.Mode.BUY ? lastBuySymbol : null);
-
-      boolean reselect = symbolToUse != null && (
-          mode == TradingView.Mode.BUY
-              || totalOwned(symbolToUse).signum() > 0
-      );
-
-      view.setHighlightedStock(reselect ? symbolToUse : null);
-      filterStocks(view.getSearchField().getText());
-
-      if (reselect) {
-        selectedSymbol = symbolToUse;
-        view.setCurrentPrice(exchange.getStock(symbolToUse).getSalesPrice());
-        updateCostPreview();
-      } else {
-        view.setCostPreview("$0.00", "$0.00", "$0.00");
-        view.setDerivedLabel("");
-      }
-      updatePlayerInfo();
-    });
-
-    view.setOnAction(this::handleAction);
+    view.setOnModeChanged(this::handleModeChanged);
+    view.setOnAction(this::handleTrade);
+    view.setOnPercentSelected(this::handlePercent);
 
     view.getSearchField().textProperty().addListener(
         (_, _, text) -> filterStocks(text)
     );
 
+    view.onExchangeUpdated(exchange);
     updatePlayerInfo();
+    selectDefault();
+  }
+
+  /**
+   * <p>Reacts to an exchange update by re-filtering the stock list and
+   * refreshing the chart for the currently selected stock.</p>
+   */
+  private void onExchangeRefresh() {
+    filterStocks(view.getSearchField().getText());
+    refreshChart();
+  }
+
+  /**
+   * <p>Expands the visible stock list by one page and re-renders the rows.</p>
+   */
+  private void loadMoreStocks() {
+    displayedCount += PAGE_SIZE;
+    renderStocks();
+  }
+
+  /**
+   * <p>Updates internal state and the view after the user selects a stock
+   * from the list.</p>
+   *
+   * @param symbol the ticker symbol of the selected stock
+   */
+  private void handleStockSelected(String symbol) {
+    selectedSymbol = symbol;
+    lastBuySymbol  = symbol;
+    ReadOnlyStock stock = exchange.getStock(symbol);
+    view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
+    view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
+    view.setCurrentPrice(stock.getSalesPrice());
+    updatePlayerInfo();
+    updateCostPreview();
+  }
+
+  /**
+   * <p>Reacts to the user switching between Buy and Sell mode.</p>
+   *
+   * <p>When switching back to Buy, falls back to the last stock shown in the
+   * panel so the user does not lose their place. Sell mode only re-selects a
+   * stock the player actually owns.</p>
+   *
+   * @param mode the mode the panel switched to
+   */
+  private void handleModeChanged(TradingView.Mode mode) {
+    String savedSymbol = selectedSymbol;
+    selectedSymbol = null;
+    view.setActionEnabled(false);
+
+    String symbolToUse = savedSymbol != null ? savedSymbol
+        : (mode == TradingView.Mode.BUY ? lastBuySymbol : null);
+
+    boolean reselect = symbolToUse != null && (
+        mode == TradingView.Mode.BUY
+            || totalOwned(symbolToUse).signum() > 0
+    );
+
+    view.setHighlightedStock(reselect ? symbolToUse : null);
+    filterStocks(view.getSearchField().getText());
+
+    if (reselect) {
+      selectedSymbol = symbolToUse;
+      view.setCurrentPrice(exchange.getStock(symbolToUse).getSalesPrice());
+      updateCostPreview();
+    } else {
+      view.setCostPreview("$0.00", "$0.00", "$0.00");
+      view.setDerivedLabel("");
+    }
+    updatePlayerInfo();
+  }
+
+  /**
+   * <p>Fills the input field with a value representing the given percentage of
+   * the player's available capacity (cash for buy orders, owned shares for
+   * sell orders). For buy orders the commission is subtracted up-front so the
+   * resulting order fits within the cash budget.</p>
+   *
+   * @param percent the percentage to apply, as a decimal (e.g. {@code 0.25})
+   */
+  private void handlePercent(BigDecimal percent) {
+    if (selectedSymbol == null) return;
+
+    if (view.getMode() == TradingView.Mode.BUY) {
+      BigDecimal cashPortion = player.getMoney().multiply(percent);
+      BigDecimal divisor = BigDecimal.ONE.add(CostPreviewCalculator.COMMISSION_RATE);
+      BigDecimal amount = cashPortion.divide(divisor, 3, RoundingMode.DOWN);
+      view.setInputAmount(amount, true);
+    } else {
+      BigDecimal owned = totalOwned(selectedSymbol);
+      BigDecimal quantity = owned.multiply(percent);
+      view.setInputAmount(quantity, false);
+    }
   }
 
   /**
@@ -120,7 +178,8 @@ public class TradingController {
 
   /**
    * <p>Recalculates and pushes the cost preview to the view based on the
-   * currently selected stock, input value, and input mode.</p>
+   * currently selected stock, input value, and input mode. Delegates the
+   * gross/commission/total math to {@link CostPreviewCalculator}.</p>
    */
   private void updateCostPreview() {
     if (selectedSymbol == null) return;
@@ -129,28 +188,26 @@ public class TradingController {
     BigDecimal price = stock.getSalesPrice();
     view.setCurrentPrice(price);
     BigDecimal qty = effectiveQuantity(price);
-    BigDecimal gross = price.multiply(qty);
-    BigDecimal commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
-    BigDecimal total = view.getMode() == TradingView.Mode.BUY
-        ? gross.add(commission)
-        : gross.subtract(commission);
+
+    CostPreviewCalculator preview = new CostPreviewCalculator(
+        price, qty, view.getMode() == TradingView.Mode.BUY);
 
     view.setCostPreview(
-        ViewFormatter.price(gross),
-        ViewFormatter.price(commission),
-        ViewFormatter.price(total)
+        ViewFormatter.price(preview.getGross()),
+        ViewFormatter.price(preview.getCommission()),
+        ViewFormatter.price(preview.getTotal())
     );
 
     if (view.isAmountMode()) {
       view.setDerivedLabel("≈ " + ViewFormatter.quantity(qty) + " shares");
     } else {
-      view.setDerivedLabel("≈ " + ViewFormatter.price(gross));
+      view.setDerivedLabel("≈ " + ViewFormatter.price(preview.getGross()));
     }
 
     boolean canProceed = qty.signum() > 0;
     if (canProceed) {
       if (view.getMode() == TradingView.Mode.BUY) {
-        canProceed = total.compareTo(player.getMoney()) <= 0;
+        canProceed = preview.getTotal().compareTo(player.getMoney()) <= 0;
       } else {
         canProceed = qty.compareTo(totalOwned(selectedSymbol)) <= 0;
       }
@@ -188,69 +245,43 @@ public class TradingController {
   }
 
   /**
-   * <p>Dispatches the action button click to the right handler based on
-   * the current panel mode.</p>
+   * <p>Executes a buy or sell order based on the current panel mode.</p>
+   *
+   * <p>This is a template method: both modes share the same flow of
+   * (1) reading the input quantity, (2) validating it, (3) executing through
+   * {@link TransactionExecutor}, and (4) showing a confirmation dialog. Only
+   * the transaction method, dialog, error title, and list-refresh side-effect
+   * differ between Buy and Sell.</p>
    *
    * @param mode the panel mode at the time of click
    */
-  private void handleAction(TradingView.Mode mode) {
+  private void handleTrade(TradingView.Mode mode) {
     if (selectedSymbol == null) return;
-    if (mode == TradingView.Mode.BUY) {
-      handleBuy(selectedSymbol);
-    } else {
-      handleSell(selectedSymbol);
-    }
-  }
 
-  /**
-   * <p>Executes a buy order and shows a confirmation dialog with the full
-   * cost breakdown.</p>
-   *
-   * @param symbol the stock symbol to buy.
-   */
-  private void handleBuy(String symbol) {
-    try {
-      ReadOnlyStock stock = exchange.getStock(symbol);
-      BigDecimal qty = effectiveQuantity(stock.getSalesPrice());
-      if (qty.signum() <= 0) {
-        TransactionDialog.showError("Purchase failed", "Quantity must be positive.");
-        return;
-      }
-      Transaction tx = exchange.buy(symbol, qty, player);
-      TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
-      updatePlayerInfo();
-    } catch (IllegalStateException | IllegalArgumentException e) {
-      TransactionDialog.showError("Purchase failed", e.getMessage());
-    } catch (Exception e) {
-      TransactionDialog.showError("Unexpected error",
-          "Could not complete purchase: " + e.getMessage());
-    }
-  }
+    final String symbol = selectedSymbol;
+    final boolean isBuy = mode == TradingView.Mode.BUY;
+    final String errorTitle = isBuy ? "Purchase failed" : "Sale failed";
 
-  /**
-   * <p>Executes a sell order, drawing across the player's lots of the
-   * selected stock, and shows a confirmation dialog.</p>
-   *
-   * @param symbol the stock symbol to sell.
-   */
-  private void handleSell(String symbol) {
-    try {
-      ReadOnlyStock stock = exchange.getStock(symbol);
-      BigDecimal qty = effectiveQuantity(stock.getSalesPrice());
-      if (qty.signum() <= 0) {
-        TransactionDialog.showError("Sale failed", "Quantity must be positive.");
-        return;
-      }
-      Transaction tx = exchange.sell(symbol, qty, player);
-      TransactionDialog.showSaleConfirmation(tx, player.getMoney());
-      filterStocks(view.getSearchField().getText());
-      updatePlayerInfo();
-    } catch (IllegalStateException | IllegalArgumentException e) {
-      TransactionDialog.showError("Sale failed", e.getMessage());
-    } catch (Exception e) {
-      TransactionDialog.showError("Unexpected error",
-          "Could not complete sale: " + e.getMessage());
+    BigDecimal qty = effectiveQuantity(exchange.getStock(symbol).getSalesPrice());
+    if (qty.signum() <= 0) {
+      TransactionDialog.showError(errorTitle, "Quantity must be positive.");
+      return;
     }
+
+    TransactionExecutor.execute(
+        errorTitle,
+        () -> isBuy ? exchange.buy(symbol, qty, player)
+                    : exchange.sell(symbol, qty, player),
+        tx -> {
+          if (isBuy) {
+            TransactionDialog.showPurchaseConfirmation(tx, player.getMoney());
+          } else {
+            TransactionDialog.showSaleConfirmation(tx, player.getMoney());
+            filterStocks(view.getSearchField().getText());
+          }
+          updatePlayerInfo();
+        }
+    );
   }
 
   /**
@@ -295,9 +326,10 @@ public class TradingController {
 
   /**
    * <p>Selects the first available stock by default so the chart and buy panel
-   * are populated on startup without requiring user interaction.</p>
+   * are populated on startup without requiring user interaction. Called from
+   * the constructor.</p>
    */
-  public void selectDefault() {
+  private void selectDefault() {
     List<? extends ReadOnlyStock> stocks = exchange.getStocks();
     if (stocks.isEmpty()) return;
     ReadOnlyStock first = stocks.get(0);
@@ -308,12 +340,35 @@ public class TradingController {
     view.selectStock(first);
   }
 
-  public void updateChart() {
+  /**
+   * <p>Focuses a stock by symbol: switches to Buy mode, populates the search
+   * field with the symbol so the list is filtered, and selects the stock so
+   * the chart and buy panel update.</p>
+   *
+   * @param symbol the ticker symbol to focus
+   */
+  public void focusStock(String symbol) {
+    if (symbol == null || !exchange.hasStock(symbol)) return;
+    view.setMode(TradingView.Mode.BUY);
+    view.getSearchField().setText(symbol);
+    selectedSymbol = symbol;
+    lastBuySymbol  = symbol;
+    view.setHighlightedStock(symbol);
+    filterStocks(symbol);
+    view.selectStock(exchange.getStock(symbol));
+  }
+
+  /**
+   * <p>Refreshes the chart for the currently selected stock. Called whenever
+   * the exchange notifies the view of an update, so a week-advance keeps the
+   * chart in sync without explicit coordination from outside.</p>
+   */
+  private void refreshChart() {
     if (selectedSymbol == null) return;
     try {
       ReadOnlyStock stock = exchange.getStock(selectedSymbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
-      view.getStockChart().setData(stock.getHistoricalPrices());
+      view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
     } catch (Exception _) {
 
     }

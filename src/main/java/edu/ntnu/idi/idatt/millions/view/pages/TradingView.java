@@ -49,6 +49,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Label ownedValueLabel;
   private Label inputLabel;
   private String highlightedSymbol = null;
+  private String lastSelectedSymbol = null;
   private HBox selectedRow = null;
   private Button selectedButton = null;
   private Spinner<Double> inputSpinner;
@@ -243,6 +244,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     inputSpinner.getEditor().textProperty().addListener((_, _, _) -> {
       if (onInputChanged != null) onInputChanged.run();
     });
+    setSpinnerValue(BigDecimal.ONE);
 
     derivedLabel = new Label();
     derivedLabel.getStyleClass().add("input-derived");
@@ -645,7 +647,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param stock the read-only stock that was selected
    */
   public void selectStock(ReadOnlyStock stock) {
-    if (!stock.getSymbol().equals(highlightedSymbol)) {
+    lastSelectedSymbol = stock.getSymbol();
+    highlightedSymbol = stock.getSymbol();
+
+    if (getInputValue().signum() <= 0) {
       setSpinnerValue(BigDecimal.ONE);
     }
 
@@ -663,7 +668,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     stockChart.setStockInfo(stock.getSymbol(), stock.getCompany());
     actionButton.setDisable(false);
-    highlightedSymbol = stock.getSymbol();
 
     if (onSelectStock != null) onSelectStock.accept(stock.getSymbol());
     updateCostPreview();

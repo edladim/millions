@@ -59,7 +59,6 @@ public class TradingController {
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
       view.setCurrentPrice(exchange.getStock(symbol).getSalesPrice());
-      view.clearInput();
       updatePlayerInfo();
       updateCostPreview();
     });

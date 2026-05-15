@@ -341,6 +341,153 @@
     -fx-text-fill: white;
 }
 
+/* ── Stock table (TradingView) ───────────────────────── */
+.stock-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.stock-table .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.stock-table .column-header,
+.stock-table .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 0 8 0;
+    -fx-size: 32;
+}
+
+.stock-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+    -fx-text-transform: uppercase;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 8;
+}
+
+
+.stock-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 2 18 2 0;
+    -fx-border-color: -border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 18 2 0;
+    -fx-padding: 4 0 4 0;
+    -fx-cell-size: 58;
+}
+
+.stock-table .table-row-cell:empty {
+    -fx-border-color: transparent;
+}
+
+.stock-table .table-row-cell:filled:hover {
+    -fx-background-color: transparent;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 18 2 0;
+}
+
+.stock-table .table-row-cell:filled:selected,
+.stock-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+    -fx-background-insets: 2 18 2 0;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 18 2 0;
+    -fx-text-fill: -text;
+}
+
+.stock-table .column-header > .arrow {
+    -fx-background-color: -primary;
+    -fx-padding: 3 4 3 4;
+    -fx-pref-width: 12;
+    -fx-min-width: 12;
+}
+
+.stock-table .column-drag-header {
+    -fx-background-color: -primary-bg;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-opacity: 0.9;
+}
+
+.stock-table .scroll-bar:vertical {
+    -fx-pref-width: 10;
+    -fx-padding: 0;
+}
+
+.stock-table .scroll-bar:vertical .thumb {
+    -fx-background-color: -border;
+    -fx-background-radius: 5;
+}
+
+.stock-table .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -text-muted;
+}
+
+.stock-table .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.stock-table .column-drag-header .label {
+    -fx-text-fill: -primary;
+    -fx-font-weight: bold;
+}
+
+.stock-table .column-overlay {
+    -fx-background-color: -primary-bg;
+    -fx-opacity: 0.35;
+}
+
+.stock-table .column-resize-line {
+    -fx-background-color: -primary;
+    -fx-padding: 0 1 0 1;
+}
+
+.stock-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 8 8 8 8;
+    -fx-alignment: center-left;
+    -fx-text-fill: -text;
+    -fx-font-size: 13px;
+}
+
+.stock-table .table-cell.table-data-cell-profit {
+    -fx-text-fill: -green;
+    -fx-font-weight: bold;
+}
+
+.stock-table .table-cell.table-data-cell-loss {
+    -fx-text-fill: -red;
+    -fx-font-weight: bold;
+}
+
+.stock-table .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.stock-table .placeholder .label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+}
+
+.stock-table .virtual-flow .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
 /* ── Transaction history rows ────────────────────────── */
 .tx-row-buy {
     -fx-background-color: #f0fdf4;

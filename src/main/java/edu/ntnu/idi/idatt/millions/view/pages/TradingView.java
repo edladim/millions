@@ -5,26 +5,44 @@ import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.function.Consumer;
-
 /**
  * <p>
- * Trading page view that renders stock listings, a chart preview, and a buy panel.
+ * Trading page view that renders the stock listing, a chart preview, and a
+ * buy/sell panel.
  * </p>
  *
  * <p>
- * The view exposes methods for adding rows, updating the selected stock, and
- * setting order cost previews.
+ * The stock listing is presented as a {@link TableView} of {@link ReadOnlyStock}
+ * rows with custom cell factories so columns render rich content (icon + name,
+ * coloured percentage change). Row selection drives the buy panel and fires the
+ * registered {@code onSelectStock} callback.
  * </p>
  */
 public class TradingView extends BorderPane implements ExchangeObserver {
@@ -33,9 +51,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   public enum Mode { BUY, SELL }
 
   private TextField searchField;
-  private VBox stockListContainer;
-  private Label loadMoreLabel;
+  private TableView<ReadOnlyStock> stockTable;
   private StockChartComponent stockChart;
+
   private Label buySymbolLabel;
   private Label buyCompanyLabel;
   private Label buyPriceLabel;
@@ -48,9 +66,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Label cashBalanceLabel;
   private Label ownedValueLabel;
   private Label inputLabel;
-  private String highlightedSymbol = null;
-  private HBox selectedRow = null;
-  private Button selectedButton = null;
+
   private Spinner<Double> inputSpinner;
   private Label derivedLabel;
   private BigDecimal currentPrice;
@@ -62,6 +78,22 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Mode currentMode = Mode.BUY;
   private boolean amountMode = false;
 
+  /**
+   * Symbol that should appear selected in the table once items contain it.
+   * Used by {@link #setHighlightedStock(String)} so callers can mark the
+   * intended selection independently of the items list; the highlight is
+   * re-applied automatically the next time {@link #setStocks(List)} runs.
+   */
+  private String pendingHighlight = null;
+
+  /**
+   * When {@code true}, the table's selection listener will not invoke the
+   * {@code onSelectStock} callback. Used to apply programmatic selection
+   * (e.g. restoring a highlight after refilling the table) without firing
+   * controller-facing events.
+   */
+  private boolean suppressSelectionEvent = false;
+
   private VBox buyPanelWrapper;
 
   private Consumer<Mode> onAction;
@@ -70,7 +102,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private Consumer<String> onSelectStock;
   private Consumer<BigDecimal> onPercentSelected;
   private Runnable onRefresh;
-  private Runnable onLoadMore;
 
   /**
    * <p>Constructs the trading view and builds its initial layout.</p>
@@ -113,7 +144,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   private VBox buildStockListPanel() {
     VBox panel = new VBox(8);
-    panel.setPadding(new Insets(0,0,0,0));
+    panel.setPadding(Insets.EMPTY);
     panel.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(panel, Priority.ALWAYS);
 
@@ -128,58 +159,242 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     searchField.getStyleClass().add("search-field");
     searchField.setMaxWidth(Double.MAX_VALUE);
 
-    HBox tableHeader = buildStockTableHeader();
+    stockTable = buildStockTable();
+    VBox.setVgrow(stockTable, Priority.ALWAYS);
 
-    stockListContainer = new VBox(4);
-
-    ScrollPane scroll = new ScrollPane(stockListContainer);
-    scroll.setFitToWidth(true);
-    scroll.getStyleClass().add("stock-scroll");
-    scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-    scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-    VBox.setVgrow(scroll, Priority.ALWAYS);
-
-    loadMoreLabel = new Label("Load more");
-    loadMoreLabel.getStyleClass().add("load-more-label");
-    loadMoreLabel.setMaxWidth(Double.MAX_VALUE);
-    loadMoreLabel.setAlignment(Pos.CENTER);
-    loadMoreLabel.setVisible(false);
-    loadMoreLabel.setManaged(false);
-    loadMoreLabel.setOnMouseClicked(e -> { if (onLoadMore != null) onLoadMore.run(); });
-
-    VBox tableCard = new VBox(0, tableHeader, buildDivider(), scroll, loadMoreLabel);
+    VBox tableCard = new VBox(stockTable);
     tableCard.getStyleClass().add("stat-card");
     tableCard.setPadding(new Insets(24));
     VBox.setVgrow(tableCard, Priority.ALWAYS);
 
     panel.getChildren().addAll(header, searchField, tableCard);
-    VBox.setVgrow(panel, Priority.ALWAYS);
     return panel;
   }
 
   /**
-   * <p>Builds the header row for the stock table.</p>
+   * <p>Builds the stock {@link TableView} with its columns and selection
+   * listener. The listener drives the buy panel and fires the
+   * {@code onSelectStock} callback whenever a row is selected.</p>
    *
-   * @return the table header container
+   * @return the configured stock table
    */
-  private HBox buildStockTableHeader() {
-    HBox header = new HBox();
-    header.setPadding(new Insets(0, 0, 8, 0));
-    header.setMaxWidth(Double.MAX_VALUE);
+  private TableView<ReadOnlyStock> buildStockTable() {
+    TableView<ReadOnlyStock> table = new TableView<>();
+    table.getStyleClass().add("stock-table");
+    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+    table.setPlaceholder(new Label("No stocks match your search."));
+    table.setMinHeight(220);
 
-    Label stockHeader = makeHeaderCell("Stock", 80, false);
-    stockHeader.setPrefWidth(190);
-    stockHeader.setMaxWidth(190);
+    table.getColumns().add(buildStockColumn());
+    table.getColumns().add(buildPriceLikeColumn("Price", ReadOnlyStock::getSalesPrice));
+    table.getColumns().add(buildChangeColumn());
+    table.getColumns().add(buildPriceLikeColumn("High", ReadOnlyStock::getHighestPrice));
+    table.getColumns().add(buildPriceLikeColumn("Low", ReadOnlyStock::getLowestPrice));
 
-    header.getChildren().addAll(
-            stockHeader,
-            makeHeaderCell("Price", 70, true),
-            makeHeaderCell("Change", 70, true),
-            makeHeaderCell("High", 60, true),
-            makeHeaderCell("Low", 60, true),
-            makeHeaderCell("", 70, false)
-    );
-    return header;
+    table.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, sel) -> {
+      if (sel == null) return;
+      pendingHighlight = sel.getSymbol();
+      updateBuyPanel(sel);
+      if (suppressSelectionEvent) return;
+      if (onSelectStock != null) onSelectStock.accept(sel.getSymbol());
+    });
+
+    table.getSortOrder().addListener((javafx.beans.Observable o) -> applyHeaderStyles(table));
+    table.comparatorProperty().addListener((obs, old, neu) -> applyHeaderStyles(table));
+
+    javafx.application.Platform.runLater(() -> applyHeaderStyles(table));
+
+    return table;
+  }
+
+  /**
+   * <p>Recolours the header label of the currently-sorted column so the active
+   * sort indicator is visually clear. Other header alignment and padding is
+   * handled by CSS, which already renders correctly on the initial paint;
+   * this method only patches the colour in response to sort changes.</p>
+   *
+   * <p>Uses {@code Platform.runLater} so the lookup runs after the skin has
+   * assigned header labels, and uses inline styles via {@code setStyle} so
+   * the change overrides any class-based rule.</p>
+   *
+   * @param table the table whose header colour should reflect the current sort
+   */
+  private static void applyHeaderStyles(TableView<?> table) {
+    javafx.application.Platform.runLater(() -> {
+      java.util.Set<String> sortedTitles = new java.util.HashSet<>();
+      for (TableColumn<?, ?> c : table.getSortOrder()) {
+        sortedTitles.add(c.getText());
+      }
+      for (javafx.scene.Node header : table.lookupAll(".column-header")) {
+        javafx.scene.Node labelNode = header.lookup(".label");
+        if (!(labelNode instanceof Label lbl)) continue;
+        String text = lbl.getText();
+        if (text == null) continue;
+        lbl.setStyle(sortedTitles.contains(text) ? "-fx-text-fill: #6366f1;" : "");
+      }
+    });
+  }
+
+  /**
+   * <p>Builds the "Stock" column that renders an icon together with the symbol
+   * and company name. Sorting is by symbol, case-insensitive.</p>
+   *
+   * @return the configured stock column
+   */
+  private TableColumn<ReadOnlyStock, ReadOnlyStock> buildStockColumn() {
+    TableColumn<ReadOnlyStock, ReadOnlyStock> col = new TableColumn<>("Stock");
+    col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
+    col.setCellFactory(c -> new TableCell<>() {
+      @Override
+      protected void updateItem(ReadOnlyStock stock, boolean empty) {
+        super.updateItem(stock, empty);
+        if (empty || stock == null) {
+          setGraphic(null);
+          setText(null);
+          return;
+        }
+        Circle icon = new Circle(18, Color.web("#6366f1"));
+        Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
+        letter.getStyleClass().add("mover-icon-letter");
+        StackPane iconPane = new StackPane(icon, letter);
+
+        Label name = new Label(stock.getSymbol());
+        name.getStyleClass().add("mover-name");
+        Label company = new Label(stock.getCompany());
+        company.getStyleClass().add("mover-symbol");
+        company.setTextOverrun(OverrunStyle.ELLIPSIS);
+        company.setMinWidth(0);
+        VBox nameBox = new VBox(2, name, company);
+
+        HBox row = new HBox(10, iconPane, nameBox);
+        row.setAlignment(Pos.CENTER_LEFT);
+        setGraphic(row);
+      }
+    });
+    col.setMinWidth(180);
+    col.setPrefWidth(220);
+    col.setComparator((a, b) -> a.getSymbol().compareToIgnoreCase(b.getSymbol()));
+    return col;
+  }
+
+  /**
+   * <p>Builds a numeric price-style column ("Price", "High", "Low") that
+   * extracts a {@link BigDecimal} from each stock and renders it using
+   * {@link ViewFormatter#price(BigDecimal)}.</p>
+   *
+   * @param title     the column header text
+   * @param extractor function returning the value to display for a given stock
+   * @return the configured column
+   */
+  private TableColumn<ReadOnlyStock, BigDecimal> buildPriceLikeColumn(
+      String title, Function<ReadOnlyStock, BigDecimal> extractor) {
+    TableColumn<ReadOnlyStock, BigDecimal> col = new TableColumn<>(title);
+    col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(extractor.apply(c.getValue())));
+    col.setCellFactory(c -> {
+      TableCell<ReadOnlyStock, BigDecimal> cell = new TableCell<>() {
+        @Override
+        protected void updateItem(BigDecimal value, boolean empty) {
+          super.updateItem(value, empty);
+          getStyleClass().remove("table-data-cell");
+          if (empty || value == null) {
+            setText(null);
+            return;
+          }
+          setText(ViewFormatter.price(value));
+          getStyleClass().add("table-data-cell");
+        }
+      };
+      return cell;
+    });
+    col.setMinWidth(70);
+    return col;
+  }
+
+  /**
+   * <p>Builds the "Change" column that displays the latest percentage change
+   * with profit/loss colouring. Sortable by the underlying numeric change so
+   * the user can order stocks by movement.</p>
+   *
+   * @return the configured change column
+   */
+  private TableColumn<ReadOnlyStock, ReadOnlyStock> buildChangeColumn() {
+    TableColumn<ReadOnlyStock, ReadOnlyStock> col = new TableColumn<>("Change");
+    col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
+    col.setCellFactory(c -> {
+      TableCell<ReadOnlyStock, ReadOnlyStock> cell = new TableCell<>() {
+        @Override
+        protected void updateItem(ReadOnlyStock stock, boolean empty) {
+          super.updateItem(stock, empty);
+          getStyleClass().removeAll("table-data-cell-profit", "table-data-cell-loss");
+          if (empty || stock == null) {
+            setText(null);
+            return;
+          }
+          BigDecimal percent = percentChange(stock);
+          setText(ViewFormatter.percent(percent));
+          getStyleClass().add(percent.signum() >= 0 ? "table-data-cell-profit" : "table-data-cell-loss");
+        }
+      };
+      return cell;
+    });
+    col.setMinWidth(80);
+    col.setComparator((a, b) -> percentChange(a).compareTo(percentChange(b)));
+    return col;
+  }
+
+  /**
+   * <p>Computes the latest price change as a percentage of the previous price.
+   * Returns {@link BigDecimal#ZERO} when no previous price exists, so callers
+   * can sort and render uniformly without null checks.</p>
+   *
+   * @param stock the stock whose latest change to express as a percentage
+   * @return the latest percentage change
+   */
+  private static BigDecimal percentChange(ReadOnlyStock stock) {
+    BigDecimal change = stock.getLatestPriceChange();
+    BigDecimal previous = stock.getSalesPrice().subtract(change);
+    if (previous.signum() == 0) return BigDecimal.ZERO;
+    return change.divide(previous, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+  }
+
+  /**
+   * <p>Replaces the stock list with the given stocks and re-applies the
+   * pending highlight, if any, so the previously-selected row stays visually
+   * selected across re-filters.</p>
+   *
+   * @param stocks the stocks to display, never {@code null}
+   */
+  public void setStocks(List<? extends ReadOnlyStock> stocks) {
+    suppressSelectionEvent = true;
+    try {
+      stockTable.getItems().setAll(stocks);
+      applyPendingHighlight();
+    } finally {
+      suppressSelectionEvent = false;
+    }
+  }
+
+  /**
+   * <p>Selects the row matching {@link #pendingHighlight} in the table. If
+   * the pending symbol is not in the current items, the selection is
+   * cleared.</p>
+   *
+   * <p>Must be called with {@link #suppressSelectionEvent} already set to
+   * {@code true}; the caller is responsible for the surrounding try/finally
+   * so the listener does not fire while the highlight is restored.</p>
+   */
+  private void applyPendingHighlight() {
+    if (pendingHighlight == null) {
+      stockTable.getSelectionModel().clearSelection();
+      return;
+    }
+    for (ReadOnlyStock s : stockTable.getItems()) {
+      if (s.getSymbol().equals(pendingHighlight)) {
+        stockTable.getSelectionModel().select(s);
+        return;
+      }
+    }
+    stockTable.getSelectionModel().clearSelection();
   }
 
   /**
@@ -489,29 +704,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Creates a table header cell label. When {@code grow} is {@code true}
-   * the cell expands to fill available space; when {@code false} it keeps a
-   * fixed preferred width (used for the action column).</p>
-   *
-   * @param text     the header text
-   * @param minWidth the minimum width in pixels
-   * @param grow     whether the cell should grow to fill remaining space
-   * @return the header label
-   */
-  private Label makeHeaderCell(String text, double minWidth, boolean grow) {
-    Label l = new Label(text);
-    l.getStyleClass().add("table-header-cell");
-    l.setMinWidth(minWidth);
-    if (grow) {
-      l.setMaxWidth(Double.MAX_VALUE);
-      HBox.setHgrow(l, Priority.ALWAYS);
-    } else {
-      l.setPrefWidth(minWidth);
-    }
-    return l;
-  }
-
-  /**
    * <p>Builds the order summary cost card.</p>
    *
    * @return the cost card container
@@ -538,14 +730,13 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Creates a cost row label with text and value.</p>
+   * <p>Creates a cost row label with text and value separated by spacing.</p>
    *
    * @param labelText the label text
    * @param value     the value text
    * @return the cost row label
    */
   private Label makeCostRow(String labelText, String value) {
-    // We return a container disguised as a label use HBox instead
     Label lbl = new Label(labelText + ":   " + value);
     lbl.getStyleClass().add("cost-row");
     lbl.setMaxWidth(Double.MAX_VALUE);
@@ -555,106 +746,13 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Triggers a refresh of the cost preview based on current input.</p>
-   */
-  private void updateCostPreview() {
-    if (onInputChanged != null) onInputChanged.run();
-  }
-
-  /**
-   * <p>Adds a stock row to the stock list panel.</p>
+   * <p>Renders the given stock into the buy panel header (symbol, company,
+   * price, change, high, low), updates the chart's stock info, and enables
+   * the action button.</p>
    *
-   * @param stock the read-only stock to display in the row
+   * @param stock the stock currently selected in the table
    */
-  public void addStockRow(ReadOnlyStock stock) {
-    BigDecimal change = stock.getLatestPriceChange();
-    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
-
-    Circle icon = new Circle(18, Color.web("#6366f1"));
-    Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
-    letter.getStyleClass().add("mover-icon-letter");
-    StackPane iconPane = new StackPane(icon, letter);
-
-    Label nameLabel = new Label(stock.getSymbol());
-    nameLabel.getStyleClass().add("mover-name");
-    Label compLabel = new Label(stock.getCompany());
-    compLabel.getStyleClass().add("mover-symbol");
-    compLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
-    compLabel.setMinWidth(0);
-    compLabel.setMaxWidth(Double.MAX_VALUE);
-    VBox nameBox = new VBox(2, nameLabel, compLabel);
-    HBox.setHgrow(nameBox, Priority.ALWAYS);
-    HBox stockCell = new HBox(10, iconPane, nameBox);
-    stockCell.setAlignment(Pos.CENTER_LEFT);
-    stockCell.setMinWidth(80);
-    stockCell.setPrefWidth(190);
-    stockCell.setMaxWidth(190);
-
-    BigDecimal prevPrice = stock.getSalesPrice().subtract(change);
-    BigDecimal changePct = prevPrice.signum() == 0 ? BigDecimal.ZERO
-        : change.divide(prevPrice, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
-
-    Label priceLabel  = makeDataCell(ViewFormatter.price(stock.getSalesPrice()),  70, "table-data-cell");
-    Label changeLabel = makeDataCell(ViewFormatter.percent(changePct),            70,
-        isPositive ? "table-data-cell-profit" : "table-data-cell-loss");
-    Label highLabel = makeDataCell(ViewFormatter.price(stock.getHighestPrice()), 60, "table-data-cell");
-    Label lowLabel = makeDataCell(ViewFormatter.price(stock.getLowestPrice()),  60, "table-data-cell");
-
-    Button selectBtn = new Button("Select");
-    selectBtn.getStyleClass().add("select-btn");
-    selectBtn.setPrefWidth(80);
-    selectBtn.setMinWidth(80);
-
-    HBox row = new HBox(stockCell, priceLabel, changeLabel, highLabel, lowLabel, selectBtn);
-    row.setAlignment(Pos.CENTER_LEFT);
-    row.setMaxWidth(Double.MAX_VALUE);
-    row.getStyleClass().add("holding-row");
-    row.setPadding(new Insets(10, 0, 10, 0));
-
-    if (stock.getSymbol().equals(highlightedSymbol)) {
-      row.getStyleClass().add("stock-row-selected");
-      selectBtn.getStyleClass().add("select-btn-active");
-      selectBtn.setText("Selected");
-      selectedRow = row;
-      selectedButton = selectBtn;
-    }
-
-    Runnable activate = () -> {
-      if (selectedRow != null) selectedRow.getStyleClass().remove("stock-row-selected");
-      if (selectedButton != null) {
-        selectedButton.getStyleClass().remove("select-btn-active");
-        selectedButton.setText("Select");
-      }
-      row.getStyleClass().add("stock-row-selected");
-      selectBtn.getStyleClass().add("select-btn-active");
-      selectBtn.setText("Selected");
-      selectedRow = row;
-      selectedButton = selectBtn;
-      selectStock(stock);
-    };
-
-    selectBtn.setOnAction(e -> activate.run());
-    row.setOnMouseClicked(e -> activate.run());
-    row.setStyle("-fx-cursor: hand;");
-
-    stockListContainer.getChildren().add(row);
-  }
-
-  /**
-   * <p>Clears all stock rows from the list.</p>
-   */
-  public void clearStocks() {
-    stockListContainer.getChildren().clear();
-    selectedRow = null;
-    selectedButton = null;
-  }
-
-  /**
-   * <p>Selects a stock and updates the buy panel and chart.</p>
-   *
-   * @param stock the read-only stock that was selected
-   */
-  public void selectStock(ReadOnlyStock stock) {
+  private void updateBuyPanel(ReadOnlyStock stock) {
     BigDecimal change = stock.getLatestPriceChange();
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 
@@ -669,10 +767,18 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
     stockChart.setStockInfo(stock.getSymbol(), stock.getCompany());
     actionButton.setDisable(false);
-    highlightedSymbol = stock.getSymbol();
+  }
 
-    if (onSelectStock != null) onSelectStock.accept(stock.getSymbol());
-    updateCostPreview();
+  /**
+   * <p>Programmatically selects the given stock in the table. Triggers the
+   * selection listener, which updates the buy panel and fires the registered
+   * {@code onSelectStock} callback.</p>
+   *
+   * @param stock the stock to select; it must already exist in the items list
+   */
+  public void selectStock(ReadOnlyStock stock) {
+    pendingHighlight = stock.getSymbol();
+    stockTable.getSelectionModel().select(stock);
   }
 
   /**
@@ -725,10 +831,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Updates the "Owned: X" hint shown above the input in Sell mode.
-   * Pass a non-positive value to hide the label.</p>
+   * <p>Updates the "Owned" value shown in the player info card.
+   * Pass a non-positive value to display the empty placeholder.</p>
    *
-   * @param qty the owned quantity, or {@code null}/zero to hide
+   * @param qty the owned quantity, or {@code null}/zero to clear
    */
   public void setOwnedQuantity(BigDecimal qty) {
     if (ownedValueLabel == null) return;
@@ -747,14 +853,21 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Sets the symbol that should appear highlighted in the stock list.
-   * Applied during the next {@link #addStockRow} call (i.e. after the next
-   * render pass).</p>
+   * <p>Selects the row matching the given symbol without firing the
+   * {@code onSelectStock} callback. If the symbol does not yet exist in the
+   * current items, the request is remembered and applied during the next
+   * {@link #setStocks(List)} call.</p>
    *
-   * @param symbol the symbol to highlight, or {@code null} to clear
+   * @param symbol the symbol to mark as selected, or {@code null} to clear
    */
   public void setHighlightedStock(String symbol) {
-    this.highlightedSymbol = symbol;
+    pendingHighlight = symbol;
+    suppressSelectionEvent = true;
+    try {
+      applyPendingHighlight();
+    } finally {
+      suppressSelectionEvent = false;
+    }
   }
 
   /**
@@ -857,15 +970,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when the user clicks the "Load more" label.</p>
-   *
-   * @param handler the action to run
-   */
-  public void setOnLoadMore(Runnable handler) {
-    this.onLoadMore = handler;
-  }
-
-  /**
    * <p>Registers a handler that runs when a percentage button (25/50/100%)
    * is clicked. The handler receives the selected percentage as a decimal.</p>
    *
@@ -888,40 +992,18 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     setSpinnerValue(value);
   }
 
-  /**
-   * <p>Shows or hides the "Load more" label below the stock list.</p>
-   *
-   * @param visible {@code true} to show the label, {@code false} to hide it
-   */
-  public void setLoadMoreVisible(boolean visible) {
-    loadMoreLabel.setVisible(visible);
-    loadMoreLabel.setManaged(visible);
-  }
-
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
     if (onRefresh != null) onRefresh.run();
   }
 
+  /**
+   * <p>Returns the chart component used by the trading view.</p>
+   *
+   * @return the chart component
+   */
   public StockChartComponent getStockChart() {
     return stockChart;
-  }
-
-  /**
-   * <p>Creates a table data cell label that grows to fill available space.</p>
-   *
-   * @param text       the cell text
-   * @param minWidth   the minimum width in pixels
-   * @param styleClass the style class to apply
-   * @return the data cell label
-   */
-  private Label makeDataCell(String text, double minWidth, String styleClass) {
-    Label l = new Label(text);
-    l.getStyleClass().add(styleClass);
-    l.setMinWidth(minWidth);
-    l.setMaxWidth(Double.MAX_VALUE);
-    HBox.setHgrow(l, Priority.ALWAYS);
-    return l;
   }
 
   /**

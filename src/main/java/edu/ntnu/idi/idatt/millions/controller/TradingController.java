@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
  */
 public class TradingController {
 
-  private static final int PAGE_SIZE = 7;
-
   private final TradingView view;
   private final Exchange exchange;
   private final Player player;
@@ -33,7 +31,6 @@ public class TradingController {
   private String selectedSymbol = null;
   private String lastBuySymbol = null;
   private List<? extends ReadOnlyStock> currentResults = List.of();
-  private int displayedCount = PAGE_SIZE;
 
   /**
    * <p>Creates a trading controller, registers the view as an exchange
@@ -51,7 +48,6 @@ public class TradingController {
     exchange.addObserver(view);
 
     view.setOnRefresh(this::onExchangeRefresh);
-    view.setOnLoadMore(this::loadMoreStocks);
     view.setOnSelectStock(this::handleStockSelected);
     view.setOnInputChanged(this::updateCostPreview);
     view.setOnModeChanged(this::handleModeChanged);
@@ -74,14 +70,6 @@ public class TradingController {
   private void onExchangeRefresh() {
     filterStocks(view.getSearchField().getText());
     refreshChart();
-  }
-
-  /**
-   * <p>Expands the visible stock list by one page and re-renders the rows.</p>
-   */
-  private void loadMoreStocks() {
-    displayedCount += PAGE_SIZE;
-    renderStocks();
   }
 
   /**
@@ -285,11 +273,11 @@ public class TradingController {
   }
 
   /**
-   * <p>Filters the stock list by the given search text and resets pagination.
-   * In Sell mode, the list is further filtered to only stocks the player
-   * currently owns.</p>
+   * <p>Filters the stock list by the given search text and pushes the result
+   * to the view. In Sell mode, the list is further filtered to only stocks
+   * the player currently owns.</p>
    *
-   * @param text the search term typed by the user.
+   * @param text the search term typed by the user
    */
   private void filterStocks(String text) {
     List<? extends ReadOnlyStock> base = text.isBlank()
@@ -307,21 +295,7 @@ public class TradingController {
       currentResults = base;
     }
 
-    displayedCount = PAGE_SIZE;
-    renderStocks();
-  }
-
-  /**
-   * <p>Renders up to {@code displayedCount} rows from {@code currentResults}
-   * and shows or hides the "Load more" label accordingly.</p>
-   */
-  private void renderStocks() {
-    view.clearStocks();
-    int toShow = Math.min(displayedCount, currentResults.size());
-    for (int i = 0; i < toShow; i++) {
-      view.addStockRow(currentResults.get(i));
-    }
-    view.setLoadMoreVisible(toShow < currentResults.size());
+    view.setStocks(currentResults);
   }
 
   /**

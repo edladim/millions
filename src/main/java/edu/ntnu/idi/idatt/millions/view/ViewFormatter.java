@@ -139,6 +139,19 @@ public final class ViewFormatter {
   }
 
   /**
+   * <p>Formats a value as a signed whole-dollar price with no decimals,
+   * e.g. {@code "+$1234"} or {@code "-$1234"}. Used as a compact alternative
+   * to {@link #signedPrice(BigDecimal)} when display width is tight.</p>
+   *
+   * @param value the monetary value to format
+   * @return the formatted signed whole-dollar string
+   */
+  public static String signedWholePrice(BigDecimal value) {
+    BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
+    return (rounded.signum() >= 0 ? "+$" : "-$") + rounded.abs().toPlainString();
+  }
+
+  /**
    * <p>Formats a game week as a plain label, e.g. {@code "Week 53"}.</p>
    *
    * @param week the total game week number (1-based)

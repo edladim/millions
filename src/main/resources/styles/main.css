@@ -374,11 +374,11 @@
 
 .stock-table .table-row-cell {
     -fx-background-color: transparent;
-    -fx-background-insets: 2 18 2 0;
+    -fx-background-insets: 2 0 2 0;
     -fx-border-color: -border;
     -fx-border-width: 1;
     -fx-border-radius: 8;
-    -fx-border-insets: 2 18 2 0;
+    -fx-border-insets: 2 0 2 0;
     -fx-padding: 4 0 4 0;
     -fx-cell-size: 58;
 }
@@ -392,18 +392,18 @@
     -fx-border-color: -primary;
     -fx-border-width: 1;
     -fx-border-radius: 8;
-    -fx-border-insets: 2 18 2 0;
+    -fx-border-insets: 2 0 2 0;
 }
 
 .stock-table .table-row-cell:filled:selected,
 .stock-table .table-row-cell:filled:selected:hover {
     -fx-background-color: -primary-bg;
     -fx-background-radius: 8;
-    -fx-background-insets: 2 18 2 0;
+    -fx-background-insets: 2 0 2 0;
     -fx-border-color: -primary;
     -fx-border-width: 1;
     -fx-border-radius: 8;
-    -fx-border-insets: 2 18 2 0;
+    -fx-border-insets: 2 0 2 0;
     -fx-text-fill: -text;
 }
 
@@ -488,31 +488,35 @@
     -fx-background-color: transparent;
 }
 
-/* ── Transaction history rows ────────────────────────── */
-.tx-row-buy {
+/* ── Transaction history rows (inside .stock-table) ─────── */
+.stock-table .table-row-cell.tx-row-buy {
     -fx-background-color: #f0fdf4;
+    -fx-background-insets: 2 0 2 0;
     -fx-background-radius: 8;
 }
 
-.tx-row-buy:hover {
+.stock-table .table-row-cell.tx-row-buy:filled:hover {
     -fx-background-color: #dcfce7;
+    -fx-border-color: -primary;
 }
 
-.tx-row-sell {
+.stock-table .table-row-cell.tx-row-sell {
     -fx-background-color: #fef2f2;
+    -fx-background-insets: 2 0 2 0;
     -fx-background-radius: 8;
 }
 
-.tx-row-sell:hover {
+.stock-table .table-row-cell.tx-row-sell:filled:hover {
     -fx-background-color: #fee2e2;
+    -fx-border-color: -primary;
 }
 
-.tx-type-buy {
+.stock-table .table-cell.tx-type-buy {
     -fx-text-fill: #16a34a;
     -fx-font-weight: bold;
 }
 
-.tx-type-sell {
+.stock-table .table-cell.tx-type-sell {
     -fx-text-fill: #dc2626;
     -fx-font-weight: bold;
 }

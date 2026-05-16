@@ -341,33 +341,274 @@
     -fx-text-fill: white;
 }
 
-/* ── Transaction history rows ────────────────────────── */
-.tx-row-buy {
+/* ── Stock table (TradingView) ───────────────────────── */
+.stock-table {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.stock-table .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.stock-table .column-header,
+.stock-table .filler {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 0 8 0;
+    -fx-size: 32;
+}
+
+.stock-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-muted;
+    -fx-text-transform: uppercase;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 8;
+}
+
+
+.stock-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-background-insets: 2 0 2 0;
+    -fx-border-color: -border;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 0 2 0;
+    -fx-padding: 4 0 4 0;
+    -fx-cell-size: 58;
+}
+
+.stock-table .table-row-cell:empty {
+    -fx-border-color: transparent;
+}
+
+.stock-table .table-row-cell:filled:hover {
+    -fx-background-color: transparent;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 0 2 0;
+}
+
+.stock-table .table-row-cell:filled:selected,
+.stock-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: -primary-bg;
+    -fx-background-radius: 8;
+    -fx-background-insets: 2 0 2 0;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-border-insets: 2 0 2 0;
+    -fx-text-fill: -text;
+}
+
+.stock-table .column-header > .arrow {
+    -fx-background-color: -primary;
+    -fx-padding: 3 4 3 4;
+    -fx-pref-width: 12;
+    -fx-min-width: 12;
+}
+
+.stock-table .column-drag-header {
+    -fx-background-color: -primary-bg;
+    -fx-border-color: -primary;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-opacity: 0.9;
+}
+
+.stock-table .scroll-bar:vertical {
+    -fx-pref-width: 10;
+    -fx-padding: 0;
+}
+
+.stock-table .scroll-bar:vertical .thumb {
+    -fx-background-color: -border;
+    -fx-background-radius: 5;
+}
+
+.stock-table .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: -text-muted;
+}
+
+.stock-table .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.stock-table .column-drag-header .label {
+    -fx-text-fill: -primary;
+    -fx-font-weight: bold;
+}
+
+.stock-table .column-overlay {
+    -fx-background-color: -primary-bg;
+    -fx-opacity: 0.35;
+}
+
+.stock-table .column-resize-line {
+    -fx-background-color: -primary;
+    -fx-padding: 0 1 0 1;
+}
+
+.stock-table .table-cell {
+    -fx-border-color: transparent;
+    -fx-padding: 8 8 8 8;
+    -fx-alignment: center-left;
+    -fx-text-fill: -text;
+    -fx-font-size: 13px;
+}
+
+.stock-table .table-cell.table-data-cell-profit {
+    -fx-text-fill: -green;
+    -fx-font-weight: bold;
+}
+
+.stock-table .table-cell.table-data-cell-loss {
+    -fx-text-fill: -red;
+    -fx-font-weight: bold;
+}
+
+.stock-table .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.stock-table .placeholder .label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+}
+
+.stock-table .virtual-flow .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+/* ── Transaction history rows (inside .stock-table) ─────── */
+.stock-table .table-row-cell.tx-row-buy {
     -fx-background-color: #f0fdf4;
+    -fx-background-insets: 2 0 2 0;
     -fx-background-radius: 8;
 }
 
-.tx-row-buy:hover {
+.stock-table .table-row-cell.tx-row-buy:filled:hover {
     -fx-background-color: #dcfce7;
+    -fx-border-color: -primary;
 }
 
-.tx-row-sell {
+.stock-table .table-row-cell.tx-row-sell {
     -fx-background-color: #fef2f2;
+    -fx-background-insets: 2 0 2 0;
     -fx-background-radius: 8;
 }
 
-.tx-row-sell:hover {
+.stock-table .table-row-cell.tx-row-sell:filled:hover {
     -fx-background-color: #fee2e2;
+    -fx-border-color: -primary;
 }
 
-.tx-type-buy {
+.stock-table .table-cell.tx-type-buy {
     -fx-text-fill: #16a34a;
     -fx-font-weight: bold;
 }
 
-.tx-type-sell {
+.stock-table .table-cell.tx-type-sell {
     -fx-text-fill: #dc2626;
     -fx-font-weight: bold;
+}
+
+/* ── Pagination control (Holdings + Transaction History) ─ */
+.pagination {
+    -fx-padding: 12 0 0 0;
+    -fx-page-information-visible: false;
+}
+
+/* Spacing between arrows and bullet dots */
+.pagination > .pagination-control > .control-box {
+    -fx-spacing: 8;
+}
+
+/* Arrow buttons */
+.pagination > .pagination-control > .control-box > .left-arrow-button,
+.pagination > .pagination-control > .control-box > .right-arrow-button {
+    -fx-background-color: -primary;
+    -fx-background-radius: 6;
+    -fx-background-insets: 0;
+    -fx-padding: 6 9 6 9;
+    -fx-cursor: hand;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button:hover,
+.pagination > .pagination-control > .control-box > .right-arrow-button:hover {
+    -fx-background-color: -primary-light;
+}
+
+.pagination > .pagination-control > .control-box > .left-arrow-button:disabled,
+.pagination > .pagination-control > .control-box > .right-arrow-button:disabled {
+    -fx-opacity: 0.4;
+}
+
+/* Arrow glyphs (the triangle shape inside the buttons) */
+.pagination > .pagination-control > .control-box > .left-arrow-button > .left-arrow,
+.pagination > .pagination-control > .control-box > .right-arrow-button > .right-arrow {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-padding: 3 4 3 4;
+}
+
+/* Bullet dots */
+.pagination > .pagination-control > .control-box > .bullet-button {
+    -fx-background-color: -primary-light;
+    -fx-background-radius: 50%;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-pref-width: 7;
+    -fx-pref-height: 7;
+    -fx-min-width: 7;
+    -fx-min-height: 7;
+    -fx-max-width: 7;
+    -fx-max-height: 7;
+    -fx-cursor: hand;
+}
+
+.pagination > .pagination-control > .control-box > .bullet-button:hover {
+    -fx-background-color: -primary;
+    -fx-opacity: 0.7;
+}
+
+.pagination > .pagination-control > .control-box > .bullet-button:selected,
+.pagination > .pagination-control > .control-box > .bullet-button:selected:hover {
+    -fx-background-color: -primary;
+    -fx-opacity: 1;
+}
+
+/* Numeric page buttons */
+.pagination > .pagination-control > .control-box > .number-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+    -fx-border-color: transparent;
+    -fx-padding: 3 7 3 7;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.pagination > .pagination-control > .control-box > .number-button:hover {
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
+}
+
+.pagination > .pagination-control > .control-box > .number-button:selected,
+.pagination > .pagination-control > .control-box > .number-button:selected:hover {
+    -fx-background-color: -primary;
+    -fx-text-fill: white;
 }
 
 /* ═══════════════════════════════════════════════════════

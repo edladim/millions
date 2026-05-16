@@ -142,7 +142,7 @@ public class SetupController {
     primaryStage.setTitle("Millions - " + player.getName());
     primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
-    primaryStage.setMinWidth(820);
+    primaryStage.setMinWidth(850);
     primaryStage.setMinHeight(580);
     primaryStage.centerOnScreen();
   }

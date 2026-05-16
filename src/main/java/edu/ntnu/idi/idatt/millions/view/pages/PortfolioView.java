@@ -23,11 +23,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -76,6 +78,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   /** Stat-card width (in px) below which monetary values render in compact form (no thousands separator, no decimals). */
   private static final double CARD_COMPACT_THRESHOLD = 170;
 
+  /** Number of rows shown per page in the Holdings and Transaction History tables. */
+  private static final int PAGE_SIZE = 5;
+
   private ReadOnlyPlayer player;
   private BiConsumer<String, BigDecimal> onSell;
 
@@ -83,9 +88,18 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private final ObjectProperty<BigDecimal> cashBalanceValue    = new SimpleObjectProperty<>(BigDecimal.ZERO);
   private final ObjectProperty<BigDecimal> portfolioValueValue = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
+  /**
+   * <p>Master lists that hold all rows. The corresponding {@link TableView} only shows
+   * the current page's slice via {@link #showPage(TableView, ObservableList, int)}.</p>
+   */
+  private final ObservableList<HoldingRow>  holdingsMaster = FXCollections.observableArrayList();
+  private final ObservableList<Transaction> txMaster       = FXCollections.observableArrayList();
+
   private Label statusLabel;
   private TableView<HoldingRow> holdingsTable;
   private TableView<Transaction> txTable;
+  private Pagination holdingsPagination;
+  private Pagination txPagination;
   private StockChartComponent portfolioChart;
 
   // ── Inner data class ──────────────────────────────────────────────────────
@@ -242,11 +256,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    */
   private VBox buildHoldingsSection() {
     holdingsTable = buildHoldingsTable();
+    holdingsPagination = buildPagination(
+        pageIndex -> showPage(holdingsTable, holdingsMaster, pageIndex));
+    wireSortToMaster(holdingsTable, holdingsMaster, holdingsPagination);
 
     Label heading = new Label("Holdings");
     heading.getStyleClass().add("section-heading");
 
-    VBox section = new VBox(0, heading, buildSpacer(16), holdingsTable);
+    VBox section = new VBox(0, heading, buildSpacer(16), holdingsTable, holdingsPagination);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24, 14, 24, 24));
     return section;
@@ -260,14 +277,96 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    */
   private VBox buildTransactionHistorySection() {
     txTable = buildTransactionTable();
+    txPagination = buildPagination(
+        pageIndex -> showPage(txTable, txMaster, pageIndex));
+    wireSortToMaster(txTable, txMaster, txPagination);
 
     Label heading = new Label("Transaction History");
     heading.getStyleClass().add("section-heading");
 
-    VBox section = new VBox(0, heading, buildSpacer(16), txTable);
+    VBox section = new VBox(0, heading, buildSpacer(16), txTable, txPagination);
     section.getStyleClass().add("stat-card");
     section.setPadding(new Insets(24, 14, 24, 24));
     return section;
+  }
+
+  /**
+   * <p>Builds a bullet-style {@link Pagination} control that delegates page
+   * rendering to the provided callback. The page factory returns an empty
+   * region because the actual data is rendered by the surrounding
+   * {@link TableView}; this control only acts as the page selector.</p>
+   *
+   * @param onPage the callback invoked with the selected page index
+   * @return the configured pagination control
+   */
+  private static Pagination buildPagination(java.util.function.IntConsumer onPage) {
+    Pagination p = new Pagination(1, 0);
+    p.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
+    p.setMaxPageIndicatorCount(10);
+    p.setPageFactory(pageIndex -> {
+      onPage.accept(pageIndex);
+      return new Region();
+    });
+    return p;
+  }
+
+  /**
+   * <p>Wires the table's sort behaviour to operate on the master list rather
+   * than only on the currently visible page slice. When the user clicks a
+   * column header, the master list is re-sorted with the table's current
+   * comparator and the current page is re-rendered.</p>
+   *
+   * @param table      the table whose sort policy to override
+   * @param master     the full backing list
+   * @param pagination the pagination control providing the current page index
+   * @param <T>        the row type
+   */
+  private static <T> void wireSortToMaster(
+      TableView<T> table, ObservableList<T> master, Pagination pagination) {
+    table.setSortPolicy(t -> {
+      java.util.Comparator<T> cmp = t.getComparator();
+      if (cmp != null) FXCollections.sort(master, cmp);
+      showPage(table, master, pagination.getCurrentPageIndex());
+      return true;
+    });
+  }
+
+  /**
+   * <p>Updates a paginated table to display the slice of {@code master} that
+   * corresponds to {@code pageIndex}, based on {@link #PAGE_SIZE}.</p>
+   *
+   * @param table     the table whose visible items to update
+   * @param master    the full backing list
+   * @param pageIndex the zero-based page index to show
+   * @param <T>       the row type
+   */
+  private static <T> void showPage(TableView<T> table, ObservableList<T> master, int pageIndex) {
+    int from = Math.max(0, pageIndex * PAGE_SIZE);
+    int to   = Math.min(from + PAGE_SIZE, master.size());
+    if (from >= master.size()) {
+      table.getItems().clear();
+    } else {
+      table.getItems().setAll(master.subList(from, to));
+    }
+  }
+
+  /**
+   * <p>Recalculates the page count from the master list size, clamps the
+   * current page index to the valid range, and toggles the pagination
+   * control's visibility so it disappears entirely when only one page exists.</p>
+   *
+   * @param master     the full backing list
+   * @param pagination the pagination control to update
+   */
+  private static void syncPagination(ObservableList<?> master, Pagination pagination) {
+    int pageCount = Math.max(1, (int) Math.ceil(master.size() / (double) PAGE_SIZE));
+    pagination.setPageCount(pageCount);
+    if (pagination.getCurrentPageIndex() >= pageCount) {
+      pagination.setCurrentPageIndex(0);
+    }
+    boolean show = pageCount > 1;
+    pagination.setVisible(show);
+    pagination.setManaged(show);
   }
 
   // ── Table builders ────────────────────────────────────────────────────────
@@ -318,7 +417,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     bindCompactText(currCol,  table, "CP",    "Current Price");
     bindCompactText(gainCol,  table, "G/L",   "Gain / Loss");
 
-    applyDynamicHeight(table);
+    applyFixedPageHeight(table);
     wireSortHeaderHighlight(table);
     wireCompactRefresh(table);
     return table;
@@ -513,21 +612,18 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Binds the table's preferred height to its row count, so the surrounding
-   * card shrinks/grows with the visible data. Uses a fixed cell size of
-   * {@link #ROW_HEIGHT} (which must match the {@code -fx-cell-size} CSS rule)
-   * plus a fixed header reservation.</p>
+   * <p>Fixes the table's height to fit exactly {@link #PAGE_SIZE} rows plus
+   * the column header, so the surrounding card does not jump when the user
+   * navigates between pages with a partial last page.</p>
    *
-   * @param table the table whose height should follow its item count
+   * @param table the table whose height should be locked
    */
-  private static void applyDynamicHeight(TableView<?> table) {
+  private static void applyFixedPageHeight(TableView<?> table) {
     table.setFixedCellSize(ROW_HEIGHT);
-    table.prefHeightProperty().bind(
-        Bindings.size(table.getItems())
-            .multiply(ROW_HEIGHT)
-            .add(TABLE_HEADER_HEIGHT));
-    table.setMinHeight(TABLE_HEADER_HEIGHT + ROW_HEIGHT);
-    table.maxHeightProperty().bind(table.prefHeightProperty());
+    double total = PAGE_SIZE * ROW_HEIGHT + TABLE_HEADER_HEIGHT;
+    table.setMinHeight(total);
+    table.setPrefHeight(total);
+    table.setMaxHeight(total);
   }
 
   /**
@@ -618,7 +714,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     weekCol.setSortType(TableColumn.SortType.DESCENDING);
     table.getSortOrder().add(weekCol);
 
-    applyDynamicHeight(table);
+    applyFixedPageHeight(table);
     wireSortHeaderHighlight(table);
     return table;
   }
@@ -772,13 +868,17 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     updateStatusLabel(player.getStatus());
     portfolioChart.setData(player.getHistoricalNetWorth());
 
-    List<HoldingRow> rows = groupSharesBySymbol(portfolio.getShares());
-    holdingsTable.getItems().setAll(rows);
+    holdingsMaster.setAll(groupSharesBySymbol(portfolio.getShares()));
+    syncPagination(holdingsMaster, holdingsPagination);
+    holdingsTable.sort();
+    showPage(holdingsTable, holdingsMaster, holdingsPagination.getCurrentPageIndex());
 
     List<Transaction> txs = new ArrayList<>(player.getTransactions());
     java.util.Collections.reverse(txs);
-    txTable.getItems().setAll(txs);
+    txMaster.setAll(txs);
+    syncPagination(txMaster, txPagination);
     txTable.sort();
+    showPage(txTable, txMaster, txPagination.getCurrentPageIndex());
   }
 
   /**

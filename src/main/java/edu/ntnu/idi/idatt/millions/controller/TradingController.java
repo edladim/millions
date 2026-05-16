@@ -310,9 +310,7 @@ public class TradingController {
   private void selectDefault() {
     List<? extends ReadOnlyStock> stocks = exchange.getStocks();
     if (stocks.isEmpty()) return;
-    ReadOnlyStock first = stocks.get(0);
-    view.setHighlightedStock(first.getSymbol());
-    view.selectStock(first);
+    view.selectStock(stocks.get(0));
   }
 
   /**

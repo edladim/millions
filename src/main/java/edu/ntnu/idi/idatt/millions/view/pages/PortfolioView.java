@@ -9,6 +9,7 @@ import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
+import edu.ntnu.idi.idatt.millions.view.TableStyleUtils;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
@@ -289,8 +290,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     bindCompactText(currCol,  table, "CP",    "Current Price");
     bindCompactText(gainCol,  table, "G/L",   "Gain / Loss");
 
-    applyFixedPageHeight(table);
-    wireSortHeaderHighlight(table);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+    TableStyleUtils.wireSortHeaderHighlight(table);
     wireCompactRefresh(table);
     return table;
   }
@@ -468,60 +469,6 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Fixes the table's height to fit exactly {@link #PAGE_SIZE} rows plus
-   * the column header, so the surrounding card does not jump when the user
-   * navigates between pages with a partial last page.</p>
-   *
-   * @param table the table whose height should be locked
-   */
-  private static void applyFixedPageHeight(TableView<?> table) {
-    table.setFixedCellSize(ROW_HEIGHT);
-    double total = PAGE_SIZE * ROW_HEIGHT + TABLE_HEADER_HEIGHT;
-    table.setMinHeight(total);
-    table.setPrefHeight(total);
-    table.setMaxHeight(total);
-  }
-
-  /**
-   * <p>Highlights the header label of the currently sorted column in primary
-   * purple. Mirrors the behaviour of the TradingView stock table.</p>
-   *
-   * <p>The lookup runs on the JavaFX application thread after the next layout
-   * pass since the column header nodes are created by the table's skin and may
-   * not exist when the listener fires. A listener on the sort order ensures
-   * the highlight follows user-initiated sort changes.</p>
-   *
-   * @param table the table whose sort header should be highlighted
-   */
-  private static void wireSortHeaderHighlight(TableView<?> table) {
-    table.getSortOrder().addListener((javafx.collections.ListChangeListener<TableColumn<?, ?>>)
-        c -> applyHeaderStyles(table));
-    javafx.application.Platform.runLater(() -> applyHeaderStyles(table));
-  }
-
-  /**
-   * <p>Applies the purple highlight to the label of every column currently in
-   * the table's sort order and clears it from all other columns.</p>
-   *
-   * @param table the table whose headers should be re-styled
-   */
-  private static void applyHeaderStyles(TableView<?> table) {
-    javafx.application.Platform.runLater(() -> {
-      java.util.Set<String> sortedTitles = new java.util.HashSet<>();
-      for (TableColumn<?, ?> c : table.getSortOrder()) {
-        sortedTitles.add(c.getText());
-      }
-      for (javafx.scene.Node header : table.lookupAll(".column-header")) {
-        javafx.scene.Node labelNode = header.lookup(".label");
-        if (!(labelNode instanceof Label lbl)) continue;
-        String text = lbl.getText();
-        if (text == null) continue;
-        lbl.setStyle(sortedTitles.contains(text) ? "-fx-text-fill: #6366f1;" : "");
-      }
-    });
-  }
-
-  /**
    * <p>Constructs and configures the transaction history {@link TableView}.
    * Columns: Stock, Quantity, Price, Value, Type, Week. Rows are coloured
    * by transaction type via a row factory. The table sorts descending by
@@ -570,8 +517,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     weekCol.setSortType(TableColumn.SortType.DESCENDING);
     table.getSortOrder().add(weekCol);
 
-    applyFixedPageHeight(table);
-    wireSortHeaderHighlight(table);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+    TableStyleUtils.wireSortHeaderHighlight(table);
     return table;
   }
 

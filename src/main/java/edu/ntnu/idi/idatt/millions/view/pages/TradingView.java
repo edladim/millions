@@ -4,6 +4,7 @@ import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
+import edu.ntnu.idi.idatt.millions.view.TableStyleUtils;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
@@ -203,11 +204,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     table.getStyleClass().add("stock-table");
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     table.setPlaceholder(new Label("No stocks match your search."));
-    double height = PAGE_SIZE * ROW_HEIGHT + TABLE_HEADER_HEIGHT;
-    table.setMinHeight(height);
-    table.setPrefHeight(height);
-    table.setMaxHeight(height);
-    table.setFixedCellSize(ROW_HEIGHT);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
 
     table.getColumns().add(buildStockColumn());
     table.getColumns().add(buildPriceLikeColumn("Price", ReadOnlyStock::getSalesPrice));
@@ -223,40 +220,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       if (onSelectStock != null) onSelectStock.accept(sel.getSymbol());
     });
 
-    table.getSortOrder().addListener((javafx.beans.Observable o) -> applyHeaderStyles(table));
-    table.comparatorProperty().addListener((obs, old, neu) -> applyHeaderStyles(table));
-
-    javafx.application.Platform.runLater(() -> applyHeaderStyles(table));
+    TableStyleUtils.wireSortHeaderHighlight(table);
+    table.comparatorProperty().addListener((obs, old, neu) -> TableStyleUtils.applyHeaderStyles(table));
 
     return table;
-  }
-
-  /**
-   * <p>Recolours the header label of the currently-sorted column so the active
-   * sort indicator is visually clear. Other header alignment and padding is
-   * handled by CSS, which already renders correctly on the initial paint;
-   * this method only patches the colour in response to sort changes.</p>
-   *
-   * <p>Uses {@code Platform.runLater} so the lookup runs after the skin has
-   * assigned header labels, and uses inline styles via {@code setStyle} so
-   * the change overrides any class-based rule.</p>
-   *
-   * @param table the table whose header colour should reflect the current sort
-   */
-  private static void applyHeaderStyles(TableView<?> table) {
-    javafx.application.Platform.runLater(() -> {
-      java.util.Set<String> sortedTitles = new java.util.HashSet<>();
-      for (TableColumn<?, ?> c : table.getSortOrder()) {
-        sortedTitles.add(c.getText());
-      }
-      for (javafx.scene.Node header : table.lookupAll(".column-header")) {
-        javafx.scene.Node labelNode = header.lookup(".label");
-        if (!(labelNode instanceof Label lbl)) continue;
-        String text = lbl.getText();
-        if (text == null) continue;
-        lbl.setStyle(sortedTitles.contains(text) ? "-fx-text-fill: #6366f1;" : "");
-      }
-    });
   }
 
   /**

@@ -5,7 +5,9 @@ import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -87,6 +89,22 @@ public final class Portfolio implements ReadOnlyPortfolio {
    */
   public List<Share> getShares() {
     return List.copyOf(shares);
+  }
+
+  /**
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share
+   * lots that reference the same stock. Order follows first occurrence in the
+   * underlying share list.
+   *
+   * @return the aggregated holdings, never null
+   */
+  @Override
+  public List<Holding> getHoldings() {
+    Map<String, List<Share>> grouped = new LinkedHashMap<>();
+    for (Share s : shares) {
+      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
+    }
+    return grouped.values().stream().map(Holding::aggregate).toList();
   }
 
   /**

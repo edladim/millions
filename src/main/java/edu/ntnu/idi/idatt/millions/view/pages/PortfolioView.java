@@ -1,9 +1,9 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
+import edu.ntnu.idi.idatt.millions.model.Holding;
 import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
-import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
@@ -14,11 +14,8 @@ import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
 import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import javafx.beans.binding.Bindings;
@@ -84,33 +81,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private final ObjectProperty<BigDecimal> portfolioValueValue = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
   private Label statusLabel;
-  private PaginatedTable<HoldingRow> holdings;
+  private PaginatedTable<Holding> holdings;
   private PaginatedTable<Transaction> transactions;
   private StockChartComponent portfolioChart;
-
-  // ── Inner data class ──────────────────────────────────────────────────────
-
-  /**
-   * <p>Aggregated view of all share lots that belong to the same stock symbol.
-   * Pre-computed so cell factories only need a simple field access.</p>
-   *
-   * @param symbol           the stock ticker symbol
-   * @param company          the full company name
-   * @param totalQty         total quantity owned across all lots
-   * @param weightedBuyPrice quantity-weighted average purchase price
-   * @param currentPrice     latest sales price from the exchange
-   * @param totalValue       {@code currentPrice × totalQty}
-   * @param gainOrLoss       {@code totalValue − totalInvestment}
-   */
-  private record HoldingRow(
-      String symbol,
-      String company,
-      BigDecimal totalQty,
-      BigDecimal weightedBuyPrice,
-      BigDecimal currentPrice,
-      BigDecimal totalValue,
-      BigDecimal gainOrLoss
-  ) {}
 
   // ── Constructor ───────────────────────────────────────────────────────────
 
@@ -252,26 +225,26 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the configured holdings table
    */
   @SuppressWarnings("deprecation")
-  private TableView<HoldingRow> buildHoldingsTable() {
-    TableView<HoldingRow> table = new TableView<>(FXCollections.observableArrayList());
+  private TableView<Holding> buildHoldingsTable() {
+    TableView<Holding> table = new TableView<>(FXCollections.observableArrayList());
     table.getStyleClass().add("stock-table");
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     table.setPlaceholder(
         new Label("You don't own any shares yet. Head to Trading to get started."));
 
-    TableColumn<HoldingRow, HoldingRow> stockCol = buildHoldingStockColumn();
+    TableColumn<Holding, Holding> stockCol = buildHoldingStockColumn();
 
-    TableColumn<HoldingRow, BigDecimal> qtyCol =
-        buildHoldingValueCol("Quantity",     HoldingRow::totalQty,
+    TableColumn<Holding, BigDecimal> qtyCol =
+        buildHoldingValueCol("Quantity",     Holding::totalQuantity,
             ViewFormatter::quantity, ViewFormatter::quantity, table);
-    TableColumn<HoldingRow, BigDecimal> buyCol =
-        buildHoldingValueCol("Buy Price",    HoldingRow::weightedBuyPrice,
+    TableColumn<Holding, BigDecimal> buyCol =
+        buildHoldingValueCol("Buy Price",    Holding::weightedBuyPrice,
             ViewFormatter::price, ViewFormatter::wholePrice, table);
-    TableColumn<HoldingRow, BigDecimal> currCol =
-        buildHoldingValueCol("Current Price", HoldingRow::currentPrice,
+    TableColumn<Holding, BigDecimal> currCol =
+        buildHoldingValueCol("Current Price", h -> h.stock().getSalesPrice(),
             ViewFormatter::price, ViewFormatter::wholePrice, table);
-    TableColumn<HoldingRow, BigDecimal> valueCol =
-        buildHoldingValueCol("Value",        HoldingRow::totalValue,
+    TableColumn<Holding, BigDecimal> valueCol =
+        buildHoldingValueCol("Value",        Holding::getTotalValue,
             ViewFormatter::price, ViewFormatter::wholePrice, table);
 
     for (TableColumn<?, ?> col : List.of(qtyCol, buyCol, currCol, valueCol)) {
@@ -279,9 +252,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
       col.setPrefWidth(100);
     }
 
-    TableColumn<HoldingRow, BigDecimal> gainCol  = buildGainLossColumn(table);
+    TableColumn<Holding, BigDecimal> gainCol  = buildGainLossColumn(table);
     gainCol.setPrefWidth(120);
-    TableColumn<HoldingRow, HoldingRow> sellCol  = buildQuickSellColumn(table);
+    TableColumn<Holding, Holding> sellCol  = buildQuickSellColumn(table);
 
     table.getColumns().addAll(stockCol, qtyCol, buyCol, currCol, valueCol, gainCol, sellCol);
 
@@ -319,27 +292,27 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    *
    * @return the configured stock column
    */
-  private TableColumn<HoldingRow, HoldingRow> buildHoldingStockColumn() {
-    TableColumn<HoldingRow, HoldingRow> col = new TableColumn<>("Stock");
+  private TableColumn<Holding, Holding> buildHoldingStockColumn() {
+    TableColumn<Holding, Holding> col = new TableColumn<>("Stock");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(c -> new TableCell<>() {
       @Override
-      protected void updateItem(HoldingRow item, boolean empty) {
+      protected void updateItem(Holding item, boolean empty) {
         super.updateItem(item, empty);
         setGraphic(empty || item == null
             ? null
-            : ViewWidgets.stockIconBlock(item.symbol(), item.company()));
+            : ViewWidgets.stockIconBlock(item.stock().getSymbol(), item.stock().getCompany()));
       }
     });
     col.setMinWidth(160);
     col.setPrefWidth(200);
-    col.setComparator((a, b) -> a.symbol().compareToIgnoreCase(b.symbol()));
+    col.setComparator((a, b) -> a.stock().getSymbol().compareToIgnoreCase(b.stock().getSymbol()));
     return col;
   }
 
   /**
    * <p>Builds a sortable numeric column for the holdings table that extracts
-   * a {@link BigDecimal} value from each {@link HoldingRow} and formats it
+   * a {@link BigDecimal} value from each {@link Holding} and formats it
    * with the long formatter when the table is wide and the short formatter
    * when the table width drops below {@link #COMPACT_THRESHOLD}.</p>
    *
@@ -350,14 +323,14 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @param table          the parent table, used to read the current width
    * @return the configured column
    */
-  private TableColumn<HoldingRow, BigDecimal> buildHoldingValueCol(
+  private TableColumn<Holding, BigDecimal> buildHoldingValueCol(
       String title,
-      Function<HoldingRow, BigDecimal> extractor,
+      Function<Holding, BigDecimal> extractor,
       Function<BigDecimal, String> longFormatter,
       Function<BigDecimal, String> shortFormatter,
-      TableView<HoldingRow> table
+      TableView<Holding> table
   ) {
-    TableColumn<HoldingRow, BigDecimal> col = new TableColumn<>(title);
+    TableColumn<Holding, BigDecimal> col = new TableColumn<>(title);
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
     col.setCellFactory(c -> new TableCell<>() {
       @Override
@@ -384,9 +357,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @param table the parent table, used to read the current width
    * @return the configured gain/loss column
    */
-  private TableColumn<HoldingRow, BigDecimal> buildGainLossColumn(TableView<HoldingRow> table) {
-    TableColumn<HoldingRow, BigDecimal> col = new TableColumn<>("Gain / Loss");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().gainOrLoss()));
+  private TableColumn<Holding, BigDecimal> buildGainLossColumn(TableView<Holding> table) {
+    TableColumn<Holding, BigDecimal> col = new TableColumn<>("Gain / Loss");
+    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getGainOrLoss()));
     col.setCellFactory(c -> new TableCell<>() {
       @Override
       protected void updateItem(BigDecimal item, boolean empty) {
@@ -414,8 +387,8 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @param table the parent table, used to bind the button label to its width
    * @return the configured actions column
    */
-  private TableColumn<HoldingRow, HoldingRow> buildQuickSellColumn(TableView<HoldingRow> table) {
-    TableColumn<HoldingRow, HoldingRow> col = new TableColumn<>("");
+  private TableColumn<Holding, Holding> buildQuickSellColumn(TableView<Holding> table) {
+    TableColumn<Holding, Holding> col = new TableColumn<>("");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(c -> new TableCell<>() {
       private final Button btn = new Button();
@@ -429,13 +402,13 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
       }
 
       @Override
-      protected void updateItem(HoldingRow item, boolean empty) {
+      protected void updateItem(Holding item, boolean empty) {
         super.updateItem(item, empty);
         if (empty || item == null) {
           setGraphic(null);
         } else {
           btn.setOnAction(e -> {
-            if (onSell != null) onSell.accept(item.symbol(), item.totalQty());
+            if (onSell != null) onSell.accept(item.stock().getSymbol(), item.totalQuantity());
           });
           setGraphic(btn);
         }
@@ -656,53 +629,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     updateStatusLabel(player.getStatus());
     portfolioChart.setData(player.getHistoricalNetWorth());
 
-    holdings.setItems(groupSharesBySymbol(portfolio.getShares()));
+    holdings.setItems(portfolio.getHoldings());
 
     List<Transaction> txs = new ArrayList<>(player.getTransactions());
     java.util.Collections.reverse(txs);
     transactions.setItems(txs);
-  }
-
-  /**
-   * <p>Groups a flat list of share lots by stock symbol and converts each
-   * group into an aggregated {@link HoldingRow}.</p>
-   *
-   * @param shares all share lots in the portfolio
-   * @return one {@link HoldingRow} per unique symbol, in insertion order
-   */
-  private List<HoldingRow> groupSharesBySymbol(List<Share> shares) {
-    Map<String, List<Share>> grouped = new LinkedHashMap<>();
-    for (Share s : shares) {
-      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
-    }
-    return grouped.values().stream().map(this::toHoldingRow).toList();
-  }
-
-  /**
-   * <p>Aggregates a list of same-symbol share lots into a single
-   * {@link HoldingRow}. The buy price is the quantity-weighted average
-   * across all lots.</p>
-   *
-   * @param lots share lots that all belong to the same stock; must not be empty
-   * @return the aggregated holding row
-   */
-  private HoldingRow toHoldingRow(List<Share> lots) {
-    var stock = lots.get(0).getStock();
-    BigDecimal totalQty = lots.stream()
-        .map(Share::getQuantity)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-    BigDecimal totalInvestment = lots.stream()
-        .map(Share::getTotalInvestment)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-    BigDecimal weightedBuyPrice = totalQty.signum() == 0
-        ? BigDecimal.ZERO
-        : totalInvestment.divide(totalQty, 4, RoundingMode.HALF_UP);
-    BigDecimal currentPrice = stock.getSalesPrice();
-    BigDecimal totalValue   = currentPrice.multiply(totalQty);
-    BigDecimal gainOrLoss   = totalValue.subtract(totalInvestment);
-    return new HoldingRow(
-        stock.getSymbol(), stock.getCompany(),
-        totalQty, weightedBuyPrice, currentPrice, totalValue, gainOrLoss);
   }
 
   /**
@@ -712,26 +643,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @param status the player's current status
    */
   private void updateStatusLabel(PlayerStatus status) {
-    String raw = status.toString().replace("_", " ");
-    statusLabel.setText(raw.charAt(0) + raw.substring(1).toLowerCase());
-
-    statusLabel.getStyleClass().removeAll(
-        "stat-card-value-status-worst",
-        "stat-card-value-status-bad",
-        "stat-card-value-status-average",
-        "stat-card-value-status-investor",
-        "stat-card-value-status-good",
-        "stat-card-value-status-excellent"
-    );
-    String css = switch (status) {
-      case BUY_HIGH_BJORN  -> "stat-card-value-status-worst";
-      case MAX_MINUS       -> "stat-card-value-status-bad";
-      case AVERAGE_JOE     -> "stat-card-value-status-average";
-      case INVESTOR        -> "stat-card-value-status-investor";
-      case RAY_DALIO       -> "stat-card-value-status-good";
-      case BERNARD_MADOFF  -> "stat-card-value-status-excellent";
-    };
-    statusLabel.getStyleClass().add(css);
+    statusLabel.setText(status.displayName());
+    statusLabel.getStyleClass().removeAll(ViewFormatter.allPlayerStatusCss());
+    statusLabel.getStyleClass().add(ViewFormatter.playerStatusCss(status));
   }
 
   // ── Public API ────────────────────────────────────────────────────────────

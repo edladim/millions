@@ -25,6 +25,14 @@ public interface ReadOnlyPortfolio {
   List<Share> getShares();
 
   /**
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share
+   * lots that reference the same stock.
+   *
+   * @return the aggregated holdings, never null
+   */
+  List<Holding> getHoldings();
+
+  /**
    * Returns the current total market value of the portfolio.
    *
    * @return the total market value

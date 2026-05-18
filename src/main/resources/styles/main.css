@@ -258,8 +258,9 @@
 }
 
 .mover-rank        { -fx-font-size: 13px; -fx-text-fill: -text-muted; -fx-font-weight: bold; }
-.stock-icon        { -fx-fill: -primary; }
-.mover-icon-letter { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: white; }
+.stock-icon         { -fx-fill: -primary; }
+.sort-header-active { -fx-text-fill: -primary; }
+.mover-icon-letter  { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: white; }
 .mover-name        { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
 .mover-symbol      { -fx-font-size: 12px; -fx-text-fill: -text-muted; }
 .mover-price       { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }

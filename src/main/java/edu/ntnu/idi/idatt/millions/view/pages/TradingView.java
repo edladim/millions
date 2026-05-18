@@ -306,7 +306,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
             setText(null);
             return;
           }
-          BigDecimal percent = percentChange(stock);
+          BigDecimal percent = stock.getLatestPercentChange();
           setText(ViewFormatter.percent(percent));
           getStyleClass().add(percent.signum() >= 0 ? "table-data-cell-profit" : "table-data-cell-loss");
         }
@@ -314,23 +314,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       return cell;
     });
     col.setMinWidth(80);
-    col.setComparator((a, b) -> percentChange(a).compareTo(percentChange(b)));
+    col.setComparator((a, b) -> a.getLatestPercentChange().compareTo(b.getLatestPercentChange()));
     return col;
-  }
-
-  /**
-   * <p>Computes the latest price change as a percentage of the previous price.
-   * Returns {@link BigDecimal#ZERO} when no previous price exists, so callers
-   * can sort and render uniformly without null checks.</p>
-   *
-   * @param stock the stock whose latest change to express as a percentage
-   * @return the latest percentage change
-   */
-  private static BigDecimal percentChange(ReadOnlyStock stock) {
-    BigDecimal change = stock.getLatestPriceChange();
-    BigDecimal previous = stock.getSalesPrice().subtract(change);
-    if (previous.signum() == 0) return BigDecimal.ZERO;
-    return change.divide(previous, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
   }
 
   /**

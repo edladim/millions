@@ -8,7 +8,9 @@ import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
+import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,24 +25,16 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Circle;
 
 
 /**
@@ -88,18 +82,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private final ObjectProperty<BigDecimal> cashBalanceValue    = new SimpleObjectProperty<>(BigDecimal.ZERO);
   private final ObjectProperty<BigDecimal> portfolioValueValue = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
-  /**
-   * <p>Master lists that hold all rows. The corresponding {@link TableView} only shows
-   * the current page's slice via {@link #showPage(TableView, ObservableList, int)}.</p>
-   */
-  private final ObservableList<HoldingRow>  holdingsMaster = FXCollections.observableArrayList();
-  private final ObservableList<Transaction> txMaster       = FXCollections.observableArrayList();
-
   private Label statusLabel;
-  private TableView<HoldingRow> holdingsTable;
-  private TableView<Transaction> txTable;
-  private Pagination holdingsPagination;
-  private Pagination txPagination;
+  private PaginatedTable<HoldingRow> holdings;
+  private PaginatedTable<Transaction> transactions;
   private StockChartComponent portfolioChart;
 
   // ── Inner data class ──────────────────────────────────────────────────────
@@ -153,13 +138,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the header container
    */
   private VBox buildHeader() {
-    Label title = new Label("My Portfolio");
-    title.getStyleClass().add("page-title");
-
-    Label subtitle = new Label("Your current holdings and balances");
-    subtitle.getStyleClass().add("page-subtitle");
-
-    return new VBox(4, title, subtitle);
+    return ViewWidgets.pageHeader("My Portfolio", "Your current holdings and balances");
   }
 
   /**
@@ -186,22 +165,22 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    VBox netWorthCard    = buildSummaryCard("Net Worth",      ZERO_PRICE, VALUE_STYLE);
-    VBox cashCard        = buildSummaryCard("Cash Balance",   ZERO_PRICE, VALUE_STYLE);
-    VBox portfolioCard   = buildSummaryCard("Portfolio Value",ZERO_PRICE, VALUE_STYLE);
-    VBox statusCard      = buildSummaryCard("Status",         "Novice",   "stat-card-value-status");
+    ViewWidgets.SummaryCard netWorth  = ViewWidgets.summaryCard("Net Worth",       ZERO_PRICE, VALUE_STYLE);
+    ViewWidgets.SummaryCard cash      = ViewWidgets.summaryCard("Cash Balance",    ZERO_PRICE, VALUE_STYLE);
+    ViewWidgets.SummaryCard portfolio = ViewWidgets.summaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
+    ViewWidgets.SummaryCard status    = ViewWidgets.summaryCard("Status",          "Novice",   "stat-card-value-status");
 
-    bindResponsivePrice((Label) netWorthCard.getChildren().get(1), netWorthValue, netWorthCard);
-    bindResponsivePrice((Label) cashCard.getChildren().get(1),    cashBalanceValue, cashCard);
-    bindResponsivePrice((Label) portfolioCard.getChildren().get(1), portfolioValueValue, portfolioCard);
-    statusLabel = (Label) statusCard.getChildren().get(1);
+    bindResponsivePrice(netWorth.valueLabel(),  netWorthValue,       netWorth.card());
+    bindResponsivePrice(cash.valueLabel(),      cashBalanceValue,    cash.card());
+    bindResponsivePrice(portfolio.valueLabel(), portfolioValueValue, portfolio.card());
+    statusLabel = status.valueLabel();
 
-    for (VBox card : new VBox[]{netWorthCard, cashCard, portfolioCard, statusCard}) {
+    for (VBox card : new VBox[]{netWorth.card(), cash.card(), portfolio.card(), status.card()}) {
       HBox.setHgrow(card, Priority.ALWAYS);
       card.setMaxWidth(Double.MAX_VALUE);
     }
 
-    row.getChildren().addAll(netWorthCard, cashCard, portfolioCard, statusCard);
+    row.getChildren().addAll(netWorth.card(), cash.card(), portfolio.card(), status.card());
     return row;
   }
 
@@ -227,44 +206,19 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Builds a single summary stat card with a title and a value label.</p>
-   *
-   * @param title           the card heading
-   * @param value           the initial value text
-   * @param valueStyleClass the CSS class applied to the value label
-   * @return the card container
-   */
-  private VBox buildSummaryCard(String title, String value, String valueStyleClass) {
-    Label titleLabel = new Label(title);
-    titleLabel.getStyleClass().add("stat-card-title");
-
-    Label valueLabel = new Label(value);
-    valueLabel.getStyleClass().add(valueStyleClass);
-
-    VBox card = new VBox(12, titleLabel, valueLabel);
-    card.getStyleClass().add("stat-card");
-    card.setPadding(new Insets(10));
-    card.setMaxWidth(Double.MAX_VALUE);
-    return card;
-  }
-
-  /**
    * <p>Builds the holdings section containing the aggregated holdings
    * {@link TableView}.</p>
    *
    * @return the holdings section container
    */
   private VBox buildHoldingsSection() {
-    holdingsTable = buildHoldingsTable();
-    holdingsPagination = buildPagination(
-        pageIndex -> showPage(holdingsTable, holdingsMaster, pageIndex));
-    wireSortToMaster(holdingsTable, holdingsMaster, holdingsPagination);
+    holdings = new PaginatedTable<>(buildHoldingsTable(), PAGE_SIZE, true);
 
-    Label heading = new Label("Holdings");
-    heading.getStyleClass().add("section-heading");
-
-    VBox section = new VBox(0, heading, buildSpacer(16), holdingsTable, holdingsPagination);
-    section.getStyleClass().add("stat-card");
+    VBox section = ViewWidgets.sectionCard(
+        ViewWidgets.sectionHeading("Holdings"),
+        ViewWidgets.spacer(16),
+        holdings.table(),
+        holdings.pagination());
     section.setPadding(new Insets(24, 14, 24, 24));
     return section;
   }
@@ -276,97 +230,15 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
    * @return the transaction history section container
    */
   private VBox buildTransactionHistorySection() {
-    txTable = buildTransactionTable();
-    txPagination = buildPagination(
-        pageIndex -> showPage(txTable, txMaster, pageIndex));
-    wireSortToMaster(txTable, txMaster, txPagination);
+    transactions = new PaginatedTable<>(buildTransactionTable(), PAGE_SIZE, true);
 
-    Label heading = new Label("Transaction History");
-    heading.getStyleClass().add("section-heading");
-
-    VBox section = new VBox(0, heading, buildSpacer(16), txTable, txPagination);
-    section.getStyleClass().add("stat-card");
+    VBox section = ViewWidgets.sectionCard(
+        ViewWidgets.sectionHeading("Transaction History"),
+        ViewWidgets.spacer(16),
+        transactions.table(),
+        transactions.pagination());
     section.setPadding(new Insets(24, 14, 24, 24));
     return section;
-  }
-
-  /**
-   * <p>Builds a bullet-style {@link Pagination} control that delegates page
-   * rendering to the provided callback. The page factory returns an empty
-   * region because the actual data is rendered by the surrounding
-   * {@link TableView}; this control only acts as the page selector.</p>
-   *
-   * @param onPage the callback invoked with the selected page index
-   * @return the configured pagination control
-   */
-  private static Pagination buildPagination(java.util.function.IntConsumer onPage) {
-    Pagination p = new Pagination(1, 0);
-    p.getStyleClass().add(Pagination.STYLE_CLASS_BULLET);
-    p.setMaxPageIndicatorCount(10);
-    p.setPageFactory(pageIndex -> {
-      onPage.accept(pageIndex);
-      return new Region();
-    });
-    return p;
-  }
-
-  /**
-   * <p>Wires the table's sort behaviour to operate on the master list rather
-   * than only on the currently visible page slice. When the user clicks a
-   * column header, the master list is re-sorted with the table's current
-   * comparator and the current page is re-rendered.</p>
-   *
-   * @param table      the table whose sort policy to override
-   * @param master     the full backing list
-   * @param pagination the pagination control providing the current page index
-   * @param <T>        the row type
-   */
-  private static <T> void wireSortToMaster(
-      TableView<T> table, ObservableList<T> master, Pagination pagination) {
-    table.setSortPolicy(t -> {
-      java.util.Comparator<T> cmp = t.getComparator();
-      if (cmp != null) FXCollections.sort(master, cmp);
-      showPage(table, master, pagination.getCurrentPageIndex());
-      return true;
-    });
-  }
-
-  /**
-   * <p>Updates a paginated table to display the slice of {@code master} that
-   * corresponds to {@code pageIndex}, based on {@link #PAGE_SIZE}.</p>
-   *
-   * @param table     the table whose visible items to update
-   * @param master    the full backing list
-   * @param pageIndex the zero-based page index to show
-   * @param <T>       the row type
-   */
-  private static <T> void showPage(TableView<T> table, ObservableList<T> master, int pageIndex) {
-    int from = Math.max(0, pageIndex * PAGE_SIZE);
-    int to   = Math.min(from + PAGE_SIZE, master.size());
-    if (from >= master.size()) {
-      table.getItems().clear();
-    } else {
-      table.getItems().setAll(master.subList(from, to));
-    }
-  }
-
-  /**
-   * <p>Recalculates the page count from the master list size, clamps the
-   * current page index to the valid range, and toggles the pagination
-   * control's visibility so it disappears entirely when only one page exists.</p>
-   *
-   * @param master     the full backing list
-   * @param pagination the pagination control to update
-   */
-  private static void syncPagination(ObservableList<?> master, Pagination pagination) {
-    int pageCount = Math.max(1, (int) Math.ceil(master.size() / (double) PAGE_SIZE));
-    pagination.setPageCount(pageCount);
-    if (pagination.getCurrentPageIndex() >= pageCount) {
-      pagination.setCurrentPageIndex(0);
-    }
-    boolean show = pageCount > 1;
-    pagination.setVisible(show);
-    pagination.setManaged(show);
   }
 
   // ── Table builders ────────────────────────────────────────────────────────
@@ -453,25 +325,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
       @Override
       protected void updateItem(HoldingRow item, boolean empty) {
         super.updateItem(item, empty);
-        if (empty || item == null) {
-          setGraphic(null);
-          return;
-        }
-        Circle icon = new Circle(18, Color.web("#6366f1"));
-        Label letter = new Label(String.valueOf(item.symbol().charAt(0)));
-        letter.getStyleClass().add("mover-icon-letter");
-        StackPane iconPane = new StackPane(icon, letter);
-
-        Label name = new Label(item.symbol());
-        name.getStyleClass().add("mover-name");
-        Label company = new Label(item.company());
-        company.getStyleClass().add("mover-symbol");
-        company.setTextOverrun(OverrunStyle.ELLIPSIS);
-        company.setMinWidth(0);
-
-        HBox row = new HBox(10, iconPane, new VBox(2, name, company));
-        row.setAlignment(Pos.CENTER_LEFT);
-        setGraphic(row);
+        setGraphic(empty || item == null
+            ? null
+            : ViewWidgets.stockIconBlock(item.symbol(), item.company()));
       }
     });
     col.setMinWidth(160);
@@ -737,24 +593,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
           setGraphic(null);
           return;
         }
-        String symbol  = item.getShare().getStock().getSymbol();
-        String company = item.getShare().getStock().getCompany();
-
-        Circle icon = new Circle(18, Color.web("#6366f1"));
-        Label letter = new Label(String.valueOf(symbol.charAt(0)));
-        letter.getStyleClass().add("mover-icon-letter");
-        StackPane iconPane = new StackPane(icon, letter);
-
-        Label name = new Label(symbol);
-        name.getStyleClass().add("mover-name");
-        Label comp = new Label(company);
-        comp.getStyleClass().add("mover-symbol");
-        comp.setTextOverrun(OverrunStyle.ELLIPSIS);
-        comp.setMinWidth(0);
-
-        HBox row = new HBox(10, iconPane, new VBox(2, name, comp));
-        row.setAlignment(Pos.CENTER_LEFT);
-        setGraphic(row);
+        setGraphic(ViewWidgets.stockIconBlock(
+            item.getShare().getStock().getSymbol(),
+            item.getShare().getStock().getCompany()));
       }
     });
     col.setMinWidth(160);
@@ -868,17 +709,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     updateStatusLabel(player.getStatus());
     portfolioChart.setData(player.getHistoricalNetWorth());
 
-    holdingsMaster.setAll(groupSharesBySymbol(portfolio.getShares()));
-    syncPagination(holdingsMaster, holdingsPagination);
-    holdingsTable.sort();
-    showPage(holdingsTable, holdingsMaster, holdingsPagination.getCurrentPageIndex());
+    holdings.setItems(groupSharesBySymbol(portfolio.getShares()));
 
     List<Transaction> txs = new ArrayList<>(player.getTransactions());
     java.util.Collections.reverse(txs);
-    txMaster.setAll(txs);
-    syncPagination(txMaster, txPagination);
-    txTable.sort();
-    showPage(txTable, txMaster, txPagination.getCurrentPageIndex());
+    transactions.setItems(txs);
   }
 
   /**
@@ -968,17 +803,5 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   // ── Utility builders ─────────────────────────────────────────────────────
-
-  /**
-   * <p>Creates a vertical spacer with a fixed height.</p>
-   *
-   * @param h the height in pixels
-   * @return the spacer region
-   */
-  private Region buildSpacer(double h) {
-    Region r = new Region();
-    r.setPrefHeight(h);
-    return r;
-  }
 
 }

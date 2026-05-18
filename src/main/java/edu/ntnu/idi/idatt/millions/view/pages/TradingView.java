@@ -3,7 +3,9 @@ package edu.ntnu.idi.idatt.millions.view.pages;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
+import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
 import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,14 +13,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.Pagination;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
@@ -29,10 +28,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
@@ -64,13 +60,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
   private TextField searchField;
   private TableView<ReadOnlyStock> stockTable;
-  private Pagination stockPagination;
-
-  /**
-   * Master list holding every stock currently visible after search/mode filter.
-   * The {@link TableView} only ever displays the slice for the current page.
-   */
-  private final ObservableList<ReadOnlyStock> stockMaster = FXCollections.observableArrayList();
+  private PaginatedTable<ReadOnlyStock> stockList;
 
   private StockChartComponent stockChart;
 
@@ -153,7 +143,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     VBox stockPanel = buildStockListPanel();
     VBox.setVgrow(stockPanel, Priority.ALWAYS);
 
-    center.getChildren().addAll(stockChart, buildDivider(), stockPanel);
+    center.getChildren().addAll(stockChart, ViewWidgets.divider(), stockPanel);
     return center;
   }
 
@@ -168,11 +158,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     panel.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(panel, Priority.ALWAYS);
 
-    Label title = new Label("Trading");
-    title.getStyleClass().add("page-title");
-    Label subtitle = new Label("Browse and buy stocks on the exchange");
-    subtitle.getStyleClass().add("page-subtitle");
-    VBox header = new VBox(4, title, subtitle);
+    VBox header = ViewWidgets.pageHeader("Trading", "Browse and buy stocks on the exchange");
 
     searchField = new TextField();
     searchField.setPromptText("Search by name or symbol");
@@ -180,11 +166,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     searchField.setMaxWidth(Double.MAX_VALUE);
 
     stockTable = buildStockTable();
-    stockPagination = buildStockPagination();
-    wireSortToMaster();
+    stockList = new PaginatedTable<>(stockTable, PAGE_SIZE, false);
+    stockList.setOnPageRendered(this::applyPendingHighlightSafely);
 
-    VBox tableCard = new VBox(stockTable, stockPagination);
-    tableCard.getStyleClass().add("stat-card");
+    VBox tableCard = ViewWidgets.sectionCard(stockTable, stockList.pagination());
     tableCard.setPadding(new Insets(24, 14, 24, 24));
 
     panel.getChildren().addAll(header, searchField, tableCard);
@@ -192,87 +177,18 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Builds the bullet-style {@link Pagination} control that drives the
-   * visible page of the stock table. The page factory updates the table's
-   * items to the slice of {@link #stockMaster} that corresponds to the
-   * selected page and returns an empty {@link Region} since the data is
-   * rendered by the table above the control.</p>
-   *
-   * @return the configured pagination control
+   * <p>Re-applies the {@link #pendingHighlight} to whichever page is currently
+   * visible, suppressing the selection listener so the controller's
+   * {@code onSelectStock} callback does not fire spuriously while the
+   * highlight is restored.</p>
    */
-  private Pagination buildStockPagination() {
-    Pagination p = new Pagination(1, 0);
-    p.setMaxPageIndicatorCount(5);
-    p.setPageFactory(pageIndex -> {
-      showPage(pageIndex);
-      return new Region();
-    });
-    return p;
-  }
-
-  /**
-   * <p>Wires the table's sort policy so column-header clicks sort the full
-   * {@link #stockMaster} list rather than only the visible page slice, then
-   * re-render the current page with the sorted data.</p>
-   */
-  private void wireSortToMaster() {
-    stockTable.setSortPolicy(t -> {
-      java.util.Comparator<ReadOnlyStock> cmp = t.getComparator();
-      if (cmp != null) FXCollections.sort(stockMaster, cmp);
-      showPage(stockPagination.getCurrentPageIndex());
-      return true;
-    });
-  }
-
-  /**
-   * <p>Updates the table to display the {@link #PAGE_SIZE}-sized slice of
-   * {@link #stockMaster} that begins at {@code pageIndex * PAGE_SIZE}, then
-   * re-applies the pending highlight in case the selected row is on this
-   * page.</p>
-   *
-   * @param pageIndex zero-based page index
-   */
-  private void showPage(int pageIndex) {
-    int from = Math.max(0, pageIndex * PAGE_SIZE);
-    int to   = Math.min(from + PAGE_SIZE, stockMaster.size());
+  private void applyPendingHighlightSafely() {
     suppressSelectionEvent = true;
     try {
-      if (from >= stockMaster.size()) {
-        stockTable.getItems().clear();
-      } else {
-        stockTable.getItems().setAll(stockMaster.subList(from, to));
-      }
       applyPendingHighlight();
     } finally {
       suppressSelectionEvent = false;
     }
-  }
-
-  /**
-   * <p>Recomputes the page count from {@link #stockMaster}, jumps the
-   * pagination control to the page that contains the row matching
-   * {@link #pendingHighlight} (if any), and hides the bullet bar entirely
-   * when only one page exists.</p>
-   */
-  private void syncPagination() {
-    int pageCount = Math.max(1, (int) Math.ceil(stockMaster.size() / (double) PAGE_SIZE));
-    stockPagination.setPageCount(pageCount);
-
-    int targetPage = 0;
-    if (pendingHighlight != null) {
-      for (int i = 0; i < stockMaster.size(); i++) {
-        if (stockMaster.get(i).getSymbol().equals(pendingHighlight)) {
-          targetPage = i / PAGE_SIZE;
-          break;
-        }
-      }
-    }
-    if (targetPage >= pageCount) targetPage = 0;
-    stockPagination.setCurrentPageIndex(targetPage);
-
-    boolean show = pageCount > 1;
-    stockPagination.setVisible(show);
-    stockPagination.setManaged(show);
   }
 
   /**
@@ -361,22 +277,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
           setText(null);
           return;
         }
-        Circle icon = new Circle(18, Color.web("#6366f1"));
-        Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
-        letter.getStyleClass().add("mover-icon-letter");
-        StackPane iconPane = new StackPane(icon, letter);
-
-        Label name = new Label(stock.getSymbol());
-        name.getStyleClass().add("mover-name");
-        Label company = new Label(stock.getCompany());
-        company.getStyleClass().add("mover-symbol");
-        company.setTextOverrun(OverrunStyle.ELLIPSIS);
-        company.setMinWidth(0);
-        VBox nameBox = new VBox(2, name, company);
-
-        HBox row = new HBox(10, iconPane, nameBox);
-        row.setAlignment(Pos.CENTER_LEFT);
-        setGraphic(row);
+        setGraphic(ViewWidgets.stockIconBlock(stock.getSymbol(), stock.getCompany()));
       }
     });
     col.setMinWidth(180);
@@ -474,11 +375,12 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    * @param stocks the stocks to display, never {@code null}
    */
   public void setStocks(List<? extends ReadOnlyStock> stocks) {
-    stockMaster.setAll(stocks);
-    java.util.Comparator<ReadOnlyStock> cmp = stockTable.getComparator();
-    if (cmp != null) FXCollections.sort(stockMaster, cmp);
-    syncPagination();
-    showPage(stockPagination.getCurrentPageIndex());
+    stockList.setItems(stocks);
+    // Jump to the page that contains the pending highlight, if any.
+    if (pendingHighlight != null) {
+      int page = stockList.findPageOf(s -> s.getSymbol().equals(pendingHighlight));
+      if (page >= 0) stockList.goToPage(page);
+    }
   }
 
   /**
@@ -594,7 +496,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
             percentageCard,
             derivedLabel,
             costCard,
-            buildSpacer(4),
+            ViewWidgets.spacer(4),
             actionButton
     );
 
@@ -885,20 +787,13 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   public void selectStock(ReadOnlyStock stock) {
     pendingHighlight = stock.getSymbol();
-    int masterIndex = -1;
-    for (int i = 0; i < stockMaster.size(); i++) {
-      if (stockMaster.get(i).getSymbol().equals(stock.getSymbol())) {
-        masterIndex = i;
-        break;
-      }
-    }
-    if (masterIndex < 0) return;
+    int targetPage = stockList.findPageOf(s -> s.getSymbol().equals(stock.getSymbol()));
+    if (targetPage < 0) return;
 
-    int targetPage = masterIndex / PAGE_SIZE;
-    if (targetPage != stockPagination.getCurrentPageIndex()) {
-      // setCurrentPageIndex fires the page factory, which calls showPage with
-      // the selection suppressed so the listener does not invoke the callback.
-      stockPagination.setCurrentPageIndex(targetPage);
+    if (targetPage != stockList.currentPage()) {
+      // goToPage fires the page factory, which calls our onPageRendered hook
+      // (applyPendingHighlightSafely) so the row is selected under suppression.
+      stockList.goToPage(targetPage);
     } else {
       suppressSelectionEvent = true;
       try {
@@ -1137,30 +1032,5 @@ public class TradingView extends BorderPane implements ExchangeObserver {
    */
   public StockChartComponent getStockChart() {
     return stockChart;
-  }
-
-  /**
-   * <p>Creates a vertical spacer region with a fixed height.</p>
-   *
-   * @param h the spacer height in pixels
-   * @return the spacer region
-   */
-  private Region buildSpacer(double h) {
-    Region r = new Region();
-    r.setPrefHeight(h);
-    return r;
-  }
-
-  /**
-   * <p>Creates a divider line for section separation.</p>
-   *
-   * @return the divider region
-   */
-  private Region buildDivider() {
-    Region d = new Region();
-    d.getStyleClass().add("divider");
-    d.setPrefHeight(1);
-    d.setMaxWidth(Double.MAX_VALUE);
-    return d;
   }
 }

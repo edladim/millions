@@ -145,6 +145,20 @@ public final class Portfolio implements ReadOnlyPortfolio {
   }
 
   /**
+   * <p>Returns the number of distinct stock symbols held in the portfolio.
+   * Two {@link Share} lots referencing the same stock count as one.</p>
+   *
+   * @return the number of unique stocks owned
+   */
+  @Override
+  public long getDistinctStockCount() {
+    return shares.stream()
+        .map(s -> s.getStock().getSymbol())
+        .distinct()
+        .count();
+  }
+
+  /**
    * Calculates the current total market value of the portfolio.
    *
    * <p>The value is calculated as the sum of the current value of each

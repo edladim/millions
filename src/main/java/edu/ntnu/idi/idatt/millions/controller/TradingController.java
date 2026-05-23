@@ -126,10 +126,16 @@ public class TradingController {
   }
 
   /**
-   * <p>Fills the input field with a value representing the given percentage of
-   * the player's available capacity (cash for buy orders, owned shares for
-   * sell orders). For buy orders the commission is subtracted up-front so the
-   * resulting order fits within the cash budget.</p>
+   * <p>Fills the input field with a share quantity representing the given
+   * percentage of the player's available capacity (cash for buy orders, owned
+   * shares for sell orders).</p>
+   *
+   * <p>For buy orders the quantity is computed as
+   * {@code floor(cash * percent / (price * (1 + commission)), 8 decimals)} so
+   * the resulting order is always affordable and leaves a sub-cent remainder
+   * at most. Going straight to a quantity avoids a cash→amount→quantity
+   * round-trip whose rounding stages would otherwise either disable the
+   * action button or leave money on the table.</p>
    *
    * @param percent the percentage to apply, as a decimal (e.g. {@code 0.25})
    */
@@ -137,12 +143,13 @@ public class TradingController {
     if (selectedSymbol == null) return;
 
     if (view.getMode() == TradingView.Mode.BUY) {
+      BigDecimal price       = exchange.getStock(selectedSymbol).getSalesPrice();
       BigDecimal cashPortion = player.getMoney().multiply(percent);
-      BigDecimal divisor = BigDecimal.ONE.add(CostPreviewCalculator.COMMISSION_RATE);
-      BigDecimal amount = cashPortion.divide(divisor, 3, RoundingMode.DOWN);
-      view.setInputAmount(amount, true);
+      BigDecimal divisor     = price.multiply(BigDecimal.ONE.add(CostPreviewCalculator.COMMISSION_RATE));
+      BigDecimal quantity    = cashPortion.divide(divisor, 8, RoundingMode.DOWN);
+      view.setInputAmount(quantity, false);
     } else {
-      BigDecimal owned = totalOwned(selectedSymbol);
+      BigDecimal owned    = totalOwned(selectedSymbol);
       BigDecimal quantity = owned.multiply(percent);
       view.setInputAmount(quantity, false);
     }

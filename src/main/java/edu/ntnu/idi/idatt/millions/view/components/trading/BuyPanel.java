@@ -309,12 +309,12 @@ public class BuyPanel extends VBox {
   }
 
   private void setSpinnerValue(BigDecimal value) {
-    String stripped = value.stripTrailingZeros().toPlainString();
-    if (stripped.startsWith(".")) stripped = "0" + stripped;
-    inputSpinner.getEditor().setText(stripped);
     SpinnerValueFactory.DoubleSpinnerValueFactory factory =
         (SpinnerValueFactory.DoubleSpinnerValueFactory) inputSpinner.getValueFactory();
     factory.setValue(value.doubleValue());
+    String stripped = value.stripTrailingZeros().toPlainString();
+    if (stripped.startsWith(".")) stripped = "0" + stripped;
+    inputSpinner.getEditor().setText(stripped);
   }
 
   private void firePercent(BigDecimal percent) {

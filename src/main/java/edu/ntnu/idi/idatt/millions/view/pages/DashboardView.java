@@ -62,20 +62,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     setPadding(new Insets(40));
 
     getChildren().addAll(
-            buildHeader(),
+            ViewWidgets.pageHeader("Dashboard", "Welcome back to your investment game"),
             buildPortfolioBanner(),
             buildStatsRow(),
             buildMoversSection()
     );
-  }
-
-  /**
-   * <p>Builds the header section containing title and subtitle.</p>
-   *
-   * @return the header container
-   */
-  private VBox buildHeader() {
-    return ViewWidgets.pageHeader("Dashboard", "Welcome back to your investment game");
   }
 
   /**
@@ -214,15 +205,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Updates the displayed portfolio value.</p>
-   *
-   * @param value the formatted portfolio value
-   */
-  private void setPortfolioValue(String value) {
-    portfolioValueLabel.setText(value);
-  }
-
-  /**
    * <p>Updates the displayed portfolio change value and styling.</p>
    *
    * @param change     the formatted change text
@@ -234,24 +216,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     if (!isPositive) {
       portfolioChangeLabel.getStyleClass().add("banner-change-negative");
     }
-  }
-
-  /**
-   * <p>Updates the displayed total assets value.</p>
-   *
-   * @param value the formatted assets value
-   */
-  private void setTotalAssets(String value) {
-    totalAssetsLabel.setText(value);
-  }
-
-  /**
-   * <p>Updates the displayed cost basis value.</p>
-   *
-   * @param value the formatted cost basis value
-   */
-  private void setCostBasis(String value) {
-    costBasisLabel.setText(value);
   }
 
   /**
@@ -324,9 +288,9 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
 
     long distinctStocks = portfolio.getDistinctStockCount();
 
-    setPortfolioValue(ViewFormatter.price(player.getNetWorth()));
-    setTotalAssets(String.valueOf(distinctStocks));
-    setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
+    portfolioValueLabel.setText(ViewFormatter.price(player.getNetWorth()));
+    totalAssetsLabel.setText(String.valueOf(distinctStocks));
+    costBasisLabel.setText(ViewFormatter.price(portfolio.getTotalInvestment()));
     setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
 
     String changeStr = ViewFormatter.rateAsPercent(player.getReturnRate())

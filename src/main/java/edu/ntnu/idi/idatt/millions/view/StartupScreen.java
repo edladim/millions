@@ -1,15 +1,21 @@
 package edu.ntnu.idi.idatt.millions.view;
 
+import java.util.function.BiConsumer;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-import java.util.function.BiConsumer;
 
 /**
  * <p>Startup screen view that collects initial player settings before the game starts.</p>
@@ -244,7 +250,7 @@ public class StartupScreen extends StackPane{
    * @param input input node to place under the label.
    * @return grouped container.
    */
-  private VBox buildFieldGroup(String labelText, javafx.scene.Node input) {
+  private VBox buildFieldGroup(String labelText, Node input) {
     Label label = new Label(labelText);
     label.getStyleClass().add("startup-field-label");
     VBox group = new VBox(6, label, input);

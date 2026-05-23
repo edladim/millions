@@ -237,24 +237,24 @@ public class BuyPanel extends VBox {
   }
 
   private HBox buildPercentageCard() {
-    Button twentyFiveBtn = new Button("25%");
-    Button fiftyBtn = new Button("50%");
-    Button hundredBtn = new Button("100%");
+    String[]     labels   = {"25%", "50%", "100%"};
+    BigDecimal[] percents = {new BigDecimal("0.25"), new BigDecimal("0.50"), new BigDecimal("1.00")};
 
-    for (Button btn : new Button[]{twentyFiveBtn, fiftyBtn, hundredBtn}) {
-      btn.getStyleClass().add("mode-tab");
-      btn.setMaxWidth(Double.MAX_VALUE);
-      HBox.setHgrow(btn, Priority.ALWAYS);
-    }
-
-    twentyFiveBtn.setOnAction(e -> firePercent(new BigDecimal("0.25")));
-    fiftyBtn.setOnAction(e -> firePercent(new BigDecimal("0.50")));
-    hundredBtn.setOnAction(e -> firePercent(new BigDecimal("1.00")));
-
-    HBox card = new HBox(5, twentyFiveBtn, fiftyBtn, hundredBtn);
+    HBox card = new HBox(5);
     card.setAlignment(Pos.CENTER);
     card.getStyleClass().add("stat-card");
     card.setPadding(new Insets(12, 16, 12, 16));
+
+    for (int i = 0; i < labels.length; i++) {
+      BigDecimal pct = percents[i];
+      Button btn = new Button(labels[i]);
+      btn.getStyleClass().add("mode-tab");
+      btn.setMaxWidth(Double.MAX_VALUE);
+      btn.setOnAction(e -> firePercent(pct));
+      HBox.setHgrow(btn, Priority.ALWAYS);
+      card.getChildren().add(btn);
+    }
+
     return card;
   }
 

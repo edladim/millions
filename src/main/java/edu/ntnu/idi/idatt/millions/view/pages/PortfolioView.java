@@ -1,39 +1,30 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.Holding;
 import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
-import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
-import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
-import edu.ntnu.idi.idatt.millions.view.TableStyleUtils;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.portfolio.HoldingsPanel;
+import edu.ntnu.idi.idatt.millions.view.components.portfolio.TransactionHistoryPanel;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-
 
 /**
  * <p>
@@ -41,16 +32,10 @@ import javafx.scene.layout.VBox;
  * </p>
  *
  * <p>
- * Holdings are aggregated by symbol into a {@link TableView}; each row shows the
- * combined quantity, weighted average buy price, current price, total value, and
- * unrealised gain/loss together with a Quick Sell button.
- * Transaction history is rendered in a second {@link TableView} sorted most-recent
- * first by default.
- * </p>
- *
- * <p>
- * The view implements {@link PlayerObserver} and {@link PortfolioObserver} so it
- * refreshes automatically whenever the player's cash or portfolio changes.
+ * The view assembles three sub-sections: a summary row of stat cards, a
+ * {@link HoldingsPanel}, and a {@link TransactionHistoryPanel}. It implements
+ * {@link PlayerObserver} and {@link PortfolioObserver} so it refreshes
+ * automatically whenever the player's cash or portfolio changes.
  * </p>
  */
 public class PortfolioView extends VBox implements PortfolioObserver, PlayerObserver {
@@ -58,34 +43,19 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   private static final String ZERO_PRICE  = ViewFormatter.price(BigDecimal.ZERO);
   private static final String VALUE_STYLE = "stat-card-value";
 
-  /** Table width (in px) below which column headers and button labels switch to short form. */
-  private static final double COMPACT_THRESHOLD = 750;
-
-  /** Approximate column header height + bottom padding, used for dynamic table height. */
-  private static final double TABLE_HEADER_HEIGHT = 40;
-
-  /** Row height used by the holdings and transactions tables; must match {@code .stock-table .table-row-cell -fx-cell-size}. */
-  private static final double ROW_HEIGHT = 58;
-
-  /** Stat-card width (in px) below which monetary values render in compact form (no thousands separator, no decimals). */
+  /** Stat-card width (px) below which monetary values render in compact form. */
   private static final double CARD_COMPACT_THRESHOLD = 170;
 
-  /** Number of rows shown per page in the Holdings and Transaction History tables. */
-  private static final int PAGE_SIZE = 5;
-
   private ReadOnlyPlayer player;
-  private BiConsumer<String, BigDecimal> onSell;
 
   private final ObjectProperty<BigDecimal> netWorthValue       = new SimpleObjectProperty<>(BigDecimal.ZERO);
   private final ObjectProperty<BigDecimal> cashBalanceValue    = new SimpleObjectProperty<>(BigDecimal.ZERO);
   private final ObjectProperty<BigDecimal> portfolioValueValue = new SimpleObjectProperty<>(BigDecimal.ZERO);
 
   private Label statusLabel;
-  private PaginatedTable<Holding> holdings;
-  private PaginatedTable<Transaction> transactions;
-  private StockChartComponent portfolioChart;
-
-  // ── Constructor ───────────────────────────────────────────────────────────
+  private final StockChartComponent portfolioChart;
+  private final HoldingsPanel holdingsPanel;
+  private final TransactionHistoryPanel transactionHistoryPanel;
 
   /**
    * <p>Constructs the portfolio view and builds its initial layout.</p>
@@ -95,43 +65,33 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     setSpacing(24);
     setPadding(new Insets(20));
 
+    portfolioChart          = buildPortfolioChart();
+    holdingsPanel           = new HoldingsPanel();
+    transactionHistoryPanel = new TransactionHistoryPanel();
+
     getChildren().addAll(
-        buildHeader(),
-        buildPortfolioChart(),
+        ViewWidgets.pageHeader("My Portfolio", "Your current holdings and balances"),
+        portfolioChart,
         buildSummaryRow(),
-        buildHoldingsSection(),
-        buildTransactionHistorySection()
+        holdingsPanel,
+        transactionHistoryPanel
     );
   }
 
-  // ── Layout builders ───────────────────────────────────────────────────────
+  // Layout builders
 
-  /**
-   * <p>Builds the page header containing the title and subtitle.</p>
-   *
-   * @return the header container
-   */
-  private VBox buildHeader() {
-    return ViewWidgets.pageHeader("My Portfolio", "Your current holdings and balances");
-  }
-
-  /**
-   * <p>Builds the portfolio net-worth chart.</p>
-   *
-   * @return the chart component
-   */
   private StockChartComponent buildPortfolioChart() {
-    portfolioChart = new StockChartComponent("Portfolio value", "");
-    portfolioChart.setYAxisLabel("Value ($)");
-    portfolioChart.setChartHeight(240);
-    portfolioChart.setPrefHeight(300);
-    return portfolioChart;
+    StockChartComponent chart = new StockChartComponent("Portfolio value", "");
+    chart.setYAxisLabel("Value ($)");
+    chart.setChartHeight(240);
+    chart.setPrefHeight(300);
+    return chart;
   }
 
   /**
-   * <p>Builds the summary row that shows key portfolio metrics as stat cards.</p>
-   *
-   * <p>Every card grows equally so they fill the full row width.</p>
+   * <p>Builds the summary row that shows key portfolio metrics as stat cards.
+   * Every card grows equally to fill the full row width. Monetary values bind
+   * responsively: compact whole-dollar format when narrow, full format when wide.</p>
    *
    * @return the summary row container
    */
@@ -159,11 +119,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Binds a stat-card value label's text so it shows the full price
-   * ({@code "$9,989.45"}) when the card has room and a compact whole-dollar
-   * format ({@code "$9989"}) when the card width drops below
-   * {@link #CARD_COMPACT_THRESHOLD}. The binding tracks both the value and
-   * the card's width so it re-renders on data change and on resize.</p>
+   * <p>Binds a stat-card value label's text so it shows the full price when the
+   * card has room and a compact whole-dollar format when the card width drops
+   * below {@link #CARD_COMPACT_THRESHOLD}.</p>
    *
    * @param label the label whose text to bind
    * @param value the monetary value property
@@ -179,428 +137,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     }, value, card.widthProperty()));
   }
 
-  /**
-   * <p>Builds the holdings section containing the aggregated holdings
-   * {@link TableView}.</p>
-   *
-   * @return the holdings section container
-   */
-  private VBox buildHoldingsSection() {
-    holdings = new PaginatedTable<>(buildHoldingsTable(), PAGE_SIZE, true);
-
-    VBox section = ViewWidgets.sectionCard(
-        ViewWidgets.sectionHeading("Holdings"),
-        ViewWidgets.spacer(16),
-        holdings.table(),
-        holdings.pagination());
-    section.setPadding(new Insets(24, 14, 24, 24));
-    return section;
-  }
-
-  /**
-   * <p>Builds the transaction history section containing the
-   * {@link TableView} sorted most-recent-first by default.</p>
-   *
-   * @return the transaction history section container
-   */
-  private VBox buildTransactionHistorySection() {
-    transactions = new PaginatedTable<>(buildTransactionTable(), PAGE_SIZE, true);
-
-    VBox section = ViewWidgets.sectionCard(
-        ViewWidgets.sectionHeading("Transaction History"),
-        ViewWidgets.spacer(16),
-        transactions.table(),
-        transactions.pagination());
-    section.setPadding(new Insets(24, 14, 24, 24));
-    return section;
-  }
-
-  // ── Table builders ────────────────────────────────────────────────────────
-
-  /**
-   * <p>Constructs and configures the holdings {@link TableView}.
-   * Columns: Stock, Quantity, Buy&nbsp;Price, Current&nbsp;Price, Value,
-   * Gain&nbsp;/&nbsp;Loss, and a Quick&nbsp;Sell action column.</p>
-   *
-   * @return the configured holdings table
-   */
-  @SuppressWarnings("deprecation")
-  private TableView<Holding> buildHoldingsTable() {
-    TableView<Holding> table = new TableView<>(FXCollections.observableArrayList());
-    table.getStyleClass().add("stock-table");
-    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    table.setPlaceholder(
-        new Label("You don't own any shares yet. Head to Trading to get started."));
-
-    TableColumn<Holding, Holding> stockCol = buildHoldingStockColumn();
-
-    TableColumn<Holding, BigDecimal> qtyCol =
-        buildHoldingValueCol("Quantity",     Holding::totalQuantity,
-            ViewFormatter::quantity, ViewFormatter::quantity, table);
-    TableColumn<Holding, BigDecimal> buyCol =
-        buildHoldingValueCol("Buy Price",    Holding::weightedBuyPrice,
-            ViewFormatter::price, ViewFormatter::wholePrice, table);
-    TableColumn<Holding, BigDecimal> currCol =
-        buildHoldingValueCol("Current Price", h -> h.stock().getSalesPrice(),
-            ViewFormatter::price, ViewFormatter::wholePrice, table);
-    TableColumn<Holding, BigDecimal> valueCol =
-        buildHoldingValueCol("Value",        Holding::getTotalValue,
-            ViewFormatter::price, ViewFormatter::wholePrice, table);
-
-    for (TableColumn<?, ?> col : List.of(qtyCol, buyCol, currCol, valueCol)) {
-      col.setMinWidth(70);
-      col.setPrefWidth(100);
-    }
-
-    TableColumn<Holding, BigDecimal> gainCol  = buildGainLossColumn(table);
-    gainCol.setPrefWidth(120);
-    TableColumn<Holding, Holding> sellCol  = buildQuickSellColumn(table);
-
-    table.getColumns().addAll(stockCol, qtyCol, buyCol, currCol, valueCol, gainCol, sellCol);
-
-    bindCompactText(qtyCol,   table, "QTY",   "Quantity");
-    bindCompactText(buyCol,   table, "BP",    "Buy Price");
-    bindCompactText(currCol,  table, "CP",    "Current Price");
-    bindCompactText(gainCol,  table, "G/L",   "Gain / Loss");
-
-    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
-    TableStyleUtils.wireSortHeaderHighlight(table);
-    wireCompactRefresh(table);
-    return table;
-  }
-
-  /**
-   * <p>Adds a width listener that calls {@link TableView#refresh()} whenever
-   * the table crosses {@link #COMPACT_THRESHOLD}, so cells using the
-   * compact/long formatter pair re-render with the appropriate format.</p>
-   *
-   * @param table the table to wire up
-   */
-  private static void wireCompactRefresh(TableView<?> table) {
-    table.widthProperty().addListener((obs, oldW, newW) -> {
-      boolean wasCompact = oldW.doubleValue() < COMPACT_THRESHOLD;
-      boolean isCompact  = newW.doubleValue() < COMPACT_THRESHOLD;
-      if (wasCompact != isCompact) table.refresh();
-    });
-  }
-
-  /**
-   * <p>Builds the Stock column for the holdings table.
-   * Each cell shows a coloured circle icon, the ticker symbol in bold,
-   * and the company name in muted text below it — the same style as the
-   * TradingView stock list.</p>
-   *
-   * @return the configured stock column
-   */
-  private TableColumn<Holding, Holding> buildHoldingStockColumn() {
-    TableColumn<Holding, Holding> col = new TableColumn<>("Stock");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Holding item, boolean empty) {
-        super.updateItem(item, empty);
-        setGraphic(empty || item == null
-            ? null
-            : ViewWidgets.stockIconBlock(item.stock().getSymbol(), item.stock().getCompany()));
-      }
-    });
-    col.setMinWidth(160);
-    col.setPrefWidth(200);
-    col.setComparator((a, b) -> a.stock().getSymbol().compareToIgnoreCase(b.stock().getSymbol()));
-    return col;
-  }
-
-  /**
-   * <p>Builds a sortable numeric column for the holdings table that extracts
-   * a {@link BigDecimal} value from each {@link Holding} and formats it
-   * with the long formatter when the table is wide and the short formatter
-   * when the table width drops below {@link #COMPACT_THRESHOLD}.</p>
-   *
-   * @param title          the column header text
-   * @param extractor      function mapping a row to the displayed value
-   * @param longFormatter  formatter used when the table has room
-   * @param shortFormatter formatter used when the table is in compact mode
-   * @param table          the parent table, used to read the current width
-   * @return the configured column
-   */
-  private TableColumn<Holding, BigDecimal> buildHoldingValueCol(
-      String title,
-      Function<Holding, BigDecimal> extractor,
-      Function<BigDecimal, String> longFormatter,
-      Function<BigDecimal, String> shortFormatter,
-      TableView<Holding> table
-  ) {
-    TableColumn<Holding, BigDecimal> col = new TableColumn<>(title);
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(BigDecimal item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
-          setText(null);
-        } else {
-          boolean compact = table.getWidth() < COMPACT_THRESHOLD;
-          setText((compact ? shortFormatter : longFormatter).apply(item));
-        }
-      }
-    });
-    return col;
-  }
-
-  /**
-   * <p>Builds the Gain&nbsp;/&nbsp;Loss column. Cell text is coloured green
-   * for positive values and red for negative ones via the
-   * {@code table-data-cell-profit} / {@code table-data-cell-loss} CSS classes.
-   * Uses the compact {@code ±$1234} format when the table is narrow and the
-   * full {@code ±$1,234.56} format otherwise.</p>
-   *
-   * @param table the parent table, used to read the current width
-   * @return the configured gain/loss column
-   */
-  private TableColumn<Holding, BigDecimal> buildGainLossColumn(TableView<Holding> table) {
-    TableColumn<Holding, BigDecimal> col = new TableColumn<>("Gain / Loss");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getGainOrLoss()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(BigDecimal item, boolean empty) {
-        super.updateItem(item, empty);
-        getStyleClass().removeAll("table-data-cell-profit", "table-data-cell-loss");
-        if (empty || item == null) {
-          setText(null);
-        } else {
-          boolean compact = table.getWidth() < COMPACT_THRESHOLD;
-          setText(compact ? ViewFormatter.signedWholePrice(item) : ViewFormatter.signedPrice(item));
-          getStyleClass().add(item.signum() >= 0 ? "table-data-cell-profit" : "table-data-cell-loss");
-        }
-      }
-    });
-    col.setMinWidth(80);
-    return col;
-  }
-
-  /**
-   * <p>Builds the Quick Sell action column. Each cell renders a button that
-   * invokes the registered {@link #onSell} handler with the row's symbol and
-   * total quantity when clicked. The button label shortens to "QS" when the
-   * table width drops below {@link #COMPACT_THRESHOLD}.</p>
-   *
-   * @param table the parent table, used to bind the button label to its width
-   * @return the configured actions column
-   */
-  private TableColumn<Holding, Holding> buildQuickSellColumn(TableView<Holding> table) {
-    TableColumn<Holding, Holding> col = new TableColumn<>("");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      private final Button btn = new Button();
-      {
-        btn.getStyleClass().add("select-btn");
-        btn.setMinWidth(0);
-        btn.textProperty().bind(
-            Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
-                .then("QS")
-                .otherwise("Quick Sell"));
-      }
-
-      @Override
-      protected void updateItem(Holding item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
-          setGraphic(null);
-        } else {
-          btn.setOnAction(e -> {
-            if (onSell != null) onSell.accept(item.stock().getSymbol(), item.totalQuantity());
-          });
-          setGraphic(btn);
-        }
-      }
-    });
-    col.setSortable(false);
-    col.setMinWidth(70);
-    col.setPrefWidth(120);
-    col.maxWidthProperty().bind(
-        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
-            .then(90)
-            .otherwise(150));
-    return col;
-  }
-
-  /**
-   * <p>Binds a column's header text to the table's width so it switches between
-   * a short and long label at the {@link #COMPACT_THRESHOLD} breakpoint.</p>
-   *
-   * @param col       the column whose header text should be responsive
-   * @param table     the parent table, providing the width property
-   * @param shortText the label shown when the table is narrow
-   * @param longText  the label shown when the table is wide
-   */
-  private static void bindCompactText(
-      TableColumn<?, ?> col, TableView<?> table, String shortText, String longText) {
-    col.textProperty().bind(
-        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
-            .then(shortText)
-            .otherwise(longText));
-  }
-
-  /**
-   * <p>Constructs and configures the transaction history {@link TableView}.
-   * Columns: Stock, Quantity, Price, Value, Type, Week. Rows are coloured
-   * by transaction type via a row factory. The table sorts descending by
-   * week on first render so the most recent transaction appears at the top.</p>
-   *
-   * @return the configured transaction table
-   */
-  @SuppressWarnings("deprecation")
-  private TableView<Transaction> buildTransactionTable() {
-    TableView<Transaction> table = new TableView<>(FXCollections.observableArrayList());
-    table.getStyleClass().add("stock-table");
-    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    table.setPlaceholder(
-        new Label("No transactions yet. Buy or sell stocks to see your history."));
-
-    table.setRowFactory(tv -> new TableRow<>() {
-      @Override
-      protected void updateItem(Transaction tx, boolean empty) {
-        super.updateItem(tx, empty);
-        getStyleClass().removeAll("tx-row-buy", "tx-row-sell");
-        if (!empty && tx != null) {
-          getStyleClass().add(tx instanceof Purchase ? "tx-row-buy" : "tx-row-sell");
-        }
-      }
-    });
-
-    TableColumn<Transaction, Transaction> stockCol = buildTxStockColumn();
-    TableColumn<Transaction, BigDecimal>  qtyCol   = buildTxBigDecimalCol(
-        "Quantity", tx -> tx.getShare().getQuantity(), ViewFormatter::quantity);
-    TableColumn<Transaction, BigDecimal>  priceCol = buildTxBigDecimalCol(
-        "Price",    tx -> tx.getShare().getPurchasePrice(), ViewFormatter::price);
-    TableColumn<Transaction, BigDecimal>  valueCol = buildTxBigDecimalCol(
-        "Value",    tx -> tx.getCalculator().calculateGross(), ViewFormatter::price);
-
-    for (TableColumn<?, ?> col : List.of(qtyCol, priceCol, valueCol)) {
-      col.setMinWidth(70);
-    }
-
-    TableColumn<Transaction, Transaction> typeCol = buildTxTypeColumn();
-    TableColumn<Transaction, Integer>     weekCol = buildTxWeekColumn();
-
-    table.getColumns().addAll(stockCol, qtyCol, priceCol, valueCol, typeCol, weekCol);
-
-    bindCompactText(qtyCol, table, "QTY", "Quantity");
-
-    weekCol.setSortType(TableColumn.SortType.DESCENDING);
-    table.getSortOrder().add(weekCol);
-
-    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
-    TableStyleUtils.wireSortHeaderHighlight(table);
-    return table;
-  }
-
-  /**
-   * <p>Builds the Stock column for the transaction table. Renders a circle
-   * icon, ticker symbol, and company name — identical in style to the
-   * holdings stock column.</p>
-   *
-   * @return the configured stock column
-   */
-  private TableColumn<Transaction, Transaction> buildTxStockColumn() {
-    TableColumn<Transaction, Transaction> col = new TableColumn<>("Stock");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Transaction item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
-          setGraphic(null);
-          return;
-        }
-        setGraphic(ViewWidgets.stockIconBlock(
-            item.getShare().getStock().getSymbol(),
-            item.getShare().getStock().getCompany()));
-      }
-    });
-    col.setMinWidth(160);
-    col.setPrefWidth(200);
-    col.setComparator((a, b) ->
-        a.getShare().getStock().getSymbol().compareToIgnoreCase(
-        b.getShare().getStock().getSymbol()));
-    return col;
-  }
-
-  /**
-   * <p>Builds a sortable {@link BigDecimal} column for the transaction table.</p>
-   *
-   * @param title     the column header text
-   * @param extractor function mapping a transaction to the displayed value
-   * @param formatter function mapping the value to its display string
-   * @return the configured column
-   */
-  private TableColumn<Transaction, BigDecimal> buildTxBigDecimalCol(
-      String title,
-      Function<Transaction, BigDecimal> extractor,
-      Function<BigDecimal, String> formatter
-  ) {
-    TableColumn<Transaction, BigDecimal> col = new TableColumn<>(title);
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(BigDecimal item, boolean empty) {
-        super.updateItem(item, empty);
-        setText(empty || item == null ? null : formatter.apply(item));
-      }
-    });
-    return col;
-  }
-
-  /**
-   * <p>Builds the Type column for the transaction table. The cell text is
-   * "Buy" or "Sell" coloured via {@code tx-type-buy} / {@code tx-type-sell}
-   * CSS classes.</p>
-   *
-   * @return the configured type column
-   */
-  private TableColumn<Transaction, Transaction> buildTxTypeColumn() {
-    TableColumn<Transaction, Transaction> col = new TableColumn<>("Type");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Transaction item, boolean empty) {
-        super.updateItem(item, empty);
-        getStyleClass().removeAll("tx-type-buy", "tx-type-sell");
-        if (empty || item == null) {
-          setText(null);
-        } else {
-          boolean isBuy = item instanceof Purchase;
-          setText(isBuy ? "Buy" : "Sell");
-          getStyleClass().add(isBuy ? "tx-type-buy" : "tx-type-sell");
-        }
-      }
-    });
-    col.setSortable(false);
-    col.setMinWidth(55);
-    return col;
-  }
-
-  /**
-   * <p>Builds the Week column for the transaction table, displaying values
-   * as "W&lt;n&gt;" (e.g. {@code W12}).</p>
-   *
-   * @return the configured week column
-   */
-  private TableColumn<Transaction, Integer> buildTxWeekColumn() {
-    TableColumn<Transaction, Integer> col = new TableColumn<>("Week");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getWeek()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Integer item, boolean empty) {
-        super.updateItem(item, empty);
-        setText(empty || item == null ? null : "W" + item);
-      }
-    });
-    col.setMinWidth(55);
-    return col;
-  }
-
-  // ── Data refresh ──────────────────────────────────────────────────────────
+  // Observer callbacks
 
   @Override
   public void onPortfolioUpdated(ReadOnlyPortfolio portfolio) {
@@ -629,11 +166,11 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     updateStatusLabel(player.getStatus());
     portfolioChart.setData(player.getHistoricalNetWorth());
 
-    holdings.setItems(portfolio.getHoldings());
+    holdingsPanel.setItems(portfolio.getHoldings());
 
     List<Transaction> txs = new ArrayList<>(player.getTransactions());
-    java.util.Collections.reverse(txs);
-    transactions.setItems(txs);
+    Collections.reverse(txs);
+    transactionHistoryPanel.setItems(txs);
   }
 
   /**
@@ -648,21 +185,15 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     statusLabel.getStyleClass().add(ViewFormatter.playerStatusCss(status));
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // Public API
 
   /**
-   * <p>Registers a handler that is invoked when the user clicks a Quick Sell
-   * button in the holdings table.</p>
-   *
-   * <p>The handler receives the stock symbol and the total quantity to sell
-   * (summed across all lots for that symbol).</p>
+   * <p>Registers a handler invoked when the user clicks Quick Sell in the
+   * holdings table. Receives the stock symbol and total quantity to sell.</p>
    *
    * @param handler the consumer receiving {@code (symbol, totalQuantity)}
    */
   public void setOnSell(BiConsumer<String, BigDecimal> handler) {
-    this.onSell = handler;
+    holdingsPanel.setOnSell(handler);
   }
-
-  // ── Utility builders ─────────────────────────────────────────────────────
-
 }

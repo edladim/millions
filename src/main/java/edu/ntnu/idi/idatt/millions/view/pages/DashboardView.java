@@ -364,7 +364,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");
     row.setPadding(new Insets(8, 8, 8, 0));
-    row.setStyle("-fx-cursor: hand;");
     row.setOnMouseClicked(e -> {
       if (onStockClicked != null) onStockClicked.accept(stock.getSymbol());
     });

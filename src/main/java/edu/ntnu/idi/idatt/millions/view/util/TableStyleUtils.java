@@ -1,11 +1,16 @@
 package edu.ntnu.idi.idatt.millions.view.util;
 
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
@@ -22,6 +27,18 @@ public final class TableStyleUtils {
 
   /** CSS style class applied to header labels of currently sorted columns. */
   private static final String SORT_HEADER_ACTIVE_CLASS = "sort-header-active";
+
+  /** Default fixed cell height used across all paginated tables. */
+  public static final double ROW_HEIGHT = 58;
+
+  /** Default reserved column-header height used across all paginated tables. */
+  public static final double TABLE_HEADER_HEIGHT = 40;
+
+  /**
+   * Table width (px) below which compact short-form labels and formatters
+   * are used in portfolio and transaction tables.
+   */
+  public static final double COMPACT_THRESHOLD = 750;
 
   private TableStyleUtils() {}
 
@@ -90,5 +107,62 @@ public final class TableStyleUtils {
     table.setMinHeight(total);
     table.setPrefHeight(total);
     table.setMaxHeight(total);
+  }
+
+  /**
+   * <p>Overload that uses the standard {@link #ROW_HEIGHT} and
+   * {@link #TABLE_HEADER_HEIGHT} defaults.</p>
+   *
+   * @param table    the table whose height should be locked
+   * @param pageSize the number of rows per page
+   */
+  public static void applyFixedPageHeight(TableView<?> table, int pageSize) {
+    applyFixedPageHeight(table, pageSize, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+  }
+
+  /**
+   * <p>Binds a column's header text so it switches between a short and a long
+   * label when the table width crosses {@link #COMPACT_THRESHOLD}.</p>
+   *
+   * @param col       the column whose header text to bind
+   * @param table     the parent table whose width drives the toggle
+   * @param shortText the label shown when the table is narrow
+   * @param longText  the label shown when the table has room
+   */
+  public static void bindCompactText(
+      TableColumn<?, ?> col, TableView<?> table, String shortText, String longText) {
+    col.textProperty().bind(
+        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
+            .then(shortText).otherwise(longText));
+  }
+
+  /**
+   * <p>Builds a reusable "Stock" column that renders a circle icon, the ticker
+   * symbol in bold, and the company name in muted text below it. Sorting is
+   * case-insensitive by symbol. Default widths are {@code minWidth=160},
+   * {@code prefWidth=200}; callers may override after construction.</p>
+   *
+   * @param <T>       the row type
+   * @param symbolFn  function extracting the ticker symbol from a row
+   * @param companyFn function extracting the company name from a row
+   * @return the configured stock column
+   */
+  public static <T> TableColumn<T, T> stockIconColumn(
+      Function<T, String> symbolFn, Function<T, String> companyFn) {
+    TableColumn<T, T> col = new TableColumn<>("Stock");
+    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
+    col.setCellFactory(c -> new TableCell<>() {
+      @Override
+      protected void updateItem(T item, boolean empty) {
+        super.updateItem(item, empty);
+        setGraphic(empty || item == null
+            ? null
+            : ViewWidgets.stockIconBlock(symbolFn.apply(item), companyFn.apply(item)));
+      }
+    });
+    col.setMinWidth(160);
+    col.setPrefWidth(200);
+    col.setComparator((a, b) -> symbolFn.apply(a).compareToIgnoreCase(symbolFn.apply(b)));
+    return col;
   }
 }

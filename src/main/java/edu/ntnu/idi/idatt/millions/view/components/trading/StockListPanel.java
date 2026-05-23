@@ -38,8 +38,6 @@ import javafx.scene.layout.VBox;
 public class StockListPanel extends VBox {
 
   private static final int PAGE_SIZE = 8;
-  private static final double ROW_HEIGHT = 58;
-  private static final double TABLE_HEADER_HEIGHT = 40;
 
   private final TextField searchField;
   private final TableView<ReadOnlyStock> stockTable;
@@ -109,9 +107,13 @@ public class StockListPanel extends VBox {
     table.getStyleClass().add("stock-table");
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     table.setPlaceholder(new Label("No stocks match your search."));
-    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE);
 
-    table.getColumns().add(buildStockColumn());
+    TableColumn<ReadOnlyStock, ReadOnlyStock> stockCol =
+        TableStyleUtils.stockIconColumn(ReadOnlyStock::getSymbol, ReadOnlyStock::getCompany);
+    stockCol.setMinWidth(180);
+    stockCol.setPrefWidth(220);
+    table.getColumns().add(stockCol);
     table.getColumns().add(buildPriceLikeColumn("Price", ReadOnlyStock::getSalesPrice));
     table.getColumns().add(buildChangeColumn());
     table.getColumns().add(buildPriceLikeColumn("High", ReadOnlyStock::getHighestPrice));
@@ -130,33 +132,6 @@ public class StockListPanel extends VBox {
     table.comparatorProperty().addListener((obs, old, neu) -> TableStyleUtils.applyHeaderStyles(table));
 
     return table;
-  }
-
-  /**
-   * <p>Builds the "Stock" column that renders an icon together with the symbol
-   * and company name. Sorting is by symbol, case-insensitive.</p>
-   *
-   * @return the configured stock column
-   */
-  private TableColumn<ReadOnlyStock, ReadOnlyStock> buildStockColumn() {
-    TableColumn<ReadOnlyStock, ReadOnlyStock> col = new TableColumn<>("Stock");
-    col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(ReadOnlyStock stock, boolean empty) {
-        super.updateItem(stock, empty);
-        if (empty || stock == null) {
-          setGraphic(null);
-          setText(null);
-          return;
-        }
-        setGraphic(ViewWidgets.stockIconBlock(stock.getSymbol(), stock.getCompany()));
-      }
-    });
-    col.setMinWidth(180);
-    col.setPrefWidth(220);
-    col.setComparator((a, b) -> a.getSymbol().compareToIgnoreCase(b.getSymbol()));
-    return col;
   }
 
   /**

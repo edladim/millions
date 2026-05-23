@@ -9,7 +9,6 @@ import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Function;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -30,17 +29,12 @@ import javafx.scene.layout.VBox;
  *
  * <p>
  * The Quantity column header shortens to "QTY" at narrow viewport widths
- * (below {@link #COMPACT_THRESHOLD}).
+ * (below {@link TableStyleUtils#COMPACT_THRESHOLD}).
  * </p>
  */
 public class TransactionHistoryPanel extends VBox {
 
-  private static final int    PAGE_SIZE = 5;
-  private static final double ROW_HEIGHT = 58;
-  private static final double TABLE_HEADER_HEIGHT = 40;
-
-  /** Table width (px) below which the Quantity header switches to short form. */
-  private static final double COMPACT_THRESHOLD   = 750;
+  private static final int PAGE_SIZE = 5;
 
   private final PaginatedTable<Transaction> transactions;
 
@@ -83,7 +77,9 @@ public class TransactionHistoryPanel extends VBox {
       }
     });
 
-    TableColumn<Transaction, Transaction> stockCol = buildTxStockColumn();
+    TableColumn<Transaction, Transaction> stockCol = TableStyleUtils.stockIconColumn(
+        tx -> tx.getShare().getStock().getSymbol(),
+        tx -> tx.getShare().getStock().getCompany());
     TableColumn<Transaction, BigDecimal>  qtyCol   = buildTxBigDecimalCol(
         "Quantity", tx -> tx.getShare().getQuantity(),          ViewFormatter::quantity);
     TableColumn<Transaction, BigDecimal>  priceCol = buildTxBigDecimalCol(
@@ -100,44 +96,14 @@ public class TransactionHistoryPanel extends VBox {
 
     table.getColumns().addAll(stockCol, qtyCol, priceCol, valueCol, typeCol, weekCol);
 
-    bindCompactText(qtyCol, table, "QTY", "Quantity");
+    TableStyleUtils.bindCompactText(qtyCol, table, "QTY", "Quantity");
 
     weekCol.setSortType(TableColumn.SortType.DESCENDING);
     table.getSortOrder().add(weekCol);
 
-    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE);
     TableStyleUtils.wireSortHeaderHighlight(table);
     return table;
-  }
-
-  /**
-   * <p>Builds the Stock column for the transaction table. Renders a circle icon,
-   * ticker symbol, and company name. Sorting is by symbol, case-insensitive.</p>
-   *
-   * @return the configured stock column
-   */
-  private TableColumn<Transaction, Transaction> buildTxStockColumn() {
-    TableColumn<Transaction, Transaction> col = new TableColumn<>("Stock");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Transaction item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
-          setGraphic(null);
-          return;
-        }
-        setGraphic(ViewWidgets.stockIconBlock(
-            item.getShare().getStock().getSymbol(),
-            item.getShare().getStock().getCompany()));
-      }
-    });
-    col.setMinWidth(160);
-    col.setPrefWidth(200);
-    col.setComparator((a, b) ->
-        a.getShare().getStock().getSymbol().compareToIgnoreCase(
-        b.getShare().getStock().getSymbol()));
-    return col;
   }
 
   /**
@@ -210,19 +176,6 @@ public class TransactionHistoryPanel extends VBox {
     });
     col.setMinWidth(55);
     return col;
-  }
-
-  // Helpers
-
-  /**
-   * <p>Binds a column's header text to the table's width so it switches between
-   * short and long label at the {@link #COMPACT_THRESHOLD} breakpoint.</p>
-   */
-  private static void bindCompactText(
-      TableColumn<?, ?> col, TableView<?> table, String shortText, String longText) {
-    col.textProperty().bind(
-        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
-            .then(shortText).otherwise(longText));
   }
 
   // Public API

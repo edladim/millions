@@ -30,18 +30,13 @@ import javafx.scene.layout.VBox;
  *
  * <p>
  * Column headers and numeric values switch to compact short-form when the
- * table width drops below {@link #COMPACT_THRESHOLD} so the panel remains
- * readable at narrow viewport widths.
+ * table width drops below {@link TableStyleUtils#COMPACT_THRESHOLD} so the
+ * panel remains readable at narrow viewport widths.
  * </p>
  */
 public class HoldingsPanel extends VBox {
 
-  private static final int    PAGE_SIZE = 5;
-  private static final double ROW_HEIGHT = 58;
-  private static final double TABLE_HEADER_HEIGHT = 40;
-
-  /** Table width (px) below which headers and values switch to compact form. */
-  private static final double COMPACT_THRESHOLD  = 750;
+  private static final int PAGE_SIZE = 5;
 
   private final PaginatedTable<Holding> holdings;
   private BiConsumer<String, BigDecimal> onSell;
@@ -73,7 +68,8 @@ public class HoldingsPanel extends VBox {
     table.setPlaceholder(
         new Label("You don't own any shares yet. Head to Trading to get started."));
 
-    TableColumn<Holding, Holding>     stockCol = buildHoldingStockColumn();
+    TableColumn<Holding, Holding>     stockCol = TableStyleUtils.stockIconColumn(
+        h -> h.stock().getSymbol(), h -> h.stock().getCompany());
     TableColumn<Holding, BigDecimal>  qtyCol   = buildHoldingValueCol("Quantity",
         Holding::totalQuantity,      ViewFormatter::quantity,   ViewFormatter::quantity, table);
     TableColumn<Holding, BigDecimal>  buyCol   = buildHoldingValueCol("Buy Price",
@@ -94,45 +90,21 @@ public class HoldingsPanel extends VBox {
 
     table.getColumns().addAll(stockCol, qtyCol, buyCol, currCol, valueCol, gainCol, sellCol);
 
-    bindCompactText(qtyCol,  table, "QTY", "Quantity");
-    bindCompactText(buyCol,  table, "BP",  "Buy Price");
-    bindCompactText(currCol, table, "CP",  "Current Price");
-    bindCompactText(gainCol, table, "G/L", "Gain / Loss");
+    TableStyleUtils.bindCompactText(qtyCol,  table, "QTY", "Quantity");
+    TableStyleUtils.bindCompactText(buyCol,  table, "BP",  "Buy Price");
+    TableStyleUtils.bindCompactText(currCol, table, "CP",  "Current Price");
+    TableStyleUtils.bindCompactText(gainCol, table, "G/L", "Gain / Loss");
 
-    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE, ROW_HEIGHT, TABLE_HEADER_HEIGHT);
+    TableStyleUtils.applyFixedPageHeight(table, PAGE_SIZE);
     TableStyleUtils.wireSortHeaderHighlight(table);
     wireCompactRefresh(table);
     return table;
   }
 
   /**
-   * <p>Builds the Stock column that renders a circle icon, ticker symbol, and
-   * company name. Sorting is by symbol, case-insensitive.</p>
-   *
-   * @return the configured stock column
-   */
-  private TableColumn<Holding, Holding> buildHoldingStockColumn() {
-    TableColumn<Holding, Holding> col = new TableColumn<>("Stock");
-    col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
-    col.setCellFactory(c -> new TableCell<>() {
-      @Override
-      protected void updateItem(Holding item, boolean empty) {
-        super.updateItem(item, empty);
-        setGraphic(empty || item == null
-            ? null
-            : ViewWidgets.stockIconBlock(item.stock().getSymbol(), item.stock().getCompany()));
-      }
-    });
-    col.setMinWidth(160);
-    col.setPrefWidth(200);
-    col.setComparator((a, b) -> a.stock().getSymbol().compareToIgnoreCase(b.stock().getSymbol()));
-    return col;
-  }
-
-  /**
    * <p>Builds a sortable numeric column that extracts a {@link BigDecimal} value
    * from each {@link Holding} and switches between a long and compact formatter
-   * at the {@link #COMPACT_THRESHOLD} width breakpoint.</p>
+   * at the {@link TableStyleUtils#COMPACT_THRESHOLD} width breakpoint.</p>
    *
    * @param title          the column header text
    * @param extractor      function mapping a row to the displayed value
@@ -156,7 +128,7 @@ public class HoldingsPanel extends VBox {
         if (empty || item == null) {
           setText(null);
         } else {
-          setText((table.getWidth() < COMPACT_THRESHOLD ? shortFormatter : longFormatter).apply(item));
+          setText((table.getWidth() < TableStyleUtils.COMPACT_THRESHOLD ? shortFormatter : longFormatter).apply(item));
         }
       }
     });
@@ -181,7 +153,7 @@ public class HoldingsPanel extends VBox {
         if (empty || item == null) {
           setText(null);
         } else {
-          setText(table.getWidth() < COMPACT_THRESHOLD
+          setText(table.getWidth() < TableStyleUtils.COMPACT_THRESHOLD
               ? ViewFormatter.signedWholePrice(item)
               : ViewFormatter.signedPrice(item));
           getStyleClass().add(item.signum() >= 0 ? "table-data-cell-profit" : "table-data-cell-loss");
@@ -209,7 +181,7 @@ public class HoldingsPanel extends VBox {
         btn.getStyleClass().add("select-btn");
         btn.setMinWidth(0);
         btn.textProperty().bind(
-            Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
+            Bindings.when(table.widthProperty().lessThan(TableStyleUtils.COMPACT_THRESHOLD))
                 .then("QS").otherwise("Quick Sell"));
       }
 
@@ -230,7 +202,7 @@ public class HoldingsPanel extends VBox {
     col.setMinWidth(70);
     col.setPrefWidth(120);
     col.maxWidthProperty().bind(
-        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
+        Bindings.when(table.widthProperty().lessThan(TableStyleUtils.COMPACT_THRESHOLD))
             .then(90).otherwise(150));
     return col;
   }
@@ -238,25 +210,14 @@ public class HoldingsPanel extends VBox {
   // Helpers
 
   /**
-   * <p>Binds a column's header text to the table's width so it switches between
-   * short and long label at the {@link #COMPACT_THRESHOLD} breakpoint.</p>
-   */
-  private static void bindCompactText(
-      TableColumn<?, ?> col, TableView<?> table, String shortText, String longText) {
-    col.textProperty().bind(
-        Bindings.when(table.widthProperty().lessThan(COMPACT_THRESHOLD))
-            .then(shortText).otherwise(longText));
-  }
-
-  /**
    * <p>Adds a width listener that calls {@link TableView#refresh()} whenever
-   * the table crosses the {@link #COMPACT_THRESHOLD}, so cells re-render
+   * the table crosses the {@link TableStyleUtils#COMPACT_THRESHOLD}, so cells re-render
    * with the appropriate formatter.</p>
    */
   private static void wireCompactRefresh(TableView<?> table) {
     table.widthProperty().addListener((obs, oldW, newW) -> {
-      boolean wasCompact = oldW.doubleValue() < COMPACT_THRESHOLD;
-      boolean isCompact  = newW.doubleValue() < COMPACT_THRESHOLD;
+      boolean wasCompact = oldW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
+      boolean isCompact  = newW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
       if (wasCompact != isCompact) table.refresh();
     });
   }

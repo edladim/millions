@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.widgets;
 
 import java.util.Comparator;
 import java.util.List;

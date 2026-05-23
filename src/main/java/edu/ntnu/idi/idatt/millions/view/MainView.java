@@ -1,9 +1,12 @@
 package edu.ntnu.idi.idatt.millions.view;
 
 import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
+import edu.ntnu.idi.idatt.millions.view.dialogs.EndGameOverlay;
 import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
+import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;

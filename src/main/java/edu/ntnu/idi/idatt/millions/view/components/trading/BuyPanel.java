@@ -1,8 +1,8 @@
-package edu.ntnu.idi.idatt.millions.view.pages.trading;
+package edu.ntnu.idi.idatt.millions.view.components.trading;
 
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView.Mode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -123,7 +123,7 @@ public class BuyPanel extends VBox {
     VBox.setVgrow(costCard, Priority.NEVER);
   }
 
-  // ── Layout builders ───────────────────────────────────────────────────────
+  // Layout builders
 
   private HBox buildModeToggle() {
     buyTab = new Button("Buy");
@@ -288,7 +288,7 @@ public class BuyPanel extends VBox {
     return lbl;
   }
 
-  // ── Internal logic ────────────────────────────────────────────────────────
+  // Internal logic
 
   private void toggleInputMode() {
     BigDecimal current = getInputValue();
@@ -321,7 +321,7 @@ public class BuyPanel extends VBox {
     if (onPercentSelected != null) onPercentSelected.accept(percent);
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // Public API
 
   /**
    * <p>Updates the stock info card (symbol, company, price, change, high, low)

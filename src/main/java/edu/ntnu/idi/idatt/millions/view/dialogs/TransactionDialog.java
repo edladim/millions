@@ -1,7 +1,8 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.dialogs;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionCalculator;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
 
 import javafx.geometry.Pos;

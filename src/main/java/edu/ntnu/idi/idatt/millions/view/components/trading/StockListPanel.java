@@ -1,10 +1,10 @@
-package edu.ntnu.idi.idatt.millions.view.pages.trading;
+package edu.ntnu.idi.idatt.millions.view.components.trading;
 
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
-import edu.ntnu.idi.idatt.millions.view.PaginatedTable;
-import edu.ntnu.idi.idatt.millions.view.TableStyleUtils;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.util.TableStyleUtils;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.widgets.PaginatedTable;
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
@@ -77,7 +77,7 @@ public class StockListPanel extends VBox {
     getChildren().addAll(header, searchField, tableCard);
   }
 
-  // ── Internal helpers ──────────────────────────────────────────────────────
+  // Internal helpers
 
   private void applyPendingHighlightSafely() {
     suppressSelectionEvent = true;
@@ -102,7 +102,7 @@ public class StockListPanel extends VBox {
     stockTable.getSelectionModel().clearSelection();
   }
 
-  // ── Table builders ────────────────────────────────────────────────────────
+  // Table builders
 
   private TableView<ReadOnlyStock> buildStockTable() {
     TableView<ReadOnlyStock> table = new TableView<>();
@@ -217,7 +217,7 @@ public class StockListPanel extends VBox {
     return col;
   }
 
-  // ── Public API ────────────────────────────────────────────────────────────
+  // Public API
 
   /**
    * <p>Replaces the master stock list with the given stocks and re-applies

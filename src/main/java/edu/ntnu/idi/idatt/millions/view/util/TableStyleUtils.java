@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.util;
 
 import java.util.HashSet;
 import java.util.Set;

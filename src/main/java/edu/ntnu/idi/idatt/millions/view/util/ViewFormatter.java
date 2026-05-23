@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.util;
 
 import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import java.math.BigDecimal;

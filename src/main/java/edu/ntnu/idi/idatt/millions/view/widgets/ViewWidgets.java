@@ -1,4 +1,4 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.widgets;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

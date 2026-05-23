@@ -4,9 +4,9 @@ import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
-import edu.ntnu.idi.idatt.millions.view.ViewWidgets;
-import edu.ntnu.idi.idatt.millions.view.pages.trading.BuyPanel;
-import edu.ntnu.idi.idatt.millions.view.pages.trading.StockListPanel;
+import edu.ntnu.idi.idatt.millions.view.components.trading.BuyPanel;
+import edu.ntnu.idi.idatt.millions.view.components.trading.StockListPanel;
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
@@ -86,14 +86,14 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return wrapper;
   }
 
-  // ── ExchangeObserver ──────────────────────────────────────────────────────
+  // ExchangeObserver
 
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
     if (onRefresh != null) onRefresh.run();
   }
 
-  // ── Public API (delegates to sub-panels) ──────────────────────────────────
+  // Public API — delegates to sub-panels
 
   /**
    * <p>Replaces the stock list and re-applies the pending highlight.</p>
@@ -182,7 +182,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /** @see BuyPanel#setCashBalance(BigDecimal) */
   public void setCashBalance(BigDecimal cash) { buyPanel.setCashBalance(cash); }
 
-  // ── Callback registration ─────────────────────────────────────────────────
+  // Callback registration
 
   /**
    * <p>Registers a handler that runs when the user confirms a trade.</p>

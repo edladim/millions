@@ -79,7 +79,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     content.setPadding(new Insets(32));
     content.getStyleClass().add("portfolio-banner");
 
-    Label heading = new Label("My Portfolio Value");
+    Label heading = new Label("Net Worth");
     heading.getStyleClass().add("banner-heading");
 
     portfolioValueLabel = new Label("$0.00");
@@ -212,10 +212,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    */
   private void setPortfolioChange(String change, boolean isPositive) {
     portfolioChangeLabel.setText((isPositive ? "↗ " : "↘ ") + change);
-    portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
-    if (!isPositive) {
-      portfolioChangeLabel.getStyleClass().add("banner-change-negative");
-    }
+    portfolioChangeLabel.getStyleClass().removeAll("banner-change-positive", "banner-change-negative");
+    portfolioChangeLabel.getStyleClass().add(isPositive ? "banner-change-positive" : "banner-change-negative");
   }
 
   /**

@@ -66,4 +66,12 @@ public interface ReadOnlyPortfolio {
    * @return the share count
    */
   int size();
+
+  /**
+   * <p>Returns the number of distinct stock symbols held in the portfolio.
+   * Two {@link Share} lots referencing the same stock count as one.</p>
+   *
+   * @return the number of unique stocks owned
+   */
+  long getDistinctStockCount();
 }

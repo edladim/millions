@@ -1,16 +1,15 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 /**
  * <p>Computes the gross, commission, and total cost of a prospective
  * transaction before it is executed.</p>
  *
- * <p>The commission is a flat percentage of the gross, scaled to two
- * decimal places using {@link RoundingMode#HALF_UP}. For buy orders the
- * commission is added to the gross; for sell orders it is subtracted, since
- * commissions reduce the player's proceeds in both cases.</p>
+ * <p>The commission is a flat percentage of the gross, computed at full
+ * {@link BigDecimal} precision so the affordability check is exact. For buy
+ * orders the commission is added to the gross; for sell orders it is
+ * subtracted, since commissions reduce the player's proceeds in both cases.</p>
  */
 public final class CostPreviewCalculator {
 
@@ -32,7 +31,7 @@ public final class CostPreviewCalculator {
    */
   public CostPreviewCalculator(BigDecimal price, BigDecimal quantity, boolean isBuy) {
     this.gross = price.multiply(quantity);
-    this.commission = gross.multiply(COMMISSION_RATE).setScale(2, RoundingMode.HALF_UP);
+    this.commission = gross.multiply(COMMISSION_RATE);
     this.total = isBuy ? gross.add(commission) : gross.subtract(commission);
   }
 

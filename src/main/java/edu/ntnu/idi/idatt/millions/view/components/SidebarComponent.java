@@ -186,7 +186,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     weekLabel.getStyleClass().add("week-box-value");
 
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
-    weekIcon.getStyleClass().add("week-box-color");
+    weekIcon.getStyleClass().add("week-box-icon");
 
     VBox textBox = new VBox(2, currentWeekLabel, weekLabel);
 

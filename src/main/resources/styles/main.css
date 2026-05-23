@@ -1,8 +1,4 @@
-/* ═══════════════════════════════════════════════════════
-   main.css  –  Millions · Global styles
-   ═══════════════════════════════════════════════════════ */
-
-/* ── Color tokens ────────────────────────────────────── */
+/* Color tokens */
 .root {
     -primary:        #6366f1;
     -primary-light:  #818cf8;
@@ -17,14 +13,7 @@
     -fx-font-family: "Inter", "Avenir Next", "SF Pro Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
 }
 
-/* ── Root layout ─────────────────────────────────────── */
-.main-root {
-    -fx-background-color: -bg;
-}
-
-/* ═══════════════════════════════════════════════════════
-   SIDEBAR
-   ═══════════════════════════════════════════════════════ */
+/* Sidebar */
 .sidebar {
     -fx-background-color: white;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 2, 0);
@@ -87,6 +76,7 @@
     -fx-background-color: -primary-light;
 }
 
+/* Sell all button */
 .sell-all-btn {
     -fx-background-color: -red;
     -fx-text-fill: white;
@@ -126,11 +116,7 @@
     -fx-font-size: 18px;
 }
 
-/* ═══════════════════════════════════════════════════════
-   SHARED PAGE ELEMENTS
-   ═══════════════════════════════════════════════════════ */
-
-/* Page wrapper */
+/* Page elements (shared) */
 .dashboard-view {
     -fx-background-color: -bg;
 }
@@ -171,23 +157,16 @@
     -fx-text-fill: -text-muted;
 }
 
-.stat-card-value {
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -text;
-}
-
-.stat-card-value-profit {
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -green;
-}
-
+.stat-card-value,
+.stat-card-value-profit,
 .stat-card-value-loss {
     -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: -red;
 }
+
+.stat-card-value        { -fx-text-fill: -text; }
+.stat-card-value-profit { -fx-text-fill: -green; }
+.stat-card-value-loss   { -fx-text-fill: -red; }
 
 .stat-card-value-status {
     -fx-font-size: 22px;
@@ -195,29 +174,12 @@
     -fx-text-fill: -text-muted;
 }
 
-.stat-card-value-status-excellent {
-    -fx-text-fill: #EDC001;
-}
-
-.stat-card-value-status-good {
-    -fx-text-fill: -green
-}
-
-.stat-card-value-status-investor {
-    -fx-text-fill: -primary;
-}
-
-.stat-card-value-status-average {
-    -fx-text-fill: -text-muted;
-}
-
-.stat-card-value-status-bad {
-    -fx-text-fill: #FF7F7F;
-}
-
-.stat-card-value-status-worst {
-    -fx-text-fill: -red;
-}
+.stat-card-value-status-excellent { -fx-text-fill: #EDC001; }
+.stat-card-value-status-good      { -fx-text-fill: -green; }
+.stat-card-value-status-investor  { -fx-text-fill: -primary; }
+.stat-card-value-status-average   { -fx-text-fill: -text-muted; }
+.stat-card-value-status-bad       { -fx-text-fill: #FF7F7F; }
+.stat-card-value-status-worst     { -fx-text-fill: -red; }
 
 /* Portfolio banner */
 .portfolio-banner {
@@ -242,6 +204,10 @@
     -fx-text-fill: rgba(255,255,255,0.9);
 }
 
+.banner-change-positive {
+    -fx-text-fill: #86efac;
+}
+
 .banner-change-negative {
     -fx-text-fill: #fca5a5;
 }
@@ -257,13 +223,13 @@
     -fx-background-color: -primary-bg;
 }
 
-.mover-rank        { -fx-font-size: 13px; -fx-text-fill: -text-muted; -fx-font-weight: bold; }
-.stock-icon         { -fx-fill: -primary; }
-.sort-header-active { -fx-text-fill: -primary; }
-.mover-icon-letter  { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: white; }
-.mover-name        { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
-.mover-symbol      { -fx-font-size: 12px; -fx-text-fill: -text-muted; }
-.mover-price       { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
+.mover-rank          { -fx-font-size: 13px; -fx-text-fill: -text-muted; -fx-font-weight: bold; }
+.stock-icon          { -fx-fill: -primary; }
+.sort-header-active  { -fx-text-fill: -primary; }
+.mover-icon-letter   { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: white; }
+.mover-name          { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
+.mover-symbol        { -fx-font-size: 12px; -fx-text-fill: -text-muted; }
+.mover-price         { -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: -text; }
 
 .mover-change-positive {
     -fx-font-size: 12px;
@@ -277,29 +243,18 @@
     -fx-text-fill: -red;
 }
 
-/* Divider */
+/* Divider and empty state */
 .divider {
     -fx-background-color: -border;
 }
 
-/* Empty state */
 .empty-label {
     -fx-font-size: 13px;
     -fx-text-fill: -text-muted;
     -fx-padding: 24;
 }
 
-/* ═══════════════════════════════════════════════════════
-   TABLE STYLES (Portfolio + Trading)
-   ═══════════════════════════════════════════════════════ */
-
-.table-header-cell {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -text-muted;
-    -fx-text-transform: uppercase;
-}
-
+/* Tables (Portfolio + Trading) */
 .table-data-cell {
     -fx-font-size: 13px;
     -fx-text-fill: -text;
@@ -317,33 +272,7 @@
     -fx-text-fill: -red;
 }
 
-.holding-row {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent transparent -border transparent;
-    -fx-border-width: 1;
-}
-
-.holding-row:hover {
-    -fx-background-color: -primary-bg;
-    -fx-background-radius: 8;
-}
-
-.stock-row-selected {
-    -fx-background-color: -primary-bg;
-    -fx-background-radius: 8;
-}
-
-.select-btn.select-btn-active {
-    -fx-background-color: -primary;
-    -fx-text-fill: white;
-}
-
-.select-btn.select-btn-active:hover {
-    -fx-background-color: -primary-light;
-    -fx-text-fill: white;
-}
-
-/* ── Stock table (TradingView) ───────────────────────── */
+/* Stock table */
 .stock-table {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -373,7 +302,6 @@
     -fx-padding: 0 0 0 8;
 }
 
-
 .stock-table .table-row-cell {
     -fx-background-color: transparent;
     -fx-background-insets: 2 0 2 0;
@@ -387,6 +315,7 @@
 
 .stock-table .table-row-cell:empty {
     -fx-border-color: transparent;
+    -fx-background-color: transparent;
 }
 
 .stock-table .table-row-cell:filled:hover {
@@ -476,11 +405,6 @@
     -fx-font-weight: bold;
 }
 
-.stock-table .table-row-cell:empty {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-}
-
 .stock-table .placeholder .label {
     -fx-text-fill: -text-muted;
     -fx-font-size: 13px;
@@ -490,7 +414,7 @@
     -fx-background-color: transparent;
 }
 
-/* ── Transaction history rows (inside .stock-table) ─────── */
+/* Transaction history rows */
 .stock-table .table-row-cell.tx-row-buy {
     -fx-background-color: #f0fdf4;
     -fx-background-insets: 2 0 2 0;
@@ -514,27 +438,25 @@
 }
 
 .stock-table .table-cell.tx-type-buy {
-    -fx-text-fill: #16a34a;
+    -fx-text-fill: -green;
     -fx-font-weight: bold;
 }
 
 .stock-table .table-cell.tx-type-sell {
-    -fx-text-fill: #dc2626;
+    -fx-text-fill: -red;
     -fx-font-weight: bold;
 }
 
-/* ── Pagination control (Holdings + Transaction History) ─ */
+/* Pagination */
 .pagination {
     -fx-padding: 12 0 0 0;
     -fx-page-information-visible: false;
 }
 
-/* Spacing between arrows and bullet dots */
 .pagination > .pagination-control > .control-box {
     -fx-spacing: 8;
 }
 
-/* Arrow buttons */
 .pagination > .pagination-control > .control-box > .left-arrow-button,
 .pagination > .pagination-control > .control-box > .right-arrow-button {
     -fx-background-color: -primary;
@@ -554,7 +476,6 @@
     -fx-opacity: 0.4;
 }
 
-/* Arrow glyphs (the triangle shape inside the buttons) */
 .pagination > .pagination-control > .control-box > .left-arrow-button > .left-arrow,
 .pagination > .pagination-control > .control-box > .right-arrow-button > .right-arrow {
     -fx-background-color: white;
@@ -562,7 +483,6 @@
     -fx-padding: 3 4 3 4;
 }
 
-/* Bullet dots */
 .pagination > .pagination-control > .control-box > .bullet-button {
     -fx-background-color: -primary-light;
     -fx-background-radius: 50%;
@@ -589,7 +509,6 @@
     -fx-opacity: 1;
 }
 
-/* Numeric page buttons */
 .pagination > .pagination-control > .control-box > .number-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -613,29 +532,7 @@
     -fx-text-fill: white;
 }
 
-/* ═══════════════════════════════════════════════════════
-   PORTFOLIO PAGE
-   ═══════════════════════════════════════════════════════ */
-
-.sell-btn {
-    -fx-background-color: -red;
-    -fx-text-fill: white;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-padding: 6 12 6 12;
-}
-
-.sell-btn:hover {
-    -fx-background-color: #b91c1c;
-}
-
-/* ═══════════════════════════════════════════════════════
-   TRADING PAGE
-   ═══════════════════════════════════════════════════════ */
-
+/* Trading page */
 .search-field {
     -fx-background-color: white;
     -fx-background-radius: 10;
@@ -651,15 +548,6 @@
 .search-field:focused {
     -fx-border-color: -primary;
     -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 8, 0, 0, 0);
-}
-
-.stock-scroll {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-
-.stock-scroll > .viewport {
-    -fx-background-color: transparent;
 }
 
 .select-btn {
@@ -689,7 +577,11 @@
     -fx-background-color: transparent;
 }
 
-/* Transparent page scroll wrapper */
+.buy-panel .stat-card {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 0, 4);
+}
+
+/* Page scroll */
 .page-scroll {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -716,6 +608,17 @@
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-text-fill: -text-muted;
+}
+
+.input-derived {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-muted;
+}
+
+.player-info-value {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
 }
 
 .cost-row {
@@ -752,10 +655,82 @@
     -fx-cursor: default;
 }
 
-/* ═══════════════════════════════════════════════════════
-   STOCK CHART COMPONENT
-   ═══════════════════════════════════════════════════════ */
+/* Buy/Sell mode tabs */
+.mode-tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 0 10 0;
+    -fx-background-radius: 8;
+    -fx-border-color: -border;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
 
+.mode-tab:hover {
+    -fx-background-color: -bg;
+}
+
+.mode-tab-active {
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
+}
+
+.mode-tab-active:hover {
+    -fx-background-color: -primary-bg;
+}
+
+/* Action button: sell variant */
+.buy-btn.action-btn-sell {
+    -fx-background-color: -red;
+}
+
+.buy-btn.action-btn-sell:hover {
+    -fx-background-color: #b91c1c;
+}
+
+.buy-btn.action-btn-sell:disabled {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+    -fx-opacity: 1;
+    -fx-cursor: default;
+}
+
+/* Swap button */
+.swap-btn {
+    -fx-background-color: -bg;
+    -fx-text-fill: -primary;
+    -fx-padding: 6 8 6 8;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-min-width: 28;
+    -fx-min-height: 24;
+}
+
+.swap-btn:hover {
+    -fx-background-color: #e0e7ff;
+}
+
+.swap-btn .ikonli-font-icon {
+    -fx-icon-color: -primary;
+}
+
+/* Load more */
+.load-more-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10 0 4 0;
+    -fx-alignment: center;
+}
+
+.load-more-label:hover {
+    -fx-text-fill: -primary;
+}
+
+/* Stock chart */
 .chart-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -785,18 +760,16 @@
 }
 
 .stock-line-chart .axis {
-    -fx-tick-label-fill: #64748b;
+    -fx-tick-label-fill: -text-muted;
 }
 
-/* Green line when trend is up */
 .stock-line-chart.chart-positive .chart-series-line {
-    -fx-stroke: #16a34a;
+    -fx-stroke: -green;
     -fx-stroke-width: 2.5px;
 }
 
-/* Red line when trend is down */
 .stock-line-chart.chart-negative .chart-series-line {
-    -fx-stroke: #dc2626;
+    -fx-stroke: -red;
     -fx-stroke-width: 2.5px;
 }
 
@@ -804,10 +777,7 @@
     -fx-background-color: transparent;
 }
 
-/* ═══════════════════════════════════════════════════════
-   TRANSACTION RECEIPT COMPONENT
-   ═══════════════════════════════════════════════════════ */
-
+/* Transaction notification */
 .notification-bar > .pane {
     -fx-background-color: #1e1e1e;
     -fx-background-radius: 12;
@@ -831,35 +801,27 @@
 .notification-bar.error > .pane {
     -fx-border-color: #ff5555;
 }
-/* ═══════════════════════════════════════════════════════
-   STARTUP SCREEN
-   ═══════════════════════════════════════════════════════ */
 
+/* Startup screen */
 .startup-root {
-    -fx-background-color: #f1f5f9;
+    -fx-background-color: -bg;
 }
 
 .startup-bg {
     -fx-background-color: linear-gradient(to bottom right, #eef2ff, #f1f5f9);
 }
 
-/* ── Card ────────────────────────────────────────────── */
+/* Card */
 .startup-card {
     -fx-background-color: white;
     -fx-background-radius: 20;
     -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.18), 48, 0, 0, 12);
 }
 
-/* ── Header banner ───────────────────────────────────── */
+/* Header banner */
 .startup-header {
     -fx-background-color: linear-gradient(to bottom right, #6366f1, #818cf8);
     -fx-background-radius: 20 20 0 0;
-}
-
-.startup-logo-icon {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
 }
 
 .startup-title {
@@ -890,7 +852,7 @@
     -fx-icon-color: white;
 }
 
-/* ── Body / form ─────────────────────────────────────── */
+/* Body / form */
 .startup-body {
     -fx-background-color: white;
     -fx-background-radius: 0 0 20 20;
@@ -905,17 +867,17 @@
 .startup-field {
     -fx-background-color: #f8fafc;
     -fx-background-radius: 10;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -border;
     -fx-border-radius: 10;
     -fx-border-width: 1;
     -fx-padding: 11 14 11 14;
     -fx-font-size: 14px;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -text;
 }
 
 .startup-field:focused {
     -fx-background-color: white;
-    -fx-border-color: #6366f1;
+    -fx-border-color: -primary;
     -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 8, 0, 0, 0);
 }
 
@@ -923,7 +885,7 @@
 .startup-file-row {
     -fx-background-color: #f8fafc;
     -fx-background-radius: 10;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -border;
     -fx-border-radius: 10;
     -fx-border-width: 1;
     -fx-padding: 10 14 10 14;
@@ -937,12 +899,12 @@
 .startup-file-label-selected {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -text;
 }
 
 .startup-browse-btn {
-    -fx-background-color: #eef2ff;
-    -fx-text-fill: #6366f1;
+    -fx-background-color: -primary-bg;
+    -fx-text-fill: -primary;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
@@ -952,7 +914,7 @@
 }
 
 .startup-browse-btn:hover {
-    -fx-background-color: #6366f1;
+    -fx-background-color: -primary;
     -fx-text-fill: white;
 }
 
@@ -963,7 +925,7 @@
 
 /* Start button */
 .startup-start-btn {
-    -fx-background-color: #6366f1;
+    -fx-background-color: -primary;
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
@@ -975,7 +937,7 @@
 }
 
 .startup-start-btn:hover {
-    -fx-background-color: #818cf8;
+    -fx-background-color: -primary-light;
     -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.5), 20, 0, 0, 6);
 }
 
@@ -987,7 +949,7 @@
 /* Error */
 .startup-error {
     -fx-font-size: 13px;
-    -fx-text-fill: #dc2626;
+    -fx-text-fill: -red;
     -fx-background-color: #fef2f2;
     -fx-background-radius: 8;
     -fx-border-color: #fecaca;
@@ -996,97 +958,10 @@
     -fx-padding: 10 14 10 14;
 }
 
-
-/* ── Load more ───────────────────────────────────────── */
-.load-more-label {
-    -fx-text-fill: -text-muted;
-    -fx-font-size: 13px;
-    -fx-cursor: hand;
-    -fx-padding: 10 0 4 0;
-    -fx-alignment: center;
-}
-
-.load-more-label:hover {
-    -fx-text-fill: -primary;
-}
-
-/* ── Buy/Sell mode tabs ──────────────────────────────── */
-.mode-tab {
-    -fx-background-color: transparent;
-    -fx-text-fill: -text-muted;
-    -fx-font-size: 14px;
-    -fx-font-weight: 600;
-    -fx-padding: 10 0 10 0;
-    -fx-background-radius: 8;
-    -fx-border-color: -border;
-    -fx-border-radius: 8;
-    -fx-border-width: 1;
-    -fx-cursor: hand;
-}
-
-.mode-tab:hover {
-    -fx-background-color: -bg;
-}
-
-.mode-tab-active {
-    -fx-background-color: -primary-bg;
-    -fx-text-fill: -primary;
-}
-
-.mode-tab-active:hover {
-    -fx-background-color: -primary-bg;
-}
-
-/* ── Owned hint ───────────────────────────────────────── */
-.owned-label {
-    -fx-font-size: 12px;
-    -fx-text-fill: -text-muted;
-    -fx-font-weight: 600;
-}
-
-/* ── Swap button (quantity <-> amount) ─────────────────── */
-.swap-btn {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #6366f1;
-    -fx-padding: 6 8 6 8;
-    -fx-background-radius: 6;
-    -fx-cursor: hand;
-    -fx-min-width: 28;
-    -fx-min-height: 24;
-}
-
-.swap-btn:hover {
-    -fx-background-color: #e0e7ff;
-}
-
-.swap-btn .ikonli-font-icon {
-    -fx-icon-color: #6366f1;
-}
-
-/* ── Stronger shadow for cards inside buy panel ──────── */
-.buy-panel .stat-card {
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 16, 0, 0, 4);
-}
-
-/* ── Action button: sell modifier (keeps .buy-btn size) ── */
-.buy-btn.action-btn-sell {
-    -fx-background-color: -red;
-}
-
-.buy-btn.action-btn-sell:hover {
-    -fx-background-color: #b91c1c;
-}
-
-.buy-btn.action-btn-sell:disabled {
-    -fx-background-color: #fee2e2;
-    -fx-text-fill: #991b1b;
-    -fx-opacity: 1;
-    -fx-cursor: default;
-}
-/* ── Retire Alert ── */
+/* Retire alert */
 .retire-alert .dialog-pane {
     -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
+    -fx-border-color: -border;
     -fx-border-width: 1;
     -fx-background-radius: 12;
     -fx-border-radius: 12;
@@ -1094,19 +969,19 @@
 }
 
 .retire-alert .header-panel {
-    -fx-background-color: #eef2ff;
+    -fx-background-color: -primary-bg;
     -fx-background-radius: 12 12 0 0;
     -fx-padding: 20 24 20 24;
 }
 
 .retire-alert .header-panel .label {
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: -text;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
 
 .retire-alert .content.label {
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -text-muted;
     -fx-font-size: 13px;
     -fx-padding: 16 24 16 24;
 }
@@ -1116,7 +991,7 @@
 }
 
 .retire-alert .button-bar .button {
-    -fx-background-color: #6366f1;
+    -fx-background-color: -primary;
     -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -1137,23 +1012,18 @@
 
 .retire-alert .button-bar .cancel-button {
     -fx-background-color: -primary;
-    -fx-text-fill: #eef2ff;
-    -fx-border-color: #e2e8f0;
+    -fx-text-fill: -primary-bg;
+    -fx-border-color: -border;
     -fx-border-width: 1;
     -fx-border-radius: 8;
 }
 
 .retire-alert .button-bar .cancel-button:hover {
-    -fx-background-color: #818cf8;
-    -fx-text-fill: #eef2ff;
+    -fx-background-color: -primary-light;
+    -fx-text-fill: -primary-bg;
 }
 
-/* ── End Game Overlay ── */
+/* End game overlay */
 .endgame-overlay {
     -fx-background-color: rgba(0, 0, 0, 0.45);
-}
-
-.endgame-stats {
-    -fx-font-size: 14px;
-    -fx-text-fill: #475569;
 }

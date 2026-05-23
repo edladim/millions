@@ -5,7 +5,9 @@ import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -90,6 +92,22 @@ public final class Portfolio implements ReadOnlyPortfolio {
   }
 
   /**
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share
+   * lots that reference the same stock. Order follows first occurrence in the
+   * underlying share list.
+   *
+   * @return the aggregated holdings, never null
+   */
+  @Override
+  public List<Holding> getHoldings() {
+    Map<String, List<Share>> grouped = new LinkedHashMap<>();
+    for (Share s : shares) {
+      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
+    }
+    return grouped.values().stream().map(Holding::aggregate).toList();
+  }
+
+  /**
    * Returns all shares associated with a specific stock symbol.
    *
    * @param symbol the ticker symbol to search for, cannot be null or blank
@@ -124,6 +142,20 @@ public final class Portfolio implements ReadOnlyPortfolio {
    */
   public int size() {
     return shares.size();
+  }
+
+  /**
+   * <p>Returns the number of distinct stock symbols held in the portfolio.
+   * Two {@link Share} lots referencing the same stock count as one.</p>
+   *
+   * @return the number of unique stocks owned
+   */
+  @Override
+  public long getDistinctStockCount() {
+    return shares.stream()
+        .map(s -> s.getStock().getSymbol())
+        .distinct()
+        .count();
   }
 
   /**

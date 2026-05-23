@@ -1,5 +1,6 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.dialogs;
 
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,9 +16,19 @@ import javafx.scene.layout.VBox;
  * <p>
  * Renders a dimmed full-screen backdrop with a centered card containing
  * summary stats and actions for starting a new game or exiting.
+ * Callers pass a list of {@link StatRow} pairs; the overlay renders
+ * one stat card per entry without any string parsing.
  * </p>
  */
 public class EndGameOverlay extends StackPane {
+
+  /**
+   * A single labelled stat shown on the end-game overlay.
+   *
+   * @param label the stat's display label (e.g. {@code "Net Worth"})
+   * @param value the formatted stat value (e.g. {@code "$12 345"})
+   */
+  public record StatRow(String label, String value) {}
 
   private final VBox card;
   private final Label title;
@@ -95,18 +106,14 @@ public class EndGameOverlay extends StackPane {
   }
 
   /**
-   * <p>Displays the overlay and replaces its stats with one card per line of
-   * {@code "Label: Value"} text.</p>
+   * <p>Displays the overlay and renders one stat card per entry in {@code stats}.</p>
    *
-   * @param stats the formatted stats block
+   * @param stats the list of label/value pairs to display
    */
-  public void show(String stats) {
+  public void show(List<StatRow> stats) {
     statsBox.getChildren().clear();
-    for (String line : stats.split("\n")) {
-      String[] parts = line.split(":", 2);
-      if (parts.length == 2) {
-        statsBox.getChildren().add(buildStatsCard(parts[0].trim(), parts[1].trim()));
-      }
+    for (StatRow row : stats) {
+      statsBox.getChildren().add(buildStatsCard(row.label(), row.value()));
     }
     setVisible(true);
     setManaged(true);

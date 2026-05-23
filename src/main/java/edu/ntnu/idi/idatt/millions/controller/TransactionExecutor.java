@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
-import edu.ntnu.idi.idatt.millions.view.TransactionDialog;
+import edu.ntnu.idi.idatt.millions.view.dialogs.TransactionDialog;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 

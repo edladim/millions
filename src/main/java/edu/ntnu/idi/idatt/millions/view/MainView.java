@@ -1,10 +1,15 @@
 package edu.ntnu.idi.idatt.millions.view;
 
 import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
+import edu.ntnu.idi.idatt.millions.view.dialogs.EndGameOverlay;
+import edu.ntnu.idi.idatt.millions.view.dialogs.EndGameOverlay.StatRow;
 import edu.ntnu.idi.idatt.millions.view.pages.DashboardView;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView;
+import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
+import java.util.List;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.scene.Scene;
@@ -160,12 +165,13 @@ public class MainView {
                           BigDecimal returnRate,
                           int weeks,
                           long score) {
-    String statsText = "Net Worth: " + ViewFormatter.wholePrice(netWorth) + "\n"
-        + "Profit: " + ViewFormatter.price(profit) + "\n"
-        + "Return Rate: " + ViewFormatter.rateAsPercent(returnRate) + "\n"
-        + "Weeks played: " + weeks + "\n"
-        + "Millions Score: " + score;
-    endGameOverlay.show(statsText);
+    endGameOverlay.show(List.of(
+        new StatRow("Net Worth",      ViewFormatter.wholePrice(netWorth)),
+        new StatRow("Profit",         ViewFormatter.price(profit)),
+        new StatRow("Return Rate",    ViewFormatter.rateAsPercent(returnRate)),
+        new StatRow("Weeks played",   String.valueOf(weeks)),
+        new StatRow("Millions Score", String.valueOf(score))
+    ));
   }
 
   /**

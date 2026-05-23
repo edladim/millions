@@ -18,5 +18,17 @@ public enum PlayerStatus {
   AVERAGE_JOE,
   INVESTOR,
   RAY_DALIO,
-  BERNARD_MADOFF
+  BERNARD_MADOFF;
+
+  /**
+   * Returns a human-readable form of this status with underscores replaced by
+   * spaces and only the first letter capitalised (e.g. {@code BUY_HIGH_BJORN}
+   * becomes {@code "Buy high bjorn"}).
+   *
+   * @return the display name for this status
+   */
+  public String displayName() {
+    String raw = name().replace('_', ' ').toLowerCase();
+    return Character.toUpperCase(raw.charAt(0)) + raw.substring(1);
+  }
 }

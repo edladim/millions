@@ -43,6 +43,12 @@ public class StockListPanel extends VBox {
   private final TableView<ReadOnlyStock> stockTable;
   private final PaginatedTable<ReadOnlyStock> stockList;
 
+  /** Threshold below which High/Low columns are hidden to prevent clipping. */
+  private static final double COMPACT_THRESHOLD = 480;
+
+  private TableColumn<ReadOnlyStock, BigDecimal> highCol;
+  private TableColumn<ReadOnlyStock, BigDecimal> lowCol;
+
   private String pendingHighlight = null;
   private boolean suppressSelectionEvent = false;
 
@@ -113,11 +119,20 @@ public class StockListPanel extends VBox {
         TableStyleUtils.stockIconColumn(ReadOnlyStock::getSymbol, ReadOnlyStock::getCompany);
     stockCol.setMinWidth(180);
     stockCol.setPrefWidth(220);
+    highCol = buildPriceLikeColumn("High", ReadOnlyStock::getHighestPrice);
+    lowCol  = buildPriceLikeColumn("Low",  ReadOnlyStock::getLowestPrice);
+
     table.getColumns().add(stockCol);
     table.getColumns().add(buildPriceLikeColumn("Price", ReadOnlyStock::getSalesPrice));
     table.getColumns().add(buildChangeColumn());
-    table.getColumns().add(buildPriceLikeColumn("High", ReadOnlyStock::getHighestPrice));
-    table.getColumns().add(buildPriceLikeColumn("Low", ReadOnlyStock::getLowestPrice));
+    table.getColumns().add(highCol);
+    table.getColumns().add(lowCol);
+
+    table.widthProperty().addListener((obs, oldW, newW) -> {
+      boolean compact = newW.doubleValue() < COMPACT_THRESHOLD;
+      highCol.setVisible(!compact);
+      lowCol.setVisible(!compact);
+    });
 
     table.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, sel) -> {
       if (sel == null) return;

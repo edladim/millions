@@ -151,6 +151,7 @@ public final class ViewWidgets {
 
     Label primaryLabel = new Label(primary);
     primaryLabel.getStyleClass().add("mover-name");
+    primaryLabel.setMinWidth(0);
 
     Label mutedLabel = new Label(muted);
     mutedLabel.getStyleClass().add("mover-symbol");

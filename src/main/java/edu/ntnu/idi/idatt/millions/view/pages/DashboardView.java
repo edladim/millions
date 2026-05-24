@@ -17,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -34,8 +35,10 @@ import javafx.scene.layout.VBox;
  */
 public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
 
-  private static final int MOVERS_PAGE_SIZE = 5;
-  private static final int MAX_MOVERS       = 20;
+  private static final int    MOVERS_PAGE_SIZE       = 5;
+  private static final int    MAX_MOVERS             = 20;
+  // Width of moversRow at which the two movers-cards switch from side-by-side to stacked.
+  private static final double MOVERS_STACK_THRESHOLD = 750;
 
   private ReadOnlyPlayer player;
   private ReadOnlyExchange currentExchange;
@@ -165,13 +168,42 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     negativeSection.setSpacing(8);
     negativeSection.setMaxWidth(Double.MAX_VALUE);
 
-    HBox section = new HBox(12, positiveSection, negativeSection);
-    section.setMaxWidth(Double.MAX_VALUE);
-    section.setFillHeight(false);
+    // setFillHeight(false) keeps each card at its own height when the other grows.
+    HBox hSection = new HBox(12, positiveSection, negativeSection);
+    hSection.setFillHeight(false);
+    hSection.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(positiveSection, Priority.ALWAYS);
     HBox.setHgrow(negativeSection, Priority.ALWAYS);
 
-    VBox fullContainer = new VBox(12, ViewWidgets.sectionHeading("Biggest Movers This Week"), section);
+    VBox vSection = new VBox(12);
+    vSection.setMaxWidth(Double.MAX_VALUE);
+
+    VBox moversRow = new VBox(hSection);
+    moversRow.setMaxWidth(Double.MAX_VALUE);
+
+    // Switch between HBox (side-by-side) and VBox (stacked) at the threshold.
+    // moversRow width is controlled by its parent, so the listener has no feedback loop.
+    boolean[] stacked = {false};
+    moversRow.widthProperty().addListener((obs, old, newVal) -> {
+      double w = newVal.doubleValue();
+      if (w < 1) return;
+      boolean nowStacked = w < MOVERS_STACK_THRESHOLD;
+      if (nowStacked == stacked[0]) return;
+      stacked[0] = nowStacked;
+      if (nowStacked) {
+        hSection.getChildren().clear();
+        vSection.getChildren().setAll(positiveSection, negativeSection);
+        moversRow.getChildren().setAll(vSection);
+      } else {
+        vSection.getChildren().clear();
+        HBox.setHgrow(positiveSection, Priority.ALWAYS);
+        HBox.setHgrow(negativeSection, Priority.ALWAYS);
+        hSection.getChildren().setAll(positiveSection, negativeSection);
+        moversRow.getChildren().setAll(hSection);
+      }
+    });
+
+    VBox fullContainer = new VBox(12, ViewWidgets.sectionHeading("Biggest Movers This Week"), moversRow);
     fullContainer.setMaxWidth(Double.MAX_VALUE);
     return fullContainer;
   }
@@ -308,6 +340,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     Label rankLabel = new Label("#" + rank);
     rankLabel.getStyleClass().add("mover-rank");
     rankLabel.setPrefWidth(32);
+    rankLabel.setMinWidth(Region.USE_PREF_SIZE);
 
     HBox iconBlock = ViewWidgets.stockIconBlockCompanyFirst(stock.getSymbol(), stock.getCompany());
     HBox.setHgrow(iconBlock, Priority.ALWAYS);
@@ -320,6 +353,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     changeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     VBox priceBox = new VBox(2, priceLabel, changeLabel);
     priceBox.setAlignment(Pos.CENTER_RIGHT);
+    priceBox.setMinWidth(Region.USE_PREF_SIZE);
 
     HBox row = new HBox(12, rankLabel, iconBlock, priceBox);
     row.setPrefWidth(0);

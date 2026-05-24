@@ -11,9 +11,11 @@ import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -67,13 +69,17 @@ public class SetupController {
   public void show() {
     FontLoader.loadInter();
     screen.setLeaderboard(LeaderboardStore.loadTop());
+    boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(startupScene);
     primaryStage.setTitle("Millions");
-    primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
     primaryStage.setMinWidth(600);
-    primaryStage.setMinHeight(0);
-    primaryStage.centerOnScreen();
+    primaryStage.setMinHeight(580);
+    if (wasFullScreen) {
+      primaryStage.setFullScreen(true);
+    } else {
+      expandToScreen();
+    }
     primaryStage.show();
   }
 
@@ -154,13 +160,34 @@ public class SetupController {
     mainView.setOnNewGame(this::show);
     mainView.setOnExit(Platform::exit);
 
+    boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());
-    primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
     primaryStage.setMinWidth(850);
     primaryStage.setMinHeight(580);
-    primaryStage.centerOnScreen();
+    if (wasFullScreen) {
+      primaryStage.setFullScreen(true);
+    } else {
+      expandToScreen();
+    }
+  }
+
+  /**
+   * <p>Sizes the stage to the primary screen's visual bounds synchronously,
+   * then marks it as maximized. Setting width and height explicitly via
+   * {@link Stage#setWidth} and {@link Stage#setHeight} updates JavaFX scene
+   * properties immediately — unlike {@link Stage#setMaximized} which triggers
+   * an asynchronous macOS animation and leaves the scene at the old width
+   * until the animation completes.</p>
+   */
+  private void expandToScreen() {
+    Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+    primaryStage.setX(bounds.getMinX());
+    primaryStage.setY(bounds.getMinY());
+    primaryStage.setWidth(bounds.getWidth());
+    primaryStage.setHeight(bounds.getHeight());
+    primaryStage.setMaximized(true);
   }
 
 }

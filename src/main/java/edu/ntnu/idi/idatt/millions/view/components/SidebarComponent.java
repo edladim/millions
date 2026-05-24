@@ -3,9 +3,14 @@ package edu.ntnu.idi.idatt.millions.view.components;
 import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.Page;
+import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -13,6 +18,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import javafx.beans.binding.Bindings;
 
@@ -35,6 +41,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Label weekLabel;
 
   private Runnable onAdvanceWeek;
+  private Runnable onRetire;
   private Consumer<Page> onNavigate;
 
   /**
@@ -129,10 +136,41 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       if (onAdvanceWeek != null) onAdvanceWeek.run();
     });
 
+    Button retireBtn = new Button("Retire");
+    retireBtn.getStyleClass().add("sell-all-btn");
+    retireBtn.setMaxWidth(Double.MAX_VALUE);
+    retireBtn.setOnAction(e -> confirmAndRetire());
+
     HBox weekBox = buildWeekBox();
 
-    bottom.getChildren().addAll(advanceBtn, weekBox);
+    bottom.getChildren().addAll(advanceBtn, retireBtn, weekBox);
     return bottom;
+  }
+
+  /**
+   * <p>Shows a styled confirmation dialog before triggering retirement.</p>
+   *
+   * <p>If the user confirms, the registered retire handler is invoked, which
+   * causes the controller to liquidate the portfolio and end the game.</p>
+   */
+  private void confirmAndRetire() {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Confirm retirement");
+    alert.setHeaderText("Are you sure you want to retire?");
+    alert.setContentText("This will sell all your shares and end the game.");
+
+    alert.getDialogPane().getStylesheets()
+        .add(Stylesheets.load("/styles/main.css"));
+    alert.getDialogPane().getStyleClass().add("retire-alert");
+
+    ButtonType yes = new ButtonType("Retire", ButtonBar.ButtonData.OK_DONE);
+    ButtonType no = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+    alert.getButtonTypes().setAll(yes, no);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.isPresent() && result.get().equals(yes) && onRetire != null) {
+      onRetire.run();
+    }
   }
 
   /**
@@ -144,11 +182,11 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     Label currentWeekLabel = new Label("Current Week");
     currentWeekLabel.getStyleClass().add("week-box-title");
 
-    weekLabel = new Label("Week 1");
+    weekLabel = new Label(ViewFormatter.week(1));
     weekLabel.getStyleClass().add("week-box-value");
 
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
-    weekIcon.getStyleClass().add("week-box-color");
+    weekIcon.getStyleClass().add("week-box-icon");
 
     VBox textBox = new VBox(2, currentWeekLabel, weekLabel);
 
@@ -195,7 +233,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    * @param week the current week number to display
    */
   private void setWeek(int week) {
-    weekLabel.setText("Week " + week);
+    weekLabel.setText(ViewFormatter.week(week));
   }
 
   /**
@@ -214,6 +252,15 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   public void setOnNavigate(Consumer<Page> handler) {
     this.onNavigate = handler;
+  }
+
+  /**
+   * <p>Registers a handler that runs after the user confirms retirement.</p>
+   *
+   * @param handler the action to run when retirement is confirmed
+   */
+  public void setOnRetire(Runnable handler) {
+    this.onRetire = handler;
   }
 
   @Override

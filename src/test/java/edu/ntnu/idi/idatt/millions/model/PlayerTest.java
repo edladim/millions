@@ -256,9 +256,9 @@ class PlayerTest {
   }
 
   @Test
-  void getStatus_goodGrowth_returnsRayDailo() {
+  void getStatus_goodGrowth_returnsRayDalio() {
     player.addMoney(new BigDecimal("10000")); // +100%
-    assertEquals(PlayerStatus.RAY_DAILO, player.getStatus());
+    assertEquals(PlayerStatus.RAY_DALIO, player.getStatus());
   }
 
   @Test

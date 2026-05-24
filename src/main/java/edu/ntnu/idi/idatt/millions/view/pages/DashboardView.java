@@ -7,18 +7,19 @@ import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
-import edu.ntnu.idi.idatt.millions.view.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 
 /**
  * <p>
@@ -34,8 +35,10 @@ import javafx.scene.shape.Circle;
  */
 public class DashboardView extends VBox implements PortfolioObserver, PlayerObserver, ExchangeObserver {
 
-  private static final int MOVERS_PAGE_SIZE = 5;
-  private static final int MAX_MOVERS       = 20;
+  private static final int    MOVERS_PAGE_SIZE       = 5;
+  private static final int    MAX_MOVERS             = 20;
+  // Width of moversRow at which the two movers-cards switch from side-by-side to stacked.
+  private static final double MOVERS_STACK_THRESHOLD = 750;
 
   private ReadOnlyPlayer player;
   private ReadOnlyExchange currentExchange;
@@ -51,6 +54,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   private Label loadMoreLosersLabel;
   private int gainersDisplayCount = MOVERS_PAGE_SIZE;
   private int losersDisplayCount  = MOVERS_PAGE_SIZE;
+  private Consumer<String> onStockClicked;
 
   /**
    * <p>Constructs the dashboard view and builds its initial layout.</p>
@@ -61,26 +65,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     setPadding(new Insets(40));
 
     getChildren().addAll(
-            buildHeader(),
+            ViewWidgets.pageHeader("Dashboard", "Welcome back to your investment game"),
             buildPortfolioBanner(),
             buildStatsRow(),
             buildMoversSection()
     );
-  }
-
-  /**
-   * <p>Builds the header section containing title and subtitle.</p>
-   *
-   * @return the header container
-   */
-  private VBox buildHeader() {
-    Label title = new Label("Dashboard");
-    title.getStyleClass().add("page-title");
-
-    Label subtitle = new Label("Welcome back to your investment game");
-    subtitle.getStyleClass().add("page-subtitle");
-
-    return new VBox(4, title, subtitle);
   }
 
   /**
@@ -93,7 +82,7 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     content.setPadding(new Insets(32));
     content.getStyleClass().add("portfolio-banner");
 
-    Label heading = new Label("My Portfolio Value");
+    Label heading = new Label("Net Worth");
     heading.getStyleClass().add("banner-heading");
 
     portfolioValueLabel = new Label("$0.00");
@@ -118,49 +107,33 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     HBox row = new HBox(16);
     row.setMaxWidth(Double.MAX_VALUE);
 
-    totalAssetsLabel = makeStatValueLabel("0");
-    costBasisLabel = makeStatValueLabel("$0.00");
-    totalProfitLabel = makeStatValueLabel("+$0.00");
+    ViewWidgets.SummaryCard totalAssets = buildStatsCard("Total Assets",      "0");
+    ViewWidgets.SummaryCard costBasis   = buildStatsCard("Cost Basis",        "$0.00");
+    ViewWidgets.SummaryCard profitLoss  = buildStatsCard("Total Profit/Loss", "+$0.00");
 
-    VBox totalAssets = buildStatsCard("Total Assets",      totalAssetsLabel);
-    VBox costBasis   = buildStatsCard("Cost Basis",        costBasisLabel);
-    VBox profitLoss  = buildStatsCard("Total Profit/Loss", totalProfitLabel);
+    totalAssetsLabel = totalAssets.valueLabel();
+    costBasisLabel   = costBasis.valueLabel();
+    totalProfitLabel = profitLoss.valueLabel();
 
-    HBox.setHgrow(totalAssets, Priority.ALWAYS);
-    HBox.setHgrow(costBasis,   Priority.ALWAYS);
-    HBox.setHgrow(profitLoss,  Priority.ALWAYS);
+    HBox.setHgrow(totalAssets.card(), Priority.ALWAYS);
+    HBox.setHgrow(costBasis.card(),   Priority.ALWAYS);
+    HBox.setHgrow(profitLoss.card(),  Priority.ALWAYS);
 
-    row.getChildren().addAll(totalAssets, costBasis, profitLoss);
+    row.getChildren().addAll(totalAssets.card(), costBasis.card(), profitLoss.card());
     return row;
   }
 
   /**
-   * <p>Creates a value label for a statistics card with the correct style applied.</p>
+   * <p>Builds a statistics card via {@link ViewWidgets#summaryCard} and bumps
+   * its padding up to {@code 24} to match the dashboard's larger card style.</p>
    *
-   * @param text the initial display text
-   * @return the configured value label
+   * @param title        the card title
+   * @param initialValue the initial text shown in the value label
+   * @return both the card container and its value label
    */
-  private Label makeStatValueLabel(String text) {
-    Label l = new Label(text);
-    l.getStyleClass().add("stat-card-value");
-    return l;
-  }
-
-  /**
-   * <p>Builds a single statistics card with a pre-constructed value label.</p>
-   *
-   * @param title      the card title
-   * @param valueLabel the label that will display the dynamic value
-   * @return the stats-card container
-   */
-  private VBox buildStatsCard(String title, Label valueLabel) {
-    Label titleLabel = new Label(title);
-    titleLabel.getStyleClass().add("stat-card-title");
-
-    VBox card = new VBox(12, titleLabel, valueLabel);
-    card.getStyleClass().add("stat-card");
-    card.setPadding(new Insets(24));
-    card.setMaxWidth(Double.MAX_VALUE);
+  private static ViewWidgets.SummaryCard buildStatsCard(String title, String initialValue) {
+    ViewWidgets.SummaryCard card = ViewWidgets.summaryCard(title, initialValue, "stat-card-value");
+    card.card().setPadding(new Insets(24));
     return card;
   }
 
@@ -170,9 +143,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    * @return the movers section container
    */
   private VBox buildMoversSection() {
-    Label heading = new Label("Biggest Movers This Week");
-    heading.getStyleClass().add("section-heading");
-
     moversPositiveContainer = new VBox(8);
     moversNegativeContainer = new VBox(8);
 
@@ -186,23 +156,54 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
       refreshMovers();
     });
 
-    VBox positiveSection = new VBox(8, moversPositiveContainer, loadMoreGainersLabel);
-    positiveSection.getStyleClass().add("stat-card");
-    positiveSection.setPadding(new Insets(24));
+    VBox positiveSection = ViewWidgets.sectionCard(
+        ViewWidgets.sectionSubheading("Top Performers"),
+        moversPositiveContainer, loadMoreGainersLabel);
+    positiveSection.setSpacing(8);
     positiveSection.setMaxWidth(Double.MAX_VALUE);
 
-    VBox negativeSection = new VBox(8, moversNegativeContainer, loadMoreLosersLabel);
-    negativeSection.getStyleClass().add("stat-card");
-    negativeSection.setPadding(new Insets(24));
+    VBox negativeSection = ViewWidgets.sectionCard(
+        ViewWidgets.sectionSubheading("Worst Performers"),
+        moversNegativeContainer, loadMoreLosersLabel);
+    negativeSection.setSpacing(8);
     negativeSection.setMaxWidth(Double.MAX_VALUE);
 
-    HBox section = new HBox(12, positiveSection, negativeSection);
-    section.setMaxWidth(Double.MAX_VALUE);
-    section.setFillHeight(false);
+    // setFillHeight(false) keeps each card at its own height when the other grows.
+    HBox hSection = new HBox(12, positiveSection, negativeSection);
+    hSection.setFillHeight(false);
+    hSection.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(positiveSection, Priority.ALWAYS);
     HBox.setHgrow(negativeSection, Priority.ALWAYS);
 
-    VBox fullContainer = new VBox(12, heading, section);
+    VBox vSection = new VBox(12);
+    vSection.setMaxWidth(Double.MAX_VALUE);
+
+    VBox moversRow = new VBox(hSection);
+    moversRow.setMaxWidth(Double.MAX_VALUE);
+
+    // Switch between HBox (side-by-side) and VBox (stacked) at the threshold.
+    // moversRow width is controlled by its parent, so the listener has no feedback loop.
+    boolean[] stacked = {false};
+    moversRow.widthProperty().addListener((obs, old, newVal) -> {
+      double w = newVal.doubleValue();
+      if (w < 1) return;
+      boolean nowStacked = w < MOVERS_STACK_THRESHOLD;
+      if (nowStacked == stacked[0]) return;
+      stacked[0] = nowStacked;
+      if (nowStacked) {
+        hSection.getChildren().clear();
+        vSection.getChildren().setAll(positiveSection, negativeSection);
+        moversRow.getChildren().setAll(vSection);
+      } else {
+        vSection.getChildren().clear();
+        HBox.setHgrow(positiveSection, Priority.ALWAYS);
+        HBox.setHgrow(negativeSection, Priority.ALWAYS);
+        hSection.getChildren().setAll(positiveSection, negativeSection);
+        moversRow.getChildren().setAll(hSection);
+      }
+    });
+
+    VBox fullContainer = new VBox(12, ViewWidgets.sectionHeading("Biggest Movers This Week"), moversRow);
     fullContainer.setMaxWidth(Double.MAX_VALUE);
     return fullContainer;
   }
@@ -236,15 +237,6 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
   }
 
   /**
-   * <p>Updates the displayed portfolio value.</p>
-   *
-   * @param value the formatted portfolio value
-   */
-  private void setPortfolioValue(String value) {
-    portfolioValueLabel.setText(value);
-  }
-
-  /**
    * <p>Updates the displayed portfolio change value and styling.</p>
    *
    * @param change     the formatted change text
@@ -252,28 +244,8 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
    */
   private void setPortfolioChange(String change, boolean isPositive) {
     portfolioChangeLabel.setText((isPositive ? "↗ " : "↘ ") + change);
-    portfolioChangeLabel.getStyleClass().removeAll("banner-change-negative");
-    if (!isPositive) {
-      portfolioChangeLabel.getStyleClass().add("banner-change-negative");
-    }
-  }
-
-  /**
-   * <p>Updates the displayed total assets value.</p>
-   *
-   * @param value the formatted assets value
-   */
-  private void setTotalAssets(String value) {
-    totalAssetsLabel.setText(value);
-  }
-
-  /**
-   * <p>Updates the displayed cost basis value.</p>
-   *
-   * @param value the formatted cost basis value
-   */
-  private void setCostBasis(String value) {
-    costBasisLabel.setText(value);
+    portfolioChangeLabel.getStyleClass().removeAll("banner-change-positive", "banner-change-negative");
+    portfolioChangeLabel.getStyleClass().add(isPositive ? "banner-change-positive" : "banner-change-negative");
   }
 
   /**
@@ -318,21 +290,21 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     moversPositiveContainer.getChildren().clear();
     moversNegativeContainer.getChildren().clear();
 
-    List<? extends ReadOnlyStock> gainers = currentExchange.getGainers(gainersDisplayCount + 1);
-    int toShowG = Math.min(gainersDisplayCount, gainers.size());
+    List<? extends ReadOnlyStock> topPerformers = currentExchange.getTopPerformers(gainersDisplayCount + 1);
+    int toShowG = Math.min(gainersDisplayCount, topPerformers.size());
     for (int i = 0; i < toShowG; i++) {
-      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, gainers.get(i)));
+      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, topPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreGainersLabel,
-        gainers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
+        topPerformers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
 
-    List<? extends ReadOnlyStock> losers = currentExchange.getLosers(losersDisplayCount + 1);
-    int toShowL = Math.min(losersDisplayCount, losers.size());
+    List<? extends ReadOnlyStock> bottomPerformers = currentExchange.getBottomPerformers(losersDisplayCount + 1);
+    int toShowL = Math.min(losersDisplayCount, bottomPerformers.size());
     for (int i = 0; i < toShowL; i++) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, losers.get(i)));
+      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, bottomPerformers.get(i)));
     }
     setLoadMoreVisible(loadMoreLosersLabel,
-        losers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
+        bottomPerformers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
   }
 
   /**
@@ -344,14 +316,11 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     BigDecimal profit = player.getProfit();
     boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 
-    long distinctStocks = portfolio.getShares().stream()
-        .map(s -> s.getStock().getSymbol())
-        .distinct()
-        .count();
+    long distinctStocks = portfolio.getDistinctStockCount();
 
-    setPortfolioValue(ViewFormatter.price(player.getNetWorth()));
-    setTotalAssets(String.valueOf(distinctStocks));
-    setCostBasis(ViewFormatter.price(portfolio.getTotalInvestment()));
+    portfolioValueLabel.setText(ViewFormatter.price(player.getNetWorth()));
+    totalAssetsLabel.setText(String.valueOf(distinctStocks));
+    costBasisLabel.setText(ViewFormatter.price(portfolio.getTotalInvestment()));
     setTotalProfit(ViewFormatter.signedPrice(profit), isPositive);
 
     String changeStr = ViewFormatter.rateAsPercent(player.getReturnRate())
@@ -371,17 +340,10 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     Label rankLabel = new Label("#" + rank);
     rankLabel.getStyleClass().add("mover-rank");
     rankLabel.setPrefWidth(32);
+    rankLabel.setMinWidth(Region.USE_PREF_SIZE);
 
-    Circle icon = new Circle(18, Color.web("#6366f1"));
-    Label letter = new Label(String.valueOf(stock.getSymbol().charAt(0)));
-    letter.getStyleClass().add("mover-icon-letter");
-    StackPane iconPane = new StackPane(icon, letter);
-
-    Label name = new Label(stock.getCompany());
-    name.getStyleClass().add("mover-name");
-    Label symbol = new Label(stock.getSymbol());
-    symbol.getStyleClass().add("mover-symbol");
-    VBox nameBox = new VBox(2, name, symbol);
+    HBox iconBlock = ViewWidgets.stockIconBlockCompanyFirst(stock.getSymbol(), stock.getCompany());
+    HBox.setHgrow(iconBlock, Priority.ALWAYS);
 
     BigDecimal change = stock.getLatestPriceChange();
     boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
@@ -391,15 +353,26 @@ public class DashboardView extends VBox implements PortfolioObserver, PlayerObse
     changeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
     VBox priceBox = new VBox(2, priceLabel, changeLabel);
     priceBox.setAlignment(Pos.CENTER_RIGHT);
+    priceBox.setMinWidth(Region.USE_PREF_SIZE);
 
-    HBox row = new HBox(12, rankLabel, iconPane, nameBox);
-    HBox.setHgrow(nameBox, Priority.ALWAYS);
+    HBox row = new HBox(12, rankLabel, iconBlock, priceBox);
     row.setPrefWidth(0);
-    row.getChildren().add(priceBox);
     row.setAlignment(Pos.CENTER_LEFT);
     row.getStyleClass().add("mover-row");
     row.setPadding(new Insets(8, 8, 8, 0));
+    row.setOnMouseClicked(e -> {
+      if (onStockClicked != null) onStockClicked.accept(stock.getSymbol());
+    });
     return row;
+  }
+
+  /**
+   * <p>Registers a handler invoked when the user clicks a mover row.</p>
+   *
+   * @param handler callback receiving the clicked stock's symbol
+   */
+  public void setOnStockClicked(Consumer<String> handler) {
+    this.onStockClicked = handler;
   }
 
 }

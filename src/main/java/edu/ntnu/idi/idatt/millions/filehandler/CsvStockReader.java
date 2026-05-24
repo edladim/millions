@@ -10,9 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -94,8 +96,9 @@ public class CsvStockReader implements StockReader {
   /**
    * Reads and returns all valid stock entries from the CSV source.
    *
-   * <p>Malformed lines are skipped and logged as warnings. The method throws
-   * only if the source cannot be read at all, or if no valid stocks are found.</p>
+   * <p>Malformed and duplicate lines are skipped and logged as warnings. The
+   * method throws only if the source cannot be read at all, or if no valid
+   * stocks are found.</p>
    *
    * @return a non-null, non-empty list of {@link Stock} objects
    * @throws StockFileException if an I/O error occurs, or no valid stocks are found
@@ -103,6 +106,7 @@ public class CsvStockReader implements StockReader {
   @Override
   public List<Stock> readStockData() throws StockFileException {
     List<Stock> stocks = new ArrayList<>();
+    Set<String> seen = new HashSet<>();
 
     try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
@@ -114,7 +118,7 @@ public class CsvStockReader implements StockReader {
         if (line.startsWith("#") || line.isBlank()) {
           continue;
         }
-        parseLine(line, lineNumber).ifPresent(stocks::add);
+        parseLine(line, lineNumber, seen).ifPresent(stocks::add);
       }
     } catch (IOException e) {
       throw new StockFileException(
@@ -136,9 +140,11 @@ public class CsvStockReader implements StockReader {
    *
    * @param line       the raw CSV line
    * @param lineNumber the 1-based line number, used in warning messages
+   * @param seen       set of symbols already accepted; lines with a duplicate
+   *                   symbol are skipped so the first occurrence wins
    * @return an {@link Optional} containing the parsed stock, or empty if the line is invalid
    */
-  private Optional<Stock> parseLine(String line, int lineNumber) {
+  private Optional<Stock> parseLine(String line, int lineNumber, Set<String> seen) {
     String[] fields = line.split(",");
 
     if (fields.length != EXPECTED_FIELD_COUNT) {
@@ -158,6 +164,11 @@ public class CsvStockReader implements StockReader {
     if (company.isBlank()) {
       LOGGER.warn("Skipping line {} in '{}': company name is blank",
           lineNumber, sourceDescription);
+      return Optional.empty();
+    }
+    if (!seen.add(symbol)) {
+      LOGGER.warn("Skipping duplicate symbol '{}' on line {} in '{}'",
+          symbol, lineNumber, sourceDescription);
       return Optional.empty();
     }
 

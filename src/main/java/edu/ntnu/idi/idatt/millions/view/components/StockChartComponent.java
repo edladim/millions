@@ -48,11 +48,10 @@ public class StockChartComponent extends VBox {
 
     xAxis = new NumberAxis();
     xAxis.setLabel("Week");
-    xAxis.setLowerBound(0);
     xAxis.setTickLabelFormatter(new NumberAxis.DefaultFormatter(xAxis) {
       @Override
       public String toString(Number value) {
-        return "W" + value.intValue();
+        return String.valueOf(value.intValue());
       }
     });
     xAxis.getStyleClass().add("chart-axis");
@@ -85,28 +84,50 @@ public class StockChartComponent extends VBox {
   }
 
   /**
-   * <p>Replaces the chart data with the provided list of prices.</p>
+   * <p>Replaces the chart data with the provided list of prices, labelling
+   * the x-axis from 1 to {@code prices.size()}. Used for charts (e.g. the
+   * portfolio value chart) whose data begins at week 1.</p>
    *
    * @param prices list of prices ordered by week
    */
   public void setData(List<BigDecimal> prices) {
+    setData(prices, prices == null ? 1 : prices.size());
+  }
+
+  /**
+   * <p>Replaces the chart data with the provided list of prices and aligns
+   * the x-axis so that the last data point is labelled {@code lastWeek}.</p>
+   *
+   * <p>Pre-simulated history that predates week 1 is shown with negative week
+   * numbers (e.g. W-29, W-15, W0), letting players see price history before
+   * the game started.</p>
+   *
+   * @param prices   list of prices ordered by week, oldest first
+   * @param lastWeek the game week corresponding to the last entry in {@code prices}
+   */
+  public void setData(List<BigDecimal> prices, int lastWeek) {
     lineChart.getData().clear();
 
     if (prices == null || prices.isEmpty()) return;
 
     XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
-    for (int i = 0; i < prices.size(); i++) {
-      series.getData().add(
-              new XYChart.Data<>(i + 1, prices.get(i).doubleValue())
-      );
+    int n = prices.size();
+    int firstWeek = lastWeek - (n - 1);
+    for (int i = 0; i < n; i++) {
+      int week = firstWeek + i;
+      series.getData().add(new XYChart.Data<>(week, prices.get(i).doubleValue()));
     }
+
+    xAxis.setAutoRanging(false);
+    xAxis.setLowerBound(firstWeek - 1);
+    xAxis.setUpperBound(lastWeek + 1);
+    xAxis.setTickUnit(Math.max(1, Math.ceil((lastWeek - firstWeek + 1) / 10.0)));
 
     lineChart.getData().add(series);
 
-    boolean isPositive = prices.size() > 1 &&
-            prices.get(prices.size() - 1)
-                    .compareTo(prices.get(0)) >= 0;
+    boolean isPositive = n > 1 &&
+        prices.get(n - 1).compareTo(prices.get(0)) >= 0;
 
     lineChart.getStyleClass().removeAll("chart-positive", "chart-negative");
     lineChart.getStyleClass().add(isPositive ? "chart-positive" : "chart-negative");

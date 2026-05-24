@@ -1,7 +1,9 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.util;
 
+import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * <p>
@@ -125,6 +127,73 @@ public final class ViewFormatter {
    */
   public static String quantity(BigDecimal quantity) {
     return scale(quantity).toPlainString();
+  }
+
+  /**
+   * <p>Formats a value as a whole-dollar price with no decimals,
+   * e.g. {@code "$1234"}.</p>
+   *
+   * @param value the monetary value to format
+   * @return the formatted whole-dollar string
+   */
+  public static String wholePrice(BigDecimal value) {
+    return "$" + value.setScale(0, RoundingMode.HALF_UP).toPlainString();
+  }
+
+  /**
+   * <p>Formats a value as a signed whole-dollar price with no decimals,
+   * e.g. {@code "+$1234"} or {@code "-$1234"}. Used as a compact alternative
+   * to {@link #signedPrice(BigDecimal)} when display width is tight.</p>
+   *
+   * @param value the monetary value to format
+   * @return the formatted signed whole-dollar string
+   */
+  public static String signedWholePrice(BigDecimal value) {
+    BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
+    return (rounded.signum() >= 0 ? "+$" : "-$") + rounded.abs().toPlainString();
+  }
+
+  /**
+   * <p>Formats a game week as a plain label, e.g. {@code "Week 53"}.</p>
+   *
+   * @param week the total game week number (1-based)
+   * @return the formatted week string
+   */
+  public static String week(int week) {
+    return "Week " + week;
+  }
+
+  /** CSS classes that may be applied to a player-status label, in enum order. */
+  private static final List<String> PLAYER_STATUS_CSS = List.of(
+      "stat-card-value-status-worst",
+      "stat-card-value-status-bad",
+      "stat-card-value-status-average",
+      "stat-card-value-status-investor",
+      "stat-card-value-status-good",
+      "stat-card-value-status-excellent"
+  );
+
+  /**
+   * <p>Returns the CSS class to apply to a status label so its colour reflects
+   * the given {@link PlayerStatus}. The enum's declaration order maps directly
+   * to a worst-to-best colour ramp.</p>
+   *
+   * @param status the player status whose colour to look up
+   * @return the CSS class name
+   */
+  public static String playerStatusCss(PlayerStatus status) {
+    return PLAYER_STATUS_CSS.get(status.ordinal());
+  }
+
+  /**
+   * <p>Returns every CSS class that {@link #playerStatusCss(PlayerStatus)} may
+   * produce. Useful for clearing previously applied status classes from a
+   * label before adding the current one.</p>
+   *
+   * @return all status CSS class names
+   */
+  public static List<String> allPlayerStatusCss() {
+    return PLAYER_STATUS_CSS;
   }
 
   private static BigDecimal scale(BigDecimal value) {

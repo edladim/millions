@@ -1,27 +1,41 @@
 package edu.ntnu.idi.idatt.millions.view;
 
+import edu.ntnu.idi.idatt.millions.model.LeaderboardEntry;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiConsumer;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
-import java.util.function.BiConsumer;
 
 /**
  * <p>Startup screen view that collects initial player settings before the game starts.</p>
  * <p>Builds the background, card UI, and input fields, and exposes callbacks for browsing
- * and starting the game.</p>
+ * and starting the game. Also renders the top-{@code N} leaderboard underneath the
+ * Start Game button — entries are injected by the controller via
+ * {@link #setLeaderboard(List)} so this view stays free of file I/O.</p>
  */
 public class StartupScreen extends StackPane{
+
+  private static final int LEADERBOARD_SIZE = 5;
 
   private TextField nameField;
   private TextField capitalField;
   private Label fileNameLabel;
   private Label errorLabel;
+  private VBox leaderboardRows;
   private Runnable onBrowse;
   private BiConsumer<String, String> onStart;
 
@@ -36,6 +50,8 @@ public class StartupScreen extends StackPane{
             buildBackground(),
             buildCard()
     );
+
+    setLeaderboard(Collections.emptyList());
 
     FadeTransition fade = new FadeTransition(Duration.millis(400), this);
     fade.setFromValue(0);
@@ -114,7 +130,7 @@ public class StartupScreen extends StackPane{
    */
   private VBox buildCardHeader() {
     FontIcon icon = new FontIcon("fas-wave-square");
-    icon.setIconSize(34);
+    icon.setIconSize(28);
     icon.setIconColor(Color.WHITE);
     icon.getStyleClass().add("logo-icon-label");
 
@@ -126,9 +142,9 @@ public class StartupScreen extends StackPane{
 
     HBox pills = buildFeaturePills();
 
-    VBox header = new VBox(10, icon, title, subtitle, pills);
+    VBox header = new VBox(8, icon, title, subtitle, pills);
     header.setAlignment(Pos.CENTER);
-    header.setPadding(new Insets(44, 40, 36, 40));
+    header.setPadding(new Insets(24, 40, 20, 40));
     header.getStyleClass().add("startup-header");
     return header;
   }
@@ -169,7 +185,7 @@ public class StartupScreen extends StackPane{
   }
 
   /**
-   * <p>Builds the body section with input fields, file selection, and start button.</p>
+   * <p>Builds the body section with input fields, file selection, start button, and leaderboard.</p>
    *
    * @return body container.
    */
@@ -205,7 +221,8 @@ public class StartupScreen extends StackPane{
             buildFieldGroup("Starting Capital ($)", capitalField),
             buildFieldGroup("Stock Data File", fileSection),
             errorLabel,
-            startBtn
+            startBtn,
+            buildLeaderboardSection()
     );
 
     return body;
@@ -238,13 +255,70 @@ public class StartupScreen extends StackPane{
   }
 
   /**
+   * <p>Builds the leaderboard section shown beneath the Start Game button.</p>
+   *
+   * <p>The row container is stored on the instance so that
+   * {@link #setLeaderboard(List)} can rebuild the rows without rebuilding the
+   * surrounding header.</p>
+   *
+   * @return leaderboard section container.
+   */
+  private VBox buildLeaderboardSection() {
+    FontIcon trophy = new FontIcon("fas-trophy");
+    trophy.setIconSize(14);
+    trophy.getStyleClass().add("leaderboard-trophy");
+
+    Label title = new Label("Leaderboard");
+    title.getStyleClass().add("leaderboard-title");
+
+    HBox header = new HBox(8, trophy, title);
+    header.setAlignment(Pos.CENTER_LEFT);
+
+    leaderboardRows = new VBox(4);
+
+    VBox section = new VBox(10, header, leaderboardRows);
+    section.getStyleClass().add("leaderboard-section");
+    return section;
+  }
+
+  /**
+   * <p>Builds a single leaderboard row with rank, name, and score.</p>
+   *
+   * @param rank  the 1-based rank to display.
+   * @param name  the player's name, or {@code "—"} for an empty slot.
+   * @param score the score string to display, or {@code "—"} for an empty slot.
+   * @param empty whether this row represents an empty slot (used for styling).
+   * @return row container.
+   */
+  private HBox buildLeaderboardRow(int rank, String name, String score, boolean empty) {
+    Label rankLabel = new Label("#" + rank);
+    rankLabel.getStyleClass().add("leaderboard-rank");
+
+    Label nameLabel = new Label(name);
+    nameLabel.getStyleClass().add("leaderboard-name");
+    nameLabel.setMaxWidth(Double.MAX_VALUE);
+    HBox.setHgrow(nameLabel, Priority.ALWAYS);
+
+    Label scoreLabel = new Label(score);
+    scoreLabel.getStyleClass().add("leaderboard-score");
+
+    HBox row = new HBox(12, rankLabel, nameLabel, scoreLabel);
+    row.setAlignment(Pos.CENTER_LEFT);
+    row.getStyleClass().add("leaderboard-row");
+    if (empty) {
+      row.getStyleClass().add("leaderboard-row-empty");
+    }
+    return row;
+  }
+
+  /**
    * <p>Builds a labeled field group for inputs.</p>
    *
    * @param labelText text shown above the input.
    * @param input input node to place under the label.
    * @return grouped container.
    */
-  private VBox buildFieldGroup(String labelText, javafx.scene.Node input) {
+  private VBox buildFieldGroup(String labelText, Node input) {
     Label label = new Label(labelText);
     label.getStyleClass().add("startup-field-label");
     VBox group = new VBox(6, label, input);
@@ -306,6 +380,32 @@ public class StartupScreen extends StackPane{
     fileNameLabel.setText(name);
     fileNameLabel.getStyleClass().removeAll("startup-file-label-default");
     fileNameLabel.getStyleClass().add("startup-file-label-selected");
+  }
+
+  /**
+   * <p>Replaces the rendered leaderboard rows with the given entries.</p>
+   *
+   * <p>The first {@code MAX_ENTRIES} entries are rendered; remaining slots are
+   * padded with placeholder rows so the layout height stays stable regardless
+   * of how many real entries exist.</p>
+   *
+   * @param entries the entries to display, already sorted by score descending.
+   *                Must be non-null but may be empty.
+   */
+  public void setLeaderboard(List<LeaderboardEntry> entries) {
+    if (leaderboardRows == null) return;
+    leaderboardRows.getChildren().clear();
+    for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+      if (i < entries.size()) {
+        LeaderboardEntry entry = entries.get(i);
+        leaderboardRows.getChildren().add(
+            buildLeaderboardRow(i + 1, entry.name(),
+                String.format("%,d", entry.score()), false));
+      } else {
+        leaderboardRows.getChildren().add(
+            buildLeaderboardRow(i + 1, "—", "—", true));
+      }
+    }
   }
 
   /**

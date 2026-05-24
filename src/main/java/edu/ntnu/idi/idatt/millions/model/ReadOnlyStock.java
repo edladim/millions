@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -67,4 +68,20 @@ public interface ReadOnlyStock {
    *         or {@link BigDecimal#ZERO} if fewer than two prices exist
    */
   BigDecimal getLatestPriceChange();
+
+  /**
+   * Returns the latest price change as a percentage of the previous price.
+   *
+   * <p>Computed as {@code change / (currentPrice − change) × 100}. Returns
+   * {@link BigDecimal#ZERO} when no previous price exists so callers can sort
+   * and render uniformly without null checks.</p>
+   *
+   * @return the latest percentage change, scaled to four decimal places
+   */
+  default BigDecimal getLatestPercentChange() {
+    BigDecimal change = getLatestPriceChange();
+    BigDecimal previous = getSalesPrice().subtract(change);
+    if (previous.signum() == 0) return BigDecimal.ZERO;
+    return change.divide(previous, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+  }
 }

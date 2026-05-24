@@ -1,7 +1,8 @@
-package edu.ntnu.idi.idatt.millions.view;
+package edu.ntnu.idi.idatt.millions.view.dialogs;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionCalculator;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
 
 import javafx.geometry.Pos;
@@ -38,7 +39,7 @@ public final class TransactionDialog {
 
     Notifications.create()
             .title("Purchase Confirmation")
-            .text("Bought " + quantity + " × " + symbol
+            .text("Bought " + quantity + " × " + symbol + "\n"
                     + "Cost: " + ViewFormatter.price(calc.calculateGross()) + "\n"
                     + "Commission:  " + ViewFormatter.price(calc.calculateCommission()) + "\n"
                     + "Total paid:  " + ViewFormatter.price(calc.calculateTotal()) + "\n"
@@ -62,7 +63,7 @@ public final class TransactionDialog {
 
     Notifications.create()
             .title("Sale Confirmation")
-            .text("Sold " + quantity + " × " + symbol
+            .text("Sold " + quantity + " × " + symbol + "\n"
                     + "Proceeds:     " + ViewFormatter.price(calc.calculateGross()) + "\n"
                     + "Commission:   " + ViewFormatter.price(calc.calculateCommission()) + "\n"
                     + "Tax:          " + ViewFormatter.price(calc.calculateTax()) + "\n"

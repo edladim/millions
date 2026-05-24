@@ -10,7 +10,9 @@ import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.VPos;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -36,9 +38,17 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /** Action mode of the trading panel. */
   public enum Mode { BUY, SELL }
 
+  /** Minimum width kept for the center panel before the buy-panel wrapper starts shrinking. */
+  private static final double CENTER_MIN_WIDTH = 420;
+  /** Natural preferred width of the buy-panel wrapper (BuyPanel pref 300 + right padding 24). */
+  private static final double WRAPPER_PREF_WIDTH = 324;
+  /** Hard floor for the buy-panel wrapper so it never collapses entirely. */
+  private static final double WRAPPER_MIN_WIDTH = 200;
+
   private final StockListPanel stockListPanel;
   private final BuyPanel buyPanel;
   private final StockChartComponent stockChart;
+  private VBox buyPanelWrapper;
 
   private Consumer<String> onSelectStock;
   private Runnable onRefresh;
@@ -65,8 +75,52 @@ public class TradingView extends BorderPane implements ExchangeObserver {
       if (onSelectStock != null) onSelectStock.accept(symbol);
     });
 
+    buyPanel.setMinWidth(0);
+
     this.setCenter(buildCenterPanel());
     this.setRight(buildBuyPanelWrapper());
+  }
+
+  /**
+   * <p>Returns {@code 0} so the parent {@link javafx.scene.control.ScrollPane}
+   * (with {@code fitToWidth=true}) can shrink this node freely to the viewport
+   * width. The default {@link BorderPane} implementation would return
+   * {@code center.minWidth + right.minWidth}, freezing the view at that
+   * combined minimum and causing the right panel to be clipped instead of
+   * shrinking.</p>
+   */
+  @Override
+  protected double computeMinWidth(double height) {
+    return 0;
+  }
+
+  /**
+   * <p>Controls the exact pixel split between the center panel and the
+   * buy-panel wrapper in one layout pass, bypassing the standard
+   * {@link BorderPane} algorithm which reads {@code prefWidth} one frame
+   * too late on window resize.</p>
+   *
+   * <p>The right wrapper holds at {@value #WRAPPER_PREF_WIDTH} px and only
+   * starts shrinking once the center reaches {@value #CENTER_MIN_WIDTH} px.
+   * It floors at {@value #WRAPPER_MIN_WIDTH} px.</p>
+   */
+  @Override
+  protected void layoutChildren() {
+    Insets ins = getInsets();
+    double x = ins.getLeft();
+    double y = ins.getTop();
+    double w = getWidth()  - ins.getLeft() - ins.getRight();
+    double h = getHeight() - ins.getTop()  - ins.getBottom();
+
+    double rightW  = Math.clamp(w - CENTER_MIN_WIDTH, WRAPPER_MIN_WIDTH, WRAPPER_PREF_WIDTH);
+    double centerW = w - rightW;
+
+    if (getCenter() != null) {
+      layoutInArea(getCenter(), x, y, centerW, h, 0, null, HPos.LEFT, VPos.TOP);
+    }
+    if (getRight() != null) {
+      layoutInArea(getRight(), x + centerW, y, rightW, h, 0, null, HPos.LEFT, VPos.TOP);
+    }
   }
 
   private VBox buildCenterPanel() {
@@ -80,10 +134,11 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   private VBox buildBuyPanelWrapper() {
-    VBox wrapper = new VBox(buyPanel);
-    wrapper.getStyleClass().add("buy-panel-wrapper");
-    wrapper.setPadding(new Insets(24, 24, 24, 0));
-    return wrapper;
+    buyPanelWrapper = new VBox(buyPanel);
+    buyPanelWrapper.getStyleClass().add("buy-panel-wrapper");
+    buyPanelWrapper.setPadding(new Insets(24, 24, 24, 0));
+    buyPanelWrapper.setMinWidth(WRAPPER_MIN_WIDTH);
+    return buyPanelWrapper;
   }
 
   // ExchangeObserver

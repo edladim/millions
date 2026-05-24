@@ -825,9 +825,67 @@
 }
 
 .startup-title {
-    -fx-font-size: 34px;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
+}
+
+/* Leaderboard */
+.leaderboard-section {
+    -fx-border-color: #e2e8f0 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 14 0 0 0;
+}
+
+.leaderboard-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.leaderboard-trophy {
+    -fx-icon-color: -primary;
+}
+
+.leaderboard-row {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+}
+
+.leaderboard-row-empty {
+    -fx-background-color: transparent;
+}
+
+.leaderboard-rank {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -primary;
+    -fx-min-width: 28;
+}
+
+.leaderboard-row-empty .leaderboard-rank {
+    -fx-text-fill: #cbd5e1;
+}
+
+.leaderboard-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text;
+}
+
+.leaderboard-row-empty .leaderboard-name {
+    -fx-text-fill: #cbd5e1;
+}
+
+.leaderboard-score {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
+}
+
+.leaderboard-row-empty .leaderboard-score {
+    -fx-text-fill: #cbd5e1;
+    -fx-font-weight: normal;
 }
 
 .startup-subtitle {

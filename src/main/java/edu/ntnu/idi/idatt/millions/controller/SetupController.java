@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
+import edu.ntnu.idi.idatt.millions.filehandler.LeaderboardStore;
 import edu.ntnu.idi.idatt.millions.filehandler.StockFileException;
 import edu.ntnu.idi.idatt.millions.filehandler.StockLoader;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
@@ -11,6 +12,7 @@ import edu.ntnu.idi.idatt.millions.view.StartupScreen;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -44,19 +46,33 @@ public class SetupController {
     screen.setOnBrowse(this::handleBrowse);
     screen.setOnStart(this::handleStart);
 
-    this.startupScene = new Scene(screen, 520, 660);
+    ScrollPane scroll = new ScrollPane(screen);
+    scroll.setFitToWidth(true);
+    scroll.setFitToHeight(true);
+    scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    scroll.getStyleClass().add("page-scroll");
+
+    this.startupScene = new Scene(scroll, 600, 760);
     this.startupScene.getStylesheets().add(Stylesheets.load("/styles/main.css"));
   }
 
   /**
    * <p>Displays the startup screen and applies base styles.</p>
+   *
+   * <p>Refreshes the leaderboard each time the screen is shown so scores added
+   * since the previous game appear immediately when the player returns from
+   * the end-game overlay.</p>
    */
   public void show() {
     FontLoader.loadInter();
+    screen.setLeaderboard(LeaderboardStore.loadTop());
     primaryStage.setScene(startupScene);
     primaryStage.setTitle("Millions");
     primaryStage.setMaximized(true);
     primaryStage.setResizable(true);
+    primaryStage.setMinWidth(600);
+    primaryStage.setMinHeight(0);
     primaryStage.centerOnScreen();
     primaryStage.show();
   }

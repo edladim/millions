@@ -1,5 +1,6 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
+import edu.ntnu.idi.idatt.millions.filehandler.LeaderboardStore;
 import edu.ntnu.idi.idatt.millions.model.Exchange;
 import edu.ntnu.idi.idatt.millions.model.Player;
 import edu.ntnu.idi.idatt.millions.model.ScoreCalculator;
@@ -7,6 +8,7 @@ import edu.ntnu.idi.idatt.millions.model.Share;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.Page;
 import java.util.ArrayList;
+import java.util.OptionalInt;
 
 /**
  * <p>Top-level controller for an active game.</p>
@@ -107,12 +109,14 @@ public class GameController {
    */
   private void endGame() {
     long score = ScoreCalculator.compute(player.getReturnRate(), exchange.getWeek());
+    OptionalInt rank = LeaderboardStore.submit(player.getName(), score);
     view.showEndGame(
         player.getNetWorth(),
         player.getProfit(),
         player.getReturnRate(),
         exchange.getWeek(),
-        score
+        score,
+        rank
     );
   }
 }

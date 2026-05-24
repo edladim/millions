@@ -10,6 +10,7 @@ import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.OptionalInt;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.scene.Scene;
@@ -159,18 +160,23 @@ public class MainView {
    * @param returnRate the player's return rate as a decimal (e.g. 0.20 for 20%)
    * @param weeks      number of weeks played
    * @param score      the computed Millions Score
+   * @param rank       the player's leaderboard rank (1-based) if they made the
+   *                   top list, or empty if they did not qualify
    */
   public void showEndGame(BigDecimal netWorth,
                           BigDecimal profit,
                           BigDecimal returnRate,
                           int weeks,
-                          long score) {
+                          long score,
+                          OptionalInt rank) {
+    String rankText = rank.isPresent() ? "#" + rank.getAsInt() : "Not in top 5";
     endGameOverlay.show(List.of(
         new StatRow("Net Worth",      ViewFormatter.wholePrice(netWorth)),
         new StatRow("Profit",         ViewFormatter.price(profit)),
         new StatRow("Return Rate",    ViewFormatter.rateAsPercent(returnRate)),
         new StatRow("Weeks played",   String.valueOf(weeks)),
-        new StatRow("Millions Score", String.valueOf(score))
+        new StatRow("Millions Score", String.valueOf(score)),
+        new StatRow("Your Rank",      rankText)
     ));
   }
 

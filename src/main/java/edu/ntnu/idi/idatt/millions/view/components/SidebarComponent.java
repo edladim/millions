@@ -155,6 +155,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    */
   private void confirmAndRetire() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.initOwner(getScene().getWindow());
     alert.setTitle("Confirm retirement");
     alert.setHeaderText("Are you sure you want to retire?");
     alert.setContentText("This will sell all your shares and end the game.");

@@ -1083,5 +1083,17 @@
 
 /* End game overlay */
 .endgame-overlay {
-    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-background-color: rgba(0, 0, 0, 0.65);
+}
+
+.endgame-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.endgame-stat-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
 }

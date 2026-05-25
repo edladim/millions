@@ -253,6 +253,109 @@ class PlayerTest {
   }
 
   /**
+   * Verifies that addMoney rejects null.
+   */
+  @Test
+  void addMoney_null_throwsNullPointerException() {
+    assertThrows(NullPointerException.class, () -> player.addMoney(null));
+  }
+
+  /**
+   * Verifies that withdrawMoney rejects null.
+   */
+  @Test
+  void withdrawMoney_null_throwsNullPointerException() {
+    assertThrows(NullPointerException.class, () -> player.withdrawMoney(null));
+  }
+
+  /**
+   * Verifies that historical net worth starts empty.
+   */
+  @Test
+  void getHistoricalNetWorth_initial_isEmpty() {
+    assertTrue(player.getHistoricalNetWorth().isEmpty());
+  }
+
+  /**
+   * Verifies that updateHistoricalNetWorth records the current net worth.
+   */
+  @Test
+  void updateHistoricalNetWorth_recordsCurrentNetWorth() {
+    player.updateHistoricalNetWorth();
+    assertEquals(1, player.getHistoricalNetWorth().size());
+    assertEquals(0, startingMoney.compareTo(player.getHistoricalNetWorth().get(0)));
+  }
+
+  /**
+   * Verifies that multiple calls to updateHistoricalNetWorth accumulate entries.
+   */
+  @Test
+  void updateHistoricalNetWorth_multipleCalls_appendsEachSnapshot() {
+    player.updateHistoricalNetWorth();
+    player.addMoney(new BigDecimal("1000"));
+    player.updateHistoricalNetWorth();
+
+    assertEquals(2, player.getHistoricalNetWorth().size());
+    assertEquals(0, new BigDecimal("10000").compareTo(player.getHistoricalNetWorth().get(0)));
+    assertEquals(0, new BigDecimal("11000").compareTo(player.getHistoricalNetWorth().get(1)));
+  }
+
+  /**
+   * Verifies that addObserver rejects null.
+   */
+  @Test
+  void addObserver_null_throwsNullPointerException() {
+    assertThrows(NullPointerException.class, () -> player.addObserver(null));
+  }
+
+  /**
+   * Verifies that registered observers are notified when money is added.
+   */
+  @Test
+  void addObserver_notifiedOnAddMoney() {
+    int[] callCount = {0};
+    player.addObserver(p -> callCount[0]++);
+    player.addMoney(new BigDecimal("100"));
+    assertEquals(1, callCount[0]);
+  }
+
+  /**
+   * Verifies that registered observers are notified when money is withdrawn.
+   */
+  @Test
+  void addObserver_notifiedOnWithdrawMoney() {
+    int[] callCount = {0};
+    player.addObserver(p -> callCount[0]++);
+    player.withdrawMoney(new BigDecimal("100"));
+    assertEquals(1, callCount[0]);
+  }
+
+  /**
+   * Verifies that registering the same observer twice does not cause duplicate notifications.
+   */
+  @Test
+  void addObserver_duplicateObserver_notifiedOnce() {
+    int[] callCount = {0};
+    var observer = (edu.ntnu.idi.idatt.millions.observer.PlayerObserver) p -> callCount[0]++;
+    player.addObserver(observer);
+    player.addObserver(observer);
+    player.addMoney(new BigDecimal("100"));
+    assertEquals(1, callCount[0]);
+  }
+
+  /**
+   * Verifies that the observer callback receives the correct player reference.
+   */
+  @Test
+  void addObserver_callbackReceivesCorrectPlayer() {
+    edu.ntnu.idi.idatt.millions.model.player.ReadOnlyPlayer[] received = {null};
+    player.addObserver(p -> received[0] = p);
+    player.addMoney(new BigDecimal("500"));
+    assertNotNull(received[0]);
+    assertEquals(player.getName(), received[0].getName());
+  }
+
+  /**
    * Verifies status assignment for each return-rate band.
    */
   @Test
@@ -289,5 +392,49 @@ class PlayerTest {
   void getStatus_worstBand_returnsBuyHighBjorn() {
     player.withdrawMoney(new BigDecimal("6000")); // -60%
     assertEquals(PlayerStatus.BUY_HIGH_BJORN, player.getStatus());
+  }
+
+  /**
+   * Verifies boundary: exactly -20% return is still AVERAGE_JOE (>= -0.20).
+   */
+  @Test
+  void getStatus_exactlyMinus20Percent_returnsAverageJoe() {
+    player.withdrawMoney(new BigDecimal("2000")); // -20%
+    assertEquals(PlayerStatus.AVERAGE_JOE, player.getStatus());
+  }
+
+  /**
+   * Verifies boundary: just below -20% crosses into MAX_MINUS.
+   */
+  @Test
+  void getStatus_justBelowMinus20Percent_returnsMaxMinus() {
+    player.withdrawMoney(new BigDecimal("2001")); // -20.01%
+    assertEquals(PlayerStatus.MAX_MINUS, player.getStatus());
+  }
+
+  /**
+   * Verifies boundary: exactly -50% return is still MAX_MINUS (>= -0.50).
+   */
+  @Test
+  void getStatus_exactlyMinus50Percent_returnsMaxMinus() {
+    player.withdrawMoney(new BigDecimal("5000")); // -50%
+    assertEquals(PlayerStatus.MAX_MINUS, player.getStatus());
+  }
+
+  /**
+   * Verifies boundary: just below -50% crosses into BUY_HIGH_BJORN.
+   */
+  @Test
+  void getStatus_justBelowMinus50Percent_returnsBuyHighBjorn() {
+    player.withdrawMoney(new BigDecimal("5001")); // -50.01%
+    assertEquals(PlayerStatus.BUY_HIGH_BJORN, player.getStatus());
+  }
+
+  /**
+   * Verifies boundary: exactly 0% return is AVERAGE_JOE (>= -0.20).
+   */
+  @Test
+  void getStatus_zeroReturn_returnsAverageJoe() {
+    assertEquals(PlayerStatus.AVERAGE_JOE, player.getStatus());
   }
 }

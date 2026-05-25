@@ -53,5 +53,15 @@ class MomentumFluctuatorTest {
     assertEquals(BigDecimal.ONE, price);
   }
 
+  @Test
+  void nextPrice_returnsRawPriceWhenAtOrAboveFloor() {
+    fluctuator.beginWeek(new ConstantRandom(1.0));
 
+    BigDecimal price = fluctuator.nextPrice(
+            "ABOVE", new BigDecimal("1.00"), new ConstantRandom(1.0));
+
+    assertTrue(price.compareTo(BigDecimal.ONE) > 0);
+  }
+
+  
 }

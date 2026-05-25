@@ -151,6 +151,55 @@ class ShareTest {
     assertEquals(s1.hashCode(), s2.hashCode());
   }
 
+  /** Verifies equals returns true for the same instance. */
+  @Test
+  void equals_sameInstance_returnsTrue() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+
+    assertTrue(share.equals(share));
+  }
+
+  /** Ensures equals returns false when quantity differs. */
+  @Test
+  void equals_differentQuantity_returnsFalse() {
+    Share s1 = new Share(stock, new BigDecimal("1"), BigDecimal.ONE);
+    Share s2 = new Share(stock, new BigDecimal("2"), BigDecimal.ONE);
+
+    assertFalse(s1.equals(s2));
+  }
+
+  /** Ensures equals returns false when purchase price differs. */
+  @Test
+  void equals_differentPurchasePrice_returnsFalse() {
+    Share s1 = new Share(stock, BigDecimal.ONE, new BigDecimal("10"));
+    Share s2 = new Share(stock, BigDecimal.ONE, new BigDecimal("11"));
+
+    assertFalse(s1.equals(s2));
+  }
+
+  /** Ensures equals safely handles null. */
+  @Test
+  void equals_null_returnsFalse() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+    assertFalse(share.equals(null));
+  }
+
+  /** Ensures equals returns false for unrelated types. */
+  @Test
+  void equals_differentType_returnsFalse() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+    assertFalse(share.equals("not share"));
+  }
+
+  /** Verifies hashCode is consistent with value equality. */
+  @Test
+  void hashCode_sameValuesDifferentScale_matches() {
+    Share s1 = new Share(stock, new BigDecimal("10.0"), new BigDecimal("150.00"));
+    Share s2 = new Share(stock, new BigDecimal("10.00"), new BigDecimal("150.0"));
+
+    assertEquals(s1.hashCode(), s2.hashCode());
+  }
+
   /**
    * Ensures two shares with different underlying stocks are not equal,
    * even if the numeric fields match.
@@ -163,23 +212,5 @@ class ShareTest {
     Share s2 = new Share(other, BigDecimal.ONE, BigDecimal.ONE);
 
     assertNotEquals(s1, s2);
-  }
-
-  /**
-   * Ensures equals safely handles null.
-   */
-  @Test
-  void equals_null_returnsFalse() {
-    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertNotEquals(null, share);
-  }
-
-  /**
-   * Ensures equals returns false for unrelated types.
-   */
-  @Test
-  void equals_differentType_returnsFalse() {
-    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertNotEquals("not share", share);
   }
 }

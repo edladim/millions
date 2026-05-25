@@ -1,12 +1,14 @@
 package edu.ntnu.idi.idatt.millions.model.portfolio;
 
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -254,4 +256,89 @@ class PortfolioTest {
     assertEquals(0, expectedNetWorth.compareTo(portfolio.getNetWorth()));
   }
 
+  @Test
+  void constructor_withNullShare_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> new Portfolio(List.of(share1, null)));
+  }
+
+  @Test
+  void getHoldings_aggregatesBySymbol() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+
+    List<Holding> holdings = portfolio.getHoldings();
+
+    assertEquals(2, holdings.size());
+    Holding appleHolding = holdings.stream()
+        .filter(h -> h.stock().getSymbol().equals("AAPL"))
+        .findFirst()
+        .orElseThrow();
+    Holding googleHolding = holdings.stream()
+        .filter(h -> h.stock().getSymbol().equals("GOOGL"))
+        .findFirst()
+        .orElseThrow();
+
+    assertEquals(0, appleHolding.totalQuantity().compareTo(new BigDecimal("15")));
+    assertEquals(0, appleHolding.totalInvestment().compareTo(new BigDecimal("2200")));
+    assertEquals(0, googleHolding.totalQuantity().compareTo(new BigDecimal("3")));
+    assertEquals(0, googleHolding.totalInvestment().compareTo(new BigDecimal("240")));
+  }
+
+  @Test
+  void getDistinctStockCount_returnsUniqueCount() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+    portfolio.addShare(share3);
+
+    assertEquals(2, portfolio.getDistinctStockCount());
+  }
+
+  @Test
+  void size_returnsShareCount() {
+    portfolio.addShare(share1);
+    portfolio.addShare(share2);
+
+    assertEquals(2, portfolio.size());
+  }
+
+  @Test
+  void addObserver_nullObserver_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> portfolio.addObserver(null));
+  }
+
+  @Test
+  void addObserver_duplicateObserver_notifiedOnce() {
+    AtomicInteger updates = new AtomicInteger();
+    PortfolioObserver observer = p -> updates.incrementAndGet();
+
+    portfolio.addObserver(observer);
+    portfolio.addObserver(observer);
+    portfolio.addShare(share1);
+
+    assertEquals(1, updates.get());
+  }
+
+  @Test
+  void notifyObservers_onlyOnSuccessfulRemove() {
+    AtomicInteger updates = new AtomicInteger();
+    PortfolioObserver observer = p -> updates.incrementAndGet();
+
+    portfolio.addObserver(observer);
+    portfolio.addShare(share1);
+    assertEquals(1, updates.get());
+
+    assertFalse(portfolio.removeShare(share2));
+    assertEquals(1, updates.get());
+
+    assertTrue(portfolio.removeShare(share1));
+    assertEquals(2, updates.get());
+  }
+
+  @Test
+  void getNetWorth_emptyPortfolio_returnsZero() {
+    assertEquals(0, BigDecimal.ZERO.compareTo(portfolio.getNetWorth()));
+  }
 }

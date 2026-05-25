@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Share;
-import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

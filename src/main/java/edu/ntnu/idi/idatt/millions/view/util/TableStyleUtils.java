@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.util;
 
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;

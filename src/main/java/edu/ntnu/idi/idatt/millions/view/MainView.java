@@ -1,5 +1,7 @@
 package edu.ntnu.idi.idatt.millions.view;
 
+import edu.ntnu.idi.idatt.millions.view.pages.Page;
+
 import edu.ntnu.idi.idatt.millions.view.components.SidebarComponent;
 import edu.ntnu.idi.idatt.millions.view.dialogs.EndGameOverlay;
 import edu.ntnu.idi.idatt.millions.view.dialogs.EndGameOverlay.StatRow;

@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 
 /**
  * Factory that creates {@link Sale} transactions.

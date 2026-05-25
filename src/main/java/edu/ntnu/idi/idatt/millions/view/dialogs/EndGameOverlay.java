@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.dialogs;
 
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

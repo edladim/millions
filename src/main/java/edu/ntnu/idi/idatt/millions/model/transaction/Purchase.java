@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 
 import java.math.BigDecimal;
 import java.util.Objects;

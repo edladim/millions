@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.model.Player;
+import edu.ntnu.idi.idatt.millions.model.market.Exchange;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.view.dialogs.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.pages.PortfolioView;
 import java.math.BigDecimal;

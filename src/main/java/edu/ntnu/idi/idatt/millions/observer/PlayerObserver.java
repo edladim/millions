@@ -1,11 +1,11 @@
 package edu.ntnu.idi.idatt.millions.observer;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
+import edu.ntnu.idi.idatt.millions.model.player.ReadOnlyPlayer;
 
 /**
  * Observer interface for receiving notifications when a player changes state.
  *
- * <p>Observers register themselves on a {@link edu.ntnu.idi.idatt.millions.model.Player}
+ * <p>Observers register themselves on a {@link edu.ntnu.idi.idatt.millions.model.player.Player}
  * and are notified whenever the player's money balance changes
  * (i.e. after a purchase or sale).</p>
  *

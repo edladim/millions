@@ -1,12 +1,12 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
-import edu.ntnu.idi.idatt.millions.filehandler.LeaderboardStore;
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.ScoreCalculator;
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.persistence.leaderboard.LeaderboardStore;
+import edu.ntnu.idi.idatt.millions.model.market.Exchange;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.player.ScoreCalculator;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import edu.ntnu.idi.idatt.millions.view.MainView;
-import edu.ntnu.idi.idatt.millions.view.Page;
+import edu.ntnu.idi.idatt.millions.view.pages.Page;
 import java.util.ArrayList;
 import java.util.OptionalInt;
 

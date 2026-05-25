@@ -63,5 +63,16 @@ class MomentumFluctuatorTest {
     assertTrue(price.compareTo(BigDecimal.ONE) > 0);
   }
 
-  
+  @Test
+  void nextPrice_reusesExistingVolatilityForSameSymbol() {
+    fluctuator.beginWeek(new ConstantRandom(1.0));
+
+    BigDecimal first = fluctuator.nextPrice(
+            "REUSE", new BigDecimal("10"), new ConstantRandom(1.0));
+    assertTrue(first.compareTo(BigDecimal.ONE) > 0);
+
+    BigDecimal second = fluctuator.nextPrice(
+            "REUSE", new BigDecimal("10"), new ConstantRandom(1.0));
+    assertTrue(second.compareTo(BigDecimal.ONE) > 0);
+  }
 }

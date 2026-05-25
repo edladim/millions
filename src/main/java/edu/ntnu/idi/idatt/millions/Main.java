@@ -1,6 +1,7 @@
 package edu.ntnu.idi.idatt.millions;
 
 import edu.ntnu.idi.idatt.millions.controller.SetupController;
+import edu.ntnu.idi.idatt.millions.view.util.AppIcon;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -21,6 +22,7 @@ public class Main extends Application {
    */
   @Override
   public void start(Stage primaryStage) {
+    AppIcon.apply(primaryStage);
     SetupController setup = new SetupController(primaryStage);
     setup.show();
   }

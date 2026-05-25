@@ -267,6 +267,24 @@ class StockTest {
     assertEquals(s1.hashCode(), s2.hashCode());
   }
 
- 
+  /** Verifies that toString includes the symbol, company, and price history. */
+  @Test
+  void toString_includesSymbolCompanyAndPrices() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+
+    String result = stock.toString();
+
+    assertTrue(result.contains("AAPL"));
+    assertTrue(result.contains("Apple"));
+    assertTrue(result.contains("10"));
+  }
+
+  /** Verifies that equals returns true when comparing the same instance. */
+  @Test
+  void equals_sameInstance_returnsTrue() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+
+    assertEquals(stock, stock);
+  }
 
 }

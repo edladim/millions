@@ -1,8 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.components;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
-import edu.ntnu.idi.idatt.millions.view.Page;
+import edu.ntnu.idi.idatt.millions.view.pages.Page;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import javafx.geometry.Insets;

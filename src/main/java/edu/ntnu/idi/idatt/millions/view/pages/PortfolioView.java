@@ -1,8 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyPlayer;
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
+import edu.ntnu.idi.idatt.millions.model.player.PlayerStatus;
+import edu.ntnu.idi.idatt.millions.model.player.ReadOnlyPlayer;
+import edu.ntnu.idi.idatt.millions.model.portfolio.ReadOnlyPortfolio;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
@@ -10,7 +10,7 @@ import edu.ntnu.idi.idatt.millions.view.components.portfolio.HoldingsPanel;
 import edu.ntnu.idi.idatt.millions.view.components.portfolio.TransactionHistoryPanel;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;

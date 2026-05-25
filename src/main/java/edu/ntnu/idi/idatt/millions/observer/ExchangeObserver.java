@@ -1,11 +1,11 @@
 package edu.ntnu.idi.idatt.millions.observer;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
 
 /**
  * Observer interface for receiving notifications when an exchange changes state.
  *
- * <p>Observers register themselves on an {@link edu.ntnu.idi.idatt.millions.model.Exchange}
+ * <p>Observers register themselves on an {@link edu.ntnu.idi.idatt.millions.model.market.Exchange}
  * and are notified whenever the exchange advances to the next trading week
  * (i.e. stock prices are updated).</p>
  *

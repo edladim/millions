@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.util;
 
-import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
+import edu.ntnu.idi.idatt.millions.model.player.PlayerStatus;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;

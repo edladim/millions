@@ -1,10 +1,10 @@
 package edu.ntnu.idi.idatt.millions.view.components.portfolio;
 
-import edu.ntnu.idi.idatt.millions.model.Holding;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Holding;
 import edu.ntnu.idi.idatt.millions.view.util.TableStyleUtils;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.widgets.PaginatedTable;
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.PaginatedTable;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.BiConsumer;

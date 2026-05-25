@@ -1,12 +1,12 @@
 package edu.ntnu.idi.idatt.millions.view.pages;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
 import edu.ntnu.idi.idatt.millions.view.components.trading.BuyPanel;
 import edu.ntnu.idi.idatt.millions.view.components.trading.StockListPanel;
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;

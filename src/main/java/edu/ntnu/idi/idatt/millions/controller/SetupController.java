@@ -1,14 +1,14 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
-import edu.ntnu.idi.idatt.millions.filehandler.LeaderboardStore;
-import edu.ntnu.idi.idatt.millions.filehandler.StockFileException;
-import edu.ntnu.idi.idatt.millions.filehandler.StockLoader;
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Stock;
+import edu.ntnu.idi.idatt.millions.persistence.leaderboard.LeaderboardStore;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
+import edu.ntnu.idi.idatt.millions.persistence.stock.StockLoader;
+import edu.ntnu.idi.idatt.millions.model.market.Exchange;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.view.util.FontLoader;
 import edu.ntnu.idi.idatt.millions.view.MainView;
-import edu.ntnu.idi.idatt.millions.view.StartupScreen;
+import edu.ntnu.idi.idatt.millions.view.pages.StartupPage;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
@@ -31,7 +31,7 @@ import java.util.List;
 public class SetupController {
 
   private final Stage primaryStage;
-  private final StartupScreen screen;
+  private final StartupPage screen;
   private final Scene startupScene;
   private File selectedFile = null;
 
@@ -43,7 +43,7 @@ public class SetupController {
    */
   public SetupController(Stage primaryStage) {
     this.primaryStage = primaryStage;
-    this.screen = new StartupScreen();
+    this.screen = new StartupPage();
 
     screen.setOnBrowse(this::handleBrowse);
     screen.setOnStart(this::handleStart);
@@ -114,7 +114,7 @@ public class SetupController {
     List<Stock> stocks;
     try {
       stocks = StockLoader.load(selectedFile);
-    } catch (StockFileException e) {
+    } catch (PersistenceException e) {
       screen.showError(e.getMessage());
       return;
     }

@@ -1,8 +1,8 @@
 package edu.ntnu.idi.idatt.millions.view.components.trading;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView.Mode;
 import java.math.BigDecimal;
 import java.math.RoundingMode;

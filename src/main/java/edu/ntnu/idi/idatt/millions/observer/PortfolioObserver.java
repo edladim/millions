@@ -1,11 +1,11 @@
 package edu.ntnu.idi.idatt.millions.observer;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyPortfolio;
+import edu.ntnu.idi.idatt.millions.model.portfolio.ReadOnlyPortfolio;
 
 /**
  * Observer interface for receiving notifications when a portfolio changes state.
  *
- * <p>Observers register themselves on a {@link edu.ntnu.idi.idatt.millions.model.Portfolio}
+ * <p>Observers register themselves on a {@link edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio}
  * and are notified whenever shares are added to or removed from it.</p>
  *
  * <p>The callback receives a {@link ReadOnlyPortfolio} to prevent observers from

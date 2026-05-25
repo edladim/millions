@@ -1,9 +1,9 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
-import edu.ntnu.idi.idatt.millions.model.Exchange;
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.market.Exchange;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.CostPreviewCalculator;
 import edu.ntnu.idi.idatt.millions.view.dialogs.TransactionDialog;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;

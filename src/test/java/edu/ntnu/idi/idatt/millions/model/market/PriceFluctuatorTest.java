@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class PriceFluctuatorTest {
   @Test
   void beginWeek_defaultImplementation_doesNothing() {
-    PriceFluctuator fluctuator = (symbol, currentPrice, random) -> currentPrice;
+    PriceFluctuator fluctuator = (_, currentPrice, _) -> currentPrice;
 
     assertDoesNotThrow(() -> fluctuator.beginWeek(new Random(1)));
   }

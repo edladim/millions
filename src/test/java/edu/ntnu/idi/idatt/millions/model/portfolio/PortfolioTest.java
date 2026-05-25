@@ -32,16 +32,14 @@ class PortfolioTest {
   private Share share1;
   private Share share2;
   private Share share3;
-  private Stock apple;
-  private Stock google;
 
   /** Creates a portfolio and sample shares before each test. */
   @BeforeEach
   void setUp() {
     portfolio = new Portfolio();
 
-    apple = new Stock("AAPL", "Apple", new BigDecimal("200"));
-    google = new Stock("GOOGL", "Google", new BigDecimal("100"));
+    Stock apple = new Stock("AAPL", "Apple", new BigDecimal("200"));
+    Stock google = new Stock("GOOGL", "Google", new BigDecimal("100"));
 
     share1 = new Share(apple, new BigDecimal("10"), new BigDecimal("150"));
     share2 = new Share(apple, new BigDecimal("5"), new BigDecimal("140"));

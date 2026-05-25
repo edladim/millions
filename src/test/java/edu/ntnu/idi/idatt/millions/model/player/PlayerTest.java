@@ -222,7 +222,7 @@ class PlayerTest {
   void updateHistoricalNetWorth_recordsCurrentNetWorth() {
     player.updateHistoricalNetWorth();
     assertEquals(1, player.getHistoricalNetWorth().size());
-    assertEquals(0, startingMoney.compareTo(player.getHistoricalNetWorth().get(0)));
+    assertEquals(0, startingMoney.compareTo(player.getHistoricalNetWorth().getFirst()));
   }
 
   /** Verifies that multiple calls to updateHistoricalNetWorth accumulate entries. */

@@ -30,8 +30,6 @@ public class EndGameOverlay extends StackPane {
    */
   public record StatRow(String label, String value) {}
 
-  private final VBox card;
-  private final Label title;
   private final VBox statsBox;
   private final Button newGameBtn;
   private final Button exitBtn;
@@ -44,12 +42,12 @@ public class EndGameOverlay extends StackPane {
     setPickOnBounds(true);
     setPadding(new Insets(20, 0, 20, 0));
 
-    card = new VBox(0);
+    VBox card = new VBox(0);
     card.getStyleClass().add("startup-card");
     card.setMaxWidth(550);
     card.setMinWidth(550);
 
-    title = new Label("Game Over");
+    Label title = new Label("Game Over");
     title.getStyleClass().add("endgame-title");
     Label subtitle = new Label("Your final results");
     subtitle.getStyleClass().add("startup-subtitle");
@@ -134,7 +132,7 @@ public class EndGameOverlay extends StackPane {
    * @param onNewGame the action to run
    */
   public void setOnNewGame(Runnable onNewGame) {
-    newGameBtn.setOnAction(e -> onNewGame.run());
+    newGameBtn.setOnAction(_ -> onNewGame.run());
   }
 
   /**
@@ -143,6 +141,6 @@ public class EndGameOverlay extends StackPane {
    * @param onExit the action to run
    */
   public void setOnExit(Runnable onExit) {
-    exitBtn.setOnAction(e -> onExit.run());
+    exitBtn.setOnAction(_ -> onExit.run());
   }
 }

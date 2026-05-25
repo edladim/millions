@@ -484,13 +484,6 @@ public class BuyPanel extends VBox {
     actionButton.setDisable(!enabled);
   }
 
-  /** Clears the input field without triggering side effects beyond the input-change listener. */
-  public void clearInput() {
-    setSpinnerValue(BigDecimal.ZERO);
-    inputSpinner.getEditor().clear();
-    derivedLabel.setText("");
-  }
-
   /**
    * Sets the current sales price of the selected stock so the panel can convert between quantity-
    * and amount-input when the user toggles the mode.

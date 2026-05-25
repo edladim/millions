@@ -182,21 +182,6 @@ public final class ViewWidgets {
   }
 
   /**
-   * Creates a centred placeholder label shown when a list or section has no data (e.g. "You don't
-   * own any shares yet.").
-   *
-   * @param text the placeholder text
-   * @return the configured label
-   */
-  public static Label emptyLabel(String text) {
-    Label label = new Label(text);
-    label.getStyleClass().add("empty-label");
-    label.setMaxWidth(Double.MAX_VALUE);
-    label.setAlignment(Pos.CENTER);
-    return label;
-  }
-
-  /**
    * Creates an invisible vertical spacer of the given height. Use for adding fixed vertical gaps in
    * a {@link VBox} without relying on spacing.
    *

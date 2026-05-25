@@ -231,7 +231,7 @@ public class DashboardView extends VBox
     label.setAlignment(Pos.CENTER);
     label.setVisible(false);
     label.setManaged(false);
-    label.setOnMouseClicked(e -> onLoad.run());
+    label.setOnMouseClicked(_ -> onLoad.run());
     return label;
   }
 

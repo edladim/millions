@@ -27,14 +27,13 @@ import org.junit.jupiter.api.Test;
 class SaleCalculatorTest {
 
   private SaleCalculator calculator;
-  private Share profitableShare;
 
   /** Creates a share that will generate a profit when sold. */
   @BeforeEach
   void setUp() {
 
     Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("200"));
-    profitableShare = new Share(stock, new BigDecimal("10"), new BigDecimal("100"));
+    Share profitableShare = new Share(stock, new BigDecimal("10"), new BigDecimal("100"));
 
     calculator = new SaleCalculator(profitableShare);
   }

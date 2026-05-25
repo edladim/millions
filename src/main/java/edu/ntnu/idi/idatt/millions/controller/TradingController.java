@@ -30,7 +30,6 @@ public class TradingController {
 
   private String selectedSymbol = null;
   private String lastBuySymbol = null;
-  private List<? extends ReadOnlyStock> currentResults = List.of();
 
   /**
    * Creates a trading controller, registers the view as an exchange observer, and wires all view
@@ -286,17 +285,18 @@ public class TradingController {
     List<? extends ReadOnlyStock> base =
         text.isBlank() ? exchange.getStocks() : exchange.findStocks(text);
 
+    List<? extends ReadOnlyStock> results;
     if (view.getMode() == TradingView.Mode.SELL) {
       Set<String> owned =
           player.getPortfolio().getShares().stream()
               .map(s -> s.getStock().getSymbol())
               .collect(Collectors.toSet());
-      currentResults = base.stream().filter(s -> owned.contains(s.getSymbol())).toList();
+      results = base.stream().filter(s -> owned.contains(s.getSymbol())).toList();
     } else {
-      currentResults = base;
+      results = base;
     }
 
-    view.setStocks(currentResults);
+    view.setStocks(results);
   }
 
   /**

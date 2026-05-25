@@ -249,8 +249,7 @@ public class StartupPage extends StackPane {
     Label hint = new Label("Leave blank to use the built-in StockData.csv");
     hint.getStyleClass().add("startup-hint");
 
-    VBox section = new VBox(6, fileRow, hint);
-    return section;
+    return new VBox(6, fileRow, hint);
   }
 
   /**
@@ -319,8 +318,7 @@ public class StartupPage extends StackPane {
   private VBox buildFieldGroup(String labelText, Node input) {
     Label label = new Label(labelText);
     label.getStyleClass().add("startup-field-label");
-    VBox group = new VBox(6, label, input);
-    return group;
+    return new VBox(6, label, input);
   }
 
   /** Validates inputs and triggers the start callback if valid. */
@@ -355,24 +353,6 @@ public class StartupPage extends StackPane {
    */
   public void setOnStart(BiConsumer<String, String> handler) {
     this.onStart = handler;
-  }
-
-  /**
-   * Gets the trimmed name input from the field.
-   *
-   * @return name input string.
-   */
-  public String getNameInput() {
-    return nameField.getText().trim();
-  }
-
-  /**
-   * Gets the trimmed capital input from the field.
-   *
-   * @return capital input string.
-   */
-  public String getCapitalInput() {
-    return capitalField.getText().trim();
   }
 
   /**

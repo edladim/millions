@@ -27,14 +27,13 @@ import org.junit.jupiter.api.Test;
 class PurchaseCalculatorTest {
 
   private PurchaseCalculator calculator;
-  private Share share;
 
   /** Creates a sample share used for testing purchase calculations. */
   @BeforeEach
   void setUp() {
 
     Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("200"));
-    share = new Share(stock, new BigDecimal("10"), new BigDecimal("100"));
+    Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("100"));
 
     calculator = new PurchaseCalculator(share);
   }

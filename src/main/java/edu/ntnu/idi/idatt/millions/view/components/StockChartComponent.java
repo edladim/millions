@@ -122,17 +122,10 @@ public class StockChartComponent extends VBox {
 
     lineChart.getData().add(series);
 
-    boolean isPositive = n > 1 && prices.get(n - 1).compareTo(prices.get(0)) >= 0;
+    boolean isPositive = n > 1 && prices.get(n - 1).compareTo(prices.getFirst()) >= 0;
 
     lineChart.getStyleClass().removeAll("chart-positive", "chart-negative");
     lineChart.getStyleClass().add(isPositive ? "chart-positive" : "chart-negative");
-  }
-
-  /** Clears the chart data and resets the labels. */
-  public void clear() {
-    lineChart.getData().clear();
-    titleLabel.setText("");
-    subtitleLabel.setText("");
   }
 
   /**
@@ -142,15 +135,6 @@ public class StockChartComponent extends VBox {
    */
   public void setChartHeight(double height) {
     lineChart.setPrefHeight(height);
-  }
-
-  /**
-   * Updates the label text shown on the X axis.
-   *
-   * @param label the axis label
-   */
-  public void setXaxisLabel(String label) {
-    horizontalAxis.setLabel(label);
   }
 
   /**

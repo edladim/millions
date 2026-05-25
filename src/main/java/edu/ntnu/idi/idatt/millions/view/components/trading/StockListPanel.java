@@ -6,6 +6,7 @@ import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.util.TableStyleUtils;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -209,7 +210,7 @@ public class StockListPanel extends VBox {
               }
             });
     col.setMinWidth(80);
-    col.setComparator((a, b) -> a.getLatestPercentChange().compareTo(b.getLatestPercentChange()));
+    col.setComparator(Comparator.comparing(ReadOnlyStock::getLatestPercentChange));
     return col;
   }
 

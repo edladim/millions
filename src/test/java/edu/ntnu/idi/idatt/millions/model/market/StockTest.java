@@ -248,6 +248,6 @@ class StockTest {
   void equals_sameInstance_returnsTrue() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
 
-    assertTrue(stock.equals(stock));
+    assertEquals(stock, stock);
   }
 }

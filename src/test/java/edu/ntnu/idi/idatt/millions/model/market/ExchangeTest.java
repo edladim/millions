@@ -7,11 +7,13 @@ import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Sale;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,6 +39,145 @@ class ExchangeTest {
   private Stock apple;
   private Stock google;
   private Player player;
+
+  /** Verifies that hasStock rejects a null symbol. */
+  @Test
+  void hasStock_nullSymbol_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> exchange.hasStock(null));
+  }
+
+  /** Verifies that hasStock rejects a blank symbol. */
+  @Test
+  void hasStock_blankSymbol_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.hasStock("  "));
+  }
+
+  /** Verifies that getStock rejects a null symbol. */
+  @Test
+  void getStock_nullSymbol_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> exchange.getStock(null));
+  }
+
+  /** Verifies that getStock rejects a blank symbol. */
+  @Test
+  void getStock_blankSymbol_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.getStock(" "));
+  }
+
+  /** Verifies that adding a null observer throws an exception. */
+  @Test
+  void addObserver_nullObserver_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> exchange.addObserver(null));
+  }
+
+  /** Verifies that adding the same observer twice only notifies once. */
+  @Test
+  void addObserver_duplicateObserver_notifiedOnce() {
+    AtomicInteger notifications = new AtomicInteger();
+    ExchangeObserver observer = ex -> notifications.incrementAndGet();
+
+    exchange.addObserver(observer);
+    exchange.addObserver(observer);
+    exchange.advance();
+
+    assertEquals(1, notifications.get());
+  }
+
+  /** Verifies that top performers are sorted by percent change and handle zero previous price. */
+  @Test
+  void getTopPerformers_sortedByPercentChange_handlesZeroPreviousPrice() {
+    apple.addNewSalesPrice(BigDecimal.ZERO);
+    apple.addNewSalesPrice(new BigDecimal("10"));
+    google.addNewSalesPrice(new BigDecimal("100"));
+    google.addNewSalesPrice(new BigDecimal("90"));
+
+    List<Stock> top = exchange.getTopPerformers(2);
+
+    assertEquals(apple, top.getFirst());
+    assertEquals(google, top.getLast());
+  }
+
+  /** Verifies that bottom performers are sorted by percent change ascending. */
+  @Test
+  void getBottomPerformers_sortedByPercentChangeAscending() {
+    apple.addNewSalesPrice(BigDecimal.ZERO);
+    apple.addNewSalesPrice(new BigDecimal("10"));
+    google.addNewSalesPrice(new BigDecimal("100"));
+    google.addNewSalesPrice(new BigDecimal("90"));
+
+    List<Stock> bottom = exchange.getBottomPerformers(2);
+
+    assertEquals(google, bottom.getFirst());
+    assertEquals(apple, bottom.getLast());
+  }
+
+  /** Verifies that an invalid limit in top performers throws an exception. */
+  @Test
+  void getTopPerformers_invalidLimit_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.getTopPerformers(0));
+  }
+
+  /** Verifies that an invalid limit in bottom performers throws an exception. */
+  @Test
+  void getBottomPerformers_invalidLimit_throwsException() {
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.getBottomPerformers(0));
+  }
+
+  /** Verifies that sell by symbol handles full and partial lots. */
+  @Test
+  void sellBySymbol_splitsAndSellsLotsInOrder() {
+    exchange.buy("AAPL", new BigDecimal("5"), player);
+    exchange.buy("AAPL", new BigDecimal("3"), player);
+
+    exchange.sell("AAPL", new BigDecimal("6"), player);
+
+    List<Share> remaining = player.getPortfolio().getShares();
+    assertEquals(1, remaining.size());
+    assertEquals(new BigDecimal("2"), remaining.getFirst().getQuantity());
+  }
+
+  /** Verifies that sell by symbol rejects invalid or excessive quantities. */
+  @Test
+  void sellBySymbol_invalidOrExcessiveQuantity_throwsException() {
+    exchange.buy("AAPL", new BigDecimal("5"), player);
+
+    assertThrows(IllegalArgumentException.class,
+        () -> exchange.sell("AAPL", BigDecimal.ZERO, player));
+    assertThrows(IllegalStateException.class,
+        () -> exchange.sell("AAPL", new BigDecimal("6"), player));
+  }
+
+  /** Verifies that sell by symbol rejects null arguments. */
+  @Test
+  void sellBySymbol_nullArguments_throwsException() {
+    assertThrows(NullPointerException.class,
+        () -> exchange.sell(null, new BigDecimal("1"), player));
+    assertThrows(NullPointerException.class,
+        () -> exchange.sell("AAPL", null, player));
+    assertThrows(NullPointerException.class,
+        () -> exchange.sell("AAPL", new BigDecimal("1"), null));
+  }
+
+  /** Verifies that sell by symbol breaks when remaining reaches zero before the last lot. */
+  @Test
+  void sellBySymbol_breaksWhenRemainingZeroBeforeEnd() {
+    exchange.buy("AAPL", new BigDecimal("2"), player);
+    exchange.buy("AAPL", new BigDecimal("3"), player);
+    exchange.buy("AAPL", new BigDecimal("4"), player);
+
+    exchange.sell("AAPL", new BigDecimal("5"), player);
+
+    List<Share> remaining = player.getPortfolio().getShares();
+    assertEquals(1, remaining.size());
+    assertEquals(new BigDecimal("4"), remaining.getFirst().getQuantity());
+  }
 
   /**
    * Creates an exchange with two stocks and a player before each test.

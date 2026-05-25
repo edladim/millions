@@ -237,7 +237,7 @@ class StockTest {
   @Test
   void equals_null_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals(null, stock);
+    assertFalse(stock.equals(null));
   }
 
   /**
@@ -246,6 +246,45 @@ class StockTest {
   @Test
   void equals_differentType_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals("not a stock", stock);
+    assertFalse(stock.equals("not a stock"));
   }
+
+  /** Verifies that the price history preserves insertion order. */
+  @Test
+  void getHistoricalPrices_preservesInsertionOrder() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+    stock.addNewSalesPrice(new BigDecimal("12"));
+
+    assertEquals(List.of(BigDecimal.TEN, new BigDecimal("12")), stock.getHistoricalPrices());
+  }
+
+  /** Verifies that hashCode is based on the ticker symbol. */
+  @Test
+  void hashCode_sameSymbol_matches() {
+    Stock s1 = new Stock("AAPL", "Apple", BigDecimal.TEN);
+    Stock s2 = new Stock("AAPL", "Apple Inc.", BigDecimal.ONE);
+
+    assertEquals(s1.hashCode(), s2.hashCode());
+  }
+
+  /** Verifies that toString includes the symbol, company, and price history. */
+  @Test
+  void toString_includesSymbolCompanyAndPrices() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+
+    String result = stock.toString();
+
+    assertTrue(result.contains("AAPL"));
+    assertTrue(result.contains("Apple"));
+    assertTrue(result.contains("10"));
+  }
+
+  /** Verifies that equals returns true when comparing the same instance. */
+  @Test
+  void equals_sameInstance_returnsTrue() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+
+    assertEquals(stock, stock);
+  }
+
 }

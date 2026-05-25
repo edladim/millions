@@ -55,7 +55,7 @@ public class StockListPanel extends VBox {
     setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(this, Priority.ALWAYS);
 
-    VBox header = ViewWidgets.pageHeader("Trading", "Browse and buy stocks on the exchange");
+    final VBox header = ViewWidgets.pageHeader("Trading", "Browse and buy stocks on the exchange");
 
     searchField = new TextField();
     searchField.setPromptText("Search by name or symbol");
@@ -133,9 +133,13 @@ public class StockListPanel extends VBox {
         .selectedItemProperty()
         .addListener(
             (obs, oldSel, sel) -> {
-              if (sel == null) return;
+              if (sel == null) {
+                return;
+              }
               pendingHighlight = sel.getSymbol();
-              if (onStockActivated != null) onStockActivated.accept(sel);
+              if (onStockActivated != null) {
+                onStockActivated.accept(sel);
+              }
               if (!suppressSelectionEvent && onStockSelected != null) {
                 onStockSelected.accept(sel.getSymbol());
               }
@@ -223,7 +227,9 @@ public class StockListPanel extends VBox {
     stockList.setItems(stocks);
     if (pendingHighlight != null) {
       int page = stockList.findPageOf(s -> s.getSymbol().equals(pendingHighlight));
-      if (page >= 0) stockList.goToPage(page);
+      if (page >= 0) {
+        stockList.goToPage(page);
+      }
     }
   }
 
@@ -237,7 +243,9 @@ public class StockListPanel extends VBox {
   public void selectStock(ReadOnlyStock stock) {
     pendingHighlight = stock.getSymbol();
     int targetPage = stockList.findPageOf(s -> s.getSymbol().equals(stock.getSymbol()));
-    if (targetPage < 0) return;
+    if (targetPage < 0) {
+      return;
+    }
 
     if (targetPage != stockList.currentPage()) {
       // goToPage fires applyPendingHighlightSafely via the page-rendered hook,
@@ -254,7 +262,9 @@ public class StockListPanel extends VBox {
     }
 
     // Fire explicitly since the listener was suppressed.
-    if (onStockSelected != null) onStockSelected.accept(stock.getSymbol());
+    if (onStockSelected != null) {
+      onStockSelected.accept(stock.getSymbol());
+    }
   }
 
   /**

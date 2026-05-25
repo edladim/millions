@@ -33,7 +33,8 @@ import org.apache.logging.log4j.Logger;
  * <p>Example usage:
  *
  * <pre>{@code
- * LeaderboardReader reader = new CsvLeaderboardReader(Path.of("/home/user/.millions/leaderboard.csv"));
+ * LeaderboardReader reader =
+ *     new CsvLeaderboardReader(Path.of("/home/user/.millions/leaderboard.csv"));
  * List<LeaderboardEntry> entries = reader.readLeaderboard();
  * }</pre>
  *

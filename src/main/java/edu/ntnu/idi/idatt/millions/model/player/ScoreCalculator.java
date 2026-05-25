@@ -66,7 +66,9 @@ public final class ScoreCalculator {
     double r = returnRate.doubleValue();
 
     // A wipe-out cannot be annualised: score is 0.
-    if (r <= -1.0) return 0L;
+    if (r <= -1.0) {
+      return 0L;
+    }
 
     double effectiveWeeks = Math.max(MIN_WEEKS_FOR_ANNUALISATION, weeks);
     double annualReturn = Math.pow(1 + r, WEEKS_PER_YEAR / effectiveWeeks) - 1;

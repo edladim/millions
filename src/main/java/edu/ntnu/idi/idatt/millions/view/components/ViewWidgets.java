@@ -137,7 +137,7 @@ public final class ViewWidgets {
     circle.getStyleClass().add("stock-icon");
     Label letter = new Label(String.valueOf(symbol.charAt(0)));
     letter.getStyleClass().add("mover-icon-letter");
-    StackPane iconPane = new StackPane(circle, letter);
+    final StackPane iconPane = new StackPane(circle, letter);
 
     Label primaryLabel = new Label(primary);
     primaryLabel.getStyleClass().add("mover-name");

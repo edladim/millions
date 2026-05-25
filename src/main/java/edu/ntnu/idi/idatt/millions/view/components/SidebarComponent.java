@@ -100,7 +100,9 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     btn.setOnAction(
         e -> {
           setActivePage(page);
-          if (onNavigate != null) onNavigate.accept(page);
+          if (onNavigate != null) {
+            onNavigate.accept(page);
+          }
         });
     return btn;
   }
@@ -124,7 +126,9 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
     advanceBtn.setOnAction(
         e -> {
-          if (onAdvanceWeek != null) onAdvanceWeek.run();
+          if (onAdvanceWeek != null) {
+            onAdvanceWeek.run();
+          }
         });
 
     Button retireBtn = new Button("Retire");
@@ -206,6 +210,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       case DASHBOARD -> dashboardBtn.getStyleClass().add("nav-btn-active");
       case PORTFOLIO -> portfolioBtn.getStyleClass().add("nav-btn-active");
       case TRADING -> tradingBtn.getStyleClass().add("nav-btn-active");
+      default -> throw new AssertionError("Unhandled page: " + page);
     }
   }
 

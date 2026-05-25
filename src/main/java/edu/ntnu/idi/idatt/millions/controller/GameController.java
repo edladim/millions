@@ -70,11 +70,13 @@ public class GameController {
    * score reflects whatever was successfully sold plus the remaining cash.
    */
   public void retire() {
-    if (gameOver) return;
+    if (gameOver) {
+      return;
+    }
     for (Share share : new ArrayList<>(player.getPortfolio().getShares())) {
       try {
         exchange.sell(share, player);
-      } catch (IllegalStateException | IllegalArgumentException _) {
+      } catch (IllegalStateException | IllegalArgumentException ignore) {
         // Expected: a lot cannot be sold right now.
         // Skip it and let the rest of the liquidation proceed.
       }
@@ -96,7 +98,9 @@ public class GameController {
    * is shown.
    */
   public void advanceWeek() {
-    if (gameOver) return;
+    if (gameOver) {
+      return;
+    }
     exchange.advance();
     player.updateHistoricalNetWorth();
 

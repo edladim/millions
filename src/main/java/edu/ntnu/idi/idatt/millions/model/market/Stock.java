@@ -144,8 +144,12 @@ public final class Stock implements ReadOnlyStock {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Stock other)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Stock other)) {
+      return false;
+    }
     return symbol.equals(other.symbol);
   }
 

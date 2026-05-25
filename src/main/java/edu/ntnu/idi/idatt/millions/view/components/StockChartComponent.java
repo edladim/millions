@@ -21,8 +21,8 @@ public class StockChartComponent extends VBox {
   private final Label titleLabel;
   private final Label subtitleLabel;
   private final LineChart<Number, Number> lineChart;
-  private final NumberAxis xAxis;
-  private final NumberAxis yAxis;
+  private final NumberAxis horizontalAxis;
+  private final NumberAxis verticalAxis;
 
   /**
    * Constructs the chart component with initial symbol and company labels.
@@ -41,23 +41,23 @@ public class StockChartComponent extends VBox {
     subtitleLabel = new Label(company);
     subtitleLabel.getStyleClass().add("chart-subtitle");
 
-    xAxis = new NumberAxis();
-    xAxis.setLabel("Week");
-    xAxis.setTickLabelFormatter(
-        new NumberAxis.DefaultFormatter(xAxis) {
+    horizontalAxis = new NumberAxis();
+    horizontalAxis.setLabel("Week");
+    horizontalAxis.setTickLabelFormatter(
+        new NumberAxis.DefaultFormatter(horizontalAxis) {
           @Override
           public String toString(Number value) {
             return String.valueOf(value.intValue());
           }
         });
-    xAxis.getStyleClass().add("chart-axis");
+    horizontalAxis.getStyleClass().add("chart-axis");
 
-    yAxis = new NumberAxis();
-    yAxis.setLabel("Price ($)");
-    yAxis.getStyleClass().add("chart-axis");
-    yAxis.setForceZeroInRange(false);
+    verticalAxis = new NumberAxis();
+    verticalAxis.setLabel("Price ($)");
+    verticalAxis.getStyleClass().add("chart-axis");
+    verticalAxis.setForceZeroInRange(false);
 
-    lineChart = new LineChart<>(xAxis, yAxis);
+    lineChart = new LineChart<>(horizontalAxis, verticalAxis);
     lineChart.setCreateSymbols(false);
     lineChart.setLegendVisible(false);
     lineChart.setAnimated(false);
@@ -102,7 +102,9 @@ public class StockChartComponent extends VBox {
   public void setData(List<BigDecimal> prices, int lastWeek) {
     lineChart.getData().clear();
 
-    if (prices == null || prices.isEmpty()) return;
+    if (prices == null || prices.isEmpty()) {
+      return;
+    }
 
     XYChart.Series<Number, Number> series = new XYChart.Series<>();
 
@@ -113,10 +115,10 @@ public class StockChartComponent extends VBox {
       series.getData().add(new XYChart.Data<>(week, prices.get(i).doubleValue()));
     }
 
-    xAxis.setAutoRanging(false);
-    xAxis.setLowerBound(firstWeek - 1);
-    xAxis.setUpperBound(lastWeek + 1);
-    xAxis.setTickUnit(Math.max(1, Math.ceil((lastWeek - firstWeek + 1) / 10.0)));
+    horizontalAxis.setAutoRanging(false);
+    horizontalAxis.setLowerBound(firstWeek - 1);
+    horizontalAxis.setUpperBound(lastWeek + 1);
+    horizontalAxis.setTickUnit(Math.max(1, Math.ceil((lastWeek - firstWeek + 1) / 10.0)));
 
     lineChart.getData().add(series);
 
@@ -147,8 +149,8 @@ public class StockChartComponent extends VBox {
    *
    * @param label the axis label
    */
-  public void setXAxisLabel(String label) {
-    xAxis.setLabel(label);
+  public void setXaxisLabel(String label) {
+    horizontalAxis.setLabel(label);
   }
 
   /**
@@ -156,7 +158,7 @@ public class StockChartComponent extends VBox {
    *
    * @param label the axis label
    */
-  public void setYAxisLabel(String label) {
-    yAxis.setLabel(label);
+  public void setYaxisLabel(String label) {
+    verticalAxis.setLabel(label);
   }
 }

@@ -112,8 +112,12 @@ public final class Share {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof Share other)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Share other)) {
+      return false;
+    }
     return stock.equals(other.stock)
         && quantity.compareTo(other.quantity) == 0
         && purchasePrice.compareTo(other.purchasePrice) == 0;

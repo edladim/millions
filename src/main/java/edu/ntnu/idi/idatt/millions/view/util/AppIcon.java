@@ -52,7 +52,8 @@ public final class AppIcon {
     try {
       BufferedImage src = ImageIO.read(AppIcon.class.getResource(ICON_PATH));
       taskbar.setIconImage(roundedIcon(src));
-    } catch (Exception ignored) {
+    } catch (Exception ignore) {
+      // Taskbar icon not supported on this platform.
     }
   }
 

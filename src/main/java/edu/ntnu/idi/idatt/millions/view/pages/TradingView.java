@@ -74,7 +74,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
         });
     stockListPanel.setOnStockSelected(
         symbol -> {
-          if (onSelectStock != null) onSelectStock.accept(symbol);
+          if (onSelectStock != null) {
+            onSelectStock.accept(symbol);
+          }
         });
 
     buyPanel.setMinWidth(0);
@@ -143,7 +145,9 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
-    if (onRefresh != null) onRefresh.run();
+    if (onRefresh != null) {
+      onRefresh.run();
+    }
   }
 
   // Public API — delegates to sub-panels
@@ -195,86 +199,62 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return stockChart;
   }
 
-  /**
-   * @see BuyPanel#setMode(Mode)
-   */
+  /** Delegates to {@link BuyPanel#setMode(Mode)}. */
   public void setMode(Mode mode) {
     buyPanel.setMode(mode);
   }
 
-  /**
-   * @see BuyPanel#getMode()
-   */
+  /** Delegates to {@link BuyPanel#getMode()}. */
   public Mode getMode() {
     return buyPanel.getMode();
   }
 
-  /**
-   * @see BuyPanel#getInputValue()
-   */
+  /** Delegates to {@link BuyPanel#getInputValue()}. */
   public BigDecimal getInputValue() {
     return buyPanel.getInputValue();
   }
 
-  /**
-   * @see BuyPanel#isAmountMode()
-   */
+  /** Delegates to {@link BuyPanel#isAmountMode()}. */
   public boolean isAmountMode() {
     return buyPanel.isAmountMode();
   }
 
-  /**
-   * @see BuyPanel#setCostPreview(String, String, String)
-   */
+  /** Delegates to {@link BuyPanel#setCostPreview(String, String, String)}. */
   public void setCostPreview(String gross, String commission, String total) {
     buyPanel.setCostPreview(gross, commission, total);
   }
 
-  /**
-   * @see BuyPanel#setDerivedLabel(String)
-   */
+  /** Delegates to {@link BuyPanel#setDerivedLabel(String)}. */
   public void setDerivedLabel(String text) {
     buyPanel.setDerivedLabel(text);
   }
 
-  /**
-   * @see BuyPanel#setActionEnabled(boolean)
-   */
+  /** Delegates to {@link BuyPanel#setActionEnabled(boolean)}. */
   public void setActionEnabled(boolean enabled) {
     buyPanel.setActionEnabled(enabled);
   }
 
-  /**
-   * @see BuyPanel#clearInput()
-   */
+  /** Delegates to {@link BuyPanel#clearInput()}. */
   public void clearInput() {
     buyPanel.clearInput();
   }
 
-  /**
-   * @see BuyPanel#setCurrentPrice(BigDecimal)
-   */
+  /** Delegates to {@link BuyPanel#setCurrentPrice(BigDecimal)}. */
   public void setCurrentPrice(BigDecimal price) {
     buyPanel.setCurrentPrice(price);
   }
 
-  /**
-   * @see BuyPanel#setInputAmount(BigDecimal, boolean)
-   */
+  /** Delegates to {@link BuyPanel#setInputAmount(BigDecimal, boolean)}. */
   public void setInputAmount(BigDecimal value, boolean asAmount) {
     buyPanel.setInputAmount(value, asAmount);
   }
 
-  /**
-   * @see BuyPanel#setOwnedQuantity(BigDecimal)
-   */
+  /** Delegates to {@link BuyPanel#setOwnedQuantity(BigDecimal)}. */
   public void setOwnedQuantity(BigDecimal qty) {
     buyPanel.setOwnedQuantity(qty);
   }
 
-  /**
-   * @see BuyPanel#setCashBalance(BigDecimal)
-   */
+  /** Delegates to {@link BuyPanel#setCashBalance(BigDecimal)}. */
   public void setCashBalance(BigDecimal cash) {
     buyPanel.setCashBalance(cash);
   }

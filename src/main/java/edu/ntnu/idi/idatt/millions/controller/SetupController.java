@@ -67,7 +67,7 @@ public class SetupController {
   public void show() {
     FontLoader.loadInter();
     screen.setLeaderboard(LeaderboardStore.loadTop());
-    boolean wasFullScreen = primaryStage.isFullScreen();
+    final boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(startupScene);
     primaryStage.setTitle("Millions");
     primaryStage.setResizable(true);
@@ -104,7 +104,9 @@ public class SetupController {
    */
   private void handleStart(String name, String capitalText) {
     BigDecimal capital = parseCapital(capitalText);
-    if (capital == null) return;
+    if (capital == null) {
+      return;
+    }
     List<Stock> stocks;
     try {
       stocks = StockLoader.load(selectedFile);
@@ -153,7 +155,7 @@ public class SetupController {
     mainView.setOnNewGame(this::show);
     mainView.setOnExit(Platform::exit);
 
-    boolean wasFullScreen = primaryStage.isFullScreen();
+    final boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());
     primaryStage.setResizable(true);

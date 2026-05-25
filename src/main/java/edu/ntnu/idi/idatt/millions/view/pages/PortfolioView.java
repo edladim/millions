@@ -77,7 +77,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
   private StockChartComponent buildPortfolioChart() {
     StockChartComponent chart = new StockChartComponent("Portfolio value", "");
-    chart.setYAxisLabel("Value ($)");
+    chart.setYaxisLabel("Value ($)");
     chart.setChartHeight(240);
     chart.setPrefHeight(300);
     return chart;
@@ -99,7 +99,7 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
     ViewWidgets.SummaryCard cash = ViewWidgets.summaryCard("Cash Balance", ZERO_PRICE, VALUE_STYLE);
     ViewWidgets.SummaryCard portfolio =
         ViewWidgets.summaryCard("Portfolio Value", ZERO_PRICE, VALUE_STYLE);
-    ViewWidgets.SummaryCard status =
+    final ViewWidgets.SummaryCard status =
         ViewWidgets.summaryCard("Status", "Novice", "stat-card-value-status");
 
     bindResponsivePrice(netWorth.valueLabel(), netWorthValue, netWorth.card());
@@ -132,7 +132,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
             Bindings.createStringBinding(
                 () -> {
                   BigDecimal v = value.get();
-                  if (v == null) return "";
+                  if (v == null) {
+                    return "";
+                  }
                   return card.getWidth() < CARD_COMPACT_THRESHOLD
                       ? ViewFormatter.wholePrice(v)
                       : ViewFormatter.price(v);
@@ -145,7 +147,9 @@ public class PortfolioView extends VBox implements PortfolioObserver, PlayerObse
 
   @Override
   public void onPortfolioUpdated(ReadOnlyPortfolio portfolio) {
-    if (player != null) refreshPortfolioData(player);
+    if (player != null) {
+      refreshPortfolioData(player);
+    }
   }
 
   @Override

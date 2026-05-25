@@ -75,9 +75,13 @@ public final class TableStyleUtils {
           }
           for (Node header : table.lookupAll(".column-header")) {
             Node labelNode = header.lookup(".label");
-            if (!(labelNode instanceof Label lbl)) continue;
+            if (!(labelNode instanceof Label lbl)) {
+              continue;
+            }
             String text = lbl.getText();
-            if (text == null) continue;
+            if (text == null) {
+              continue;
+            }
             boolean shouldHighlight = sortedTitles.contains(text);
             boolean hasHighlight = lbl.getStyleClass().contains(SORT_HEADER_ACTIVE_CLASS);
             if (shouldHighlight && !hasHighlight) {

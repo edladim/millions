@@ -171,16 +171,16 @@ public class DashboardView extends VBox
     negativeSection.setMaxWidth(Double.MAX_VALUE);
 
     // setFillHeight(false) keeps each card at its own height when the other grows.
-    HBox hSection = new HBox(12, positiveSection, negativeSection);
-    hSection.setFillHeight(false);
-    hSection.setMaxWidth(Double.MAX_VALUE);
+    HBox horizSection = new HBox(12, positiveSection, negativeSection);
+    horizSection.setFillHeight(false);
+    horizSection.setMaxWidth(Double.MAX_VALUE);
     HBox.setHgrow(positiveSection, Priority.ALWAYS);
     HBox.setHgrow(negativeSection, Priority.ALWAYS);
 
-    VBox vSection = new VBox(12);
-    vSection.setMaxWidth(Double.MAX_VALUE);
+    VBox vertSection = new VBox(12);
+    vertSection.setMaxWidth(Double.MAX_VALUE);
 
-    VBox moversRow = new VBox(hSection);
+    VBox moversRow = new VBox(horizSection);
     moversRow.setMaxWidth(Double.MAX_VALUE);
 
     // Switch between HBox (side-by-side) and VBox (stacked) at the threshold.
@@ -191,20 +191,24 @@ public class DashboardView extends VBox
         .addListener(
             (obs, old, newVal) -> {
               double w = newVal.doubleValue();
-              if (w < 1) return;
+              if (w < 1) {
+                return;
+              }
               boolean nowStacked = w < MOVERS_STACK_THRESHOLD;
-              if (nowStacked == stacked[0]) return;
+              if (nowStacked == stacked[0]) {
+                return;
+              }
               stacked[0] = nowStacked;
               if (nowStacked) {
-                hSection.getChildren().clear();
-                vSection.getChildren().setAll(positiveSection, negativeSection);
-                moversRow.getChildren().setAll(vSection);
+                horizSection.getChildren().clear();
+                vertSection.getChildren().setAll(positiveSection, negativeSection);
+                moversRow.getChildren().setAll(vertSection);
               } else {
-                vSection.getChildren().clear();
+                vertSection.getChildren().clear();
                 HBox.setHgrow(positiveSection, Priority.ALWAYS);
                 HBox.setHgrow(negativeSection, Priority.ALWAYS);
-                hSection.getChildren().setAll(positiveSection, negativeSection);
-                moversRow.getChildren().setAll(hSection);
+                horizSection.getChildren().setAll(positiveSection, negativeSection);
+                moversRow.getChildren().setAll(horizSection);
               }
             });
 
@@ -329,7 +333,7 @@ public class DashboardView extends VBox
   private void refreshStats() {
     ReadOnlyPortfolio portfolio = player.getPortfolio();
     BigDecimal profit = player.getProfit();
-    boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
+    final boolean isPositive = profit.compareTo(BigDecimal.ZERO) >= 0;
 
     long distinctStocks = portfolio.getDistinctStockCount();
 
@@ -380,7 +384,9 @@ public class DashboardView extends VBox
     row.setPadding(new Insets(8, 8, 8, 0));
     row.setOnMouseClicked(
         e -> {
-          if (onStockClicked != null) onStockClicked.accept(stock.getSymbol());
+          if (onStockClicked != null) {
+            onStockClicked.accept(stock.getSymbol());
+          }
         });
     return row;
   }

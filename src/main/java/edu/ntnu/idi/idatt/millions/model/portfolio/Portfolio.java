@@ -88,21 +88,6 @@ public final class Portfolio implements ReadOnlyPortfolio {
   }
 
   /**
-   * Returns one {@link Holding} per unique stock symbol, aggregating all share lots that reference
-   * the same stock. Order follows first occurrence in the underlying share list.
-   *
-   * @return the aggregated holdings, never null
-   */
-  @Override
-  public List<Holding> getHoldings() {
-    Map<String, List<Share>> grouped = new LinkedHashMap<>();
-    for (Share s : shares) {
-      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
-    }
-    return grouped.values().stream().map(Holding::aggregate).toList();
-  }
-
-  /**
    * Returns all shares associated with a specific stock symbol.
    *
    * @param symbol the ticker symbol to search for, cannot be null or blank
@@ -116,6 +101,21 @@ public final class Portfolio implements ReadOnlyPortfolio {
     return shares.stream()
         .filter(share -> share.getStock().getSymbol().equals(validatedSymbol))
         .toList();
+  }
+
+  /**
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share lots that reference
+   * the same stock. Order follows first occurrence in the underlying share list.
+   *
+   * @return the aggregated holdings, never null
+   */
+  @Override
+  public List<Holding> getHoldings() {
+    Map<String, List<Share>> grouped = new LinkedHashMap<>();
+    for (Share s : shares) {
+      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
+    }
+    return grouped.values().stream().map(Holding::aggregate).toList();
   }
 
   /**

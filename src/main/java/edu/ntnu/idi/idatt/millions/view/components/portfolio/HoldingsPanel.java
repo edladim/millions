@@ -222,8 +222,9 @@ public class HoldingsPanel extends VBox {
                 } else {
                   btn.setOnAction(
                       e -> {
-                        if (onSell != null)
+                        if (onSell != null) {
                           onSell.accept(item.stock().getSymbol(), item.totalQuantity());
+                        }
                       });
                   setGraphic(btn);
                 }
@@ -253,7 +254,9 @@ public class HoldingsPanel extends VBox {
             (obs, oldW, newW) -> {
               boolean wasCompact = oldW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
               boolean isCompact = newW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
-              if (wasCompact != isCompact) table.refresh();
+              if (wasCompact != isCompact) {
+                table.refresh();
+              }
             });
   }
 

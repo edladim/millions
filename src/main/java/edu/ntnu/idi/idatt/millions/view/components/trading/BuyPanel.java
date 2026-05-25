@@ -70,14 +70,14 @@ public class BuyPanel extends VBox {
     setMaxWidth(300);
     setPadding(new Insets(24, 20, 24, 20));
 
-    HBox modeToggle = buildModeToggle();
+    final HBox modeToggle = buildModeToggle();
 
     panelTitle = new Label("Buy Stock");
     panelTitle.getStyleClass().add("section-heading");
 
-    VBox stockInfoCard = buildSelectedStockInfo();
-    HBox playerInfoCard = buildPlayerInfoCard();
-    HBox inputHeader = buildInputHeader();
+    final VBox stockInfoCard = buildSelectedStockInfo();
+    final HBox playerInfoCard = buildPlayerInfoCard();
+    final HBox inputHeader = buildInputHeader();
 
     inputSpinner = buildInputSpinner();
 
@@ -87,7 +87,7 @@ public class BuyPanel extends VBox {
     derivedLabel.setMinWidth(0);
     derivedLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
-    VBox costCard = buildCostCard();
+    final VBox costCard = buildCostCard();
 
     actionButton = new Button("Buy now");
     actionButton.getStyleClass().add("buy-btn");
@@ -95,7 +95,9 @@ public class BuyPanel extends VBox {
     actionButton.setDisable(true);
     actionButton.setOnAction(
         e -> {
-          if (onAction != null) onAction.accept(currentMode);
+          if (onAction != null) {
+            onAction.accept(currentMode);
+          }
         });
 
     HBox percentageCard = buildPercentageCard();
@@ -212,7 +214,9 @@ public class BuyPanel extends VBox {
         new javafx.util.StringConverter<>() {
           @Override
           public String toString(Double v) {
-            if (v == null || v == 0.0) return "";
+            if (v == null || v == 0.0) {
+              return "";
+            }
             return (v == Math.floor(v) && !Double.isInfinite(v))
                 ? String.valueOf(v.longValue())
                 : String.valueOf(v);
@@ -220,7 +224,9 @@ public class BuyPanel extends VBox {
 
           @Override
           public Double fromString(String s) {
-            if (s == null || s.isBlank()) return 0.0;
+            if (s == null || s.isBlank()) {
+              return 0.0;
+            }
             try {
               return Double.parseDouble(s.trim().replace(",", "."));
             } catch (NumberFormatException e) {
@@ -236,14 +242,16 @@ public class BuyPanel extends VBox {
         .getEditor()
         .textProperty()
         .addListener(
-            (_, _, _) -> {
-              if (onInputChanged != null) onInputChanged.run();
+            (obs, old, nw) -> {
+              if (onInputChanged != null) {
+                onInputChanged.run();
+              }
             });
     return spinner;
   }
 
   private HBox buildPercentageCard() {
-    String[] labels = {"25%", "50%", "100%"};
+    final String[] labels = {"25%", "50%", "100%"};
     BigDecimal[] percents = {
       new BigDecimal("0.25"), new BigDecimal("0.50"), new BigDecimal("1.00")
     };
@@ -314,7 +322,9 @@ public class BuyPanel extends VBox {
       setSpinnerValue(BigDecimal.ZERO);
     }
 
-    if (onInputChanged != null) onInputChanged.run();
+    if (onInputChanged != null) {
+      onInputChanged.run();
+    }
   }
 
   private void setSpinnerValue(BigDecimal value) {
@@ -322,12 +332,16 @@ public class BuyPanel extends VBox {
         (SpinnerValueFactory.DoubleSpinnerValueFactory) inputSpinner.getValueFactory();
     factory.setValue(value.doubleValue());
     String stripped = value.stripTrailingZeros().toPlainString();
-    if (stripped.startsWith(".")) stripped = "0" + stripped;
+    if (stripped.startsWith(".")) {
+      stripped = "0" + stripped;
+    }
     inputSpinner.getEditor().setText(stripped);
   }
 
   private void firePercent(BigDecimal percent) {
-    if (onPercentSelected != null) onPercentSelected.accept(percent);
+    if (onPercentSelected != null) {
+      onPercentSelected.accept(percent);
+    }
   }
 
   // Public API
@@ -340,7 +354,7 @@ public class BuyPanel extends VBox {
    */
   public void updateStockInfo(ReadOnlyStock stock) {
     BigDecimal change = stock.getLatestPriceChange();
-    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
+    final boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 
     buySymbolLabel.setText(stock.getSymbol());
     buyCompanyLabel.setText(stock.getCompany());
@@ -362,7 +376,9 @@ public class BuyPanel extends VBox {
    * @param mode the new mode
    */
   public void setMode(Mode mode) {
-    if (currentMode == mode) return;
+    if (currentMode == mode) {
+      return;
+    }
     currentMode = mode;
 
     buyTab.getStyleClass().removeAll("mode-tab-active");
@@ -372,9 +388,13 @@ public class BuyPanel extends VBox {
     panelTitle.setText(mode == Mode.BUY ? "Buy Stock" : "Sell Stock");
     actionButton.setText(mode == Mode.BUY ? "Buy now" : "Sell now");
     actionButton.getStyleClass().removeAll("action-btn-sell");
-    if (mode == Mode.SELL) actionButton.getStyleClass().add("action-btn-sell");
+    if (mode == Mode.SELL) {
+      actionButton.getStyleClass().add("action-btn-sell");
+    }
 
-    if (onModeChanged != null) onModeChanged.accept(mode);
+    if (onModeChanged != null) {
+      onModeChanged.accept(mode);
+    }
   }
 
   /**
@@ -398,7 +418,9 @@ public class BuyPanel extends VBox {
    */
   public BigDecimal getInputValue() {
     String text = inputSpinner.getEditor().getText();
-    if (text == null || text.isBlank()) return BigDecimal.ZERO;
+    if (text == null || text.isBlank()) {
+      return BigDecimal.ZERO;
+    }
     try {
       return new BigDecimal(text.trim().replace(",", "."));
     } catch (NumberFormatException e) {
@@ -486,7 +508,9 @@ public class BuyPanel extends VBox {
    * @param asAmount {@code true} to interpret as a dollar amount, {@code false} for quantity
    */
   public void setInputAmount(BigDecimal value, boolean asAmount) {
-    if (asAmount != amountMode) toggleInputMode();
+    if (asAmount != amountMode) {
+      toggleInputMode();
+    }
     setSpinnerValue(value);
   }
 

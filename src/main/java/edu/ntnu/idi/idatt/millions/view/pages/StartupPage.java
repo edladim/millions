@@ -195,7 +195,7 @@ public class StartupPage extends StackPane {
     capitalField = new TextField("10000");
     capitalField.getStyleClass().add("startup-field");
 
-    VBox fileSection = buildFileSection();
+    final VBox fileSection = buildFileSection();
 
     errorLabel = new Label("");
     errorLabel.getStyleClass().add("startup-error");
@@ -237,7 +237,9 @@ public class StartupPage extends StackPane {
     browseBtn.getStyleClass().add("startup-browse-btn");
     browseBtn.setOnAction(
         e -> {
-          if (onBrowse != null) onBrowse.run();
+          if (onBrowse != null) {
+            onBrowse.run();
+          }
         });
 
     HBox fileRow = new HBox(12, fileNameLabel, browseBtn);
@@ -394,7 +396,9 @@ public class StartupPage extends StackPane {
    *     may be empty.
    */
   public void setLeaderboard(List<LeaderboardEntry> entries) {
-    if (leaderboardRows == null) return;
+    if (leaderboardRows == null) {
+      return;
+    }
     leaderboardRows.getChildren().clear();
     for (int i = 0; i < LEADERBOARD_SIZE; i++) {
       if (i < entries.size()) {

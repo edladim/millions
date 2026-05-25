@@ -75,7 +75,9 @@ public interface ReadOnlyStock {
   default BigDecimal getLatestPercentChange() {
     BigDecimal change = getLatestPriceChange();
     BigDecimal previous = getSalesPrice().subtract(change);
-    if (previous.signum() == 0) return BigDecimal.ZERO;
+    if (previous.signum() == 0) {
+      return BigDecimal.ZERO;
+    }
     return change.divide(previous, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
   }
 }

@@ -53,21 +53,27 @@ public class PaginatedTable<T> {
   }
 
   /**
-   * @return the wrapped table (use to add columns and put it in a layout)
+   * Returns the wrapped table (use to add columns and put it in a layout).
+   *
+   * @return the wrapped table
    */
   public TableView<T> table() {
     return table;
   }
 
   /**
-   * @return the pagination control (add it to a layout next to the table)
+   * Returns the pagination control (add it to a layout next to the table).
+   *
+   * @return the pagination control
    */
   public Pagination pagination() {
     return pagination;
   }
 
   /**
-   * @return the current zero-based page index
+   * Returns the current zero-based page index.
+   *
+   * @return the current page index
    */
   public int currentPage() {
     return pagination.getCurrentPageIndex();
@@ -93,7 +99,9 @@ public class PaginatedTable<T> {
   public void setItems(List<? extends T> items) {
     master.setAll(items);
     Comparator<T> cmp = table.getComparator();
-    if (cmp != null) FXCollections.sort(master, cmp);
+    if (cmp != null) {
+      FXCollections.sort(master, cmp);
+    }
     syncPagination();
     showPage(pagination.getCurrentPageIndex());
   }
@@ -105,7 +113,9 @@ public class PaginatedTable<T> {
    * @param index zero-based page index to jump to
    */
   public void goToPage(int index) {
-    if (index < 0 || index >= pagination.getPageCount()) return;
+    if (index < 0 || index >= pagination.getPageCount()) {
+      return;
+    }
     pagination.setCurrentPageIndex(index);
   }
 
@@ -118,7 +128,9 @@ public class PaginatedTable<T> {
    */
   public int findPageOf(Predicate<T> match) {
     for (int i = 0; i < master.size(); i++) {
-      if (match.test(master.get(i))) return i / pageSize;
+      if (match.test(master.get(i))) {
+        return i / pageSize;
+      }
     }
     return -1;
   }
@@ -189,7 +201,9 @@ public class PaginatedTable<T> {
     table.setSortPolicy(
         t -> {
           Comparator<T> cmp = t.getComparator();
-          if (cmp != null) FXCollections.sort(master, cmp);
+          if (cmp != null) {
+            FXCollections.sort(master, cmp);
+          }
           showPage(pagination.getCurrentPageIndex());
           return true;
         });

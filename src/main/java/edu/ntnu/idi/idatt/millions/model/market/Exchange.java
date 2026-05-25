@@ -10,7 +10,13 @@ import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Represents a stock exchange where players can buy and sell stocks.
@@ -296,7 +302,9 @@ public final class Exchange implements ReadOnlyExchange {
     BigDecimal remaining = quantity;
     Transaction lastTx = null;
     for (Share share : matching) {
-      if (remaining.signum() <= 0) break;
+      if (remaining.signum() <= 0) {
+        break;
+      }
 
       if (share.getQuantity().compareTo(remaining) <= 0) {
         lastTx = sell(share, player);
@@ -358,7 +366,9 @@ public final class Exchange implements ReadOnlyExchange {
   private static double percentChange(Stock stock) {
     BigDecimal change = stock.getLatestPriceChange();
     BigDecimal prev = stock.getSalesPrice().subtract(change);
-    if (prev.signum() == 0) return 0.0;
+    if (prev.signum() == 0) {
+      return 0.0;
+    }
     return change.divide(prev, 8, RoundingMode.HALF_UP).doubleValue();
   }
 

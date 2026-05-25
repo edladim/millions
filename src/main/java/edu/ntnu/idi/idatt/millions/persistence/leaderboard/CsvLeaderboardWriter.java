@@ -30,7 +30,8 @@ import org.apache.logging.log4j.Logger;
  * <p>Example usage:
  *
  * <pre>{@code
- * LeaderboardWriter writer = new CsvLeaderboardWriter(Path.of("/home/user/.millions/leaderboard.csv"));
+ * LeaderboardWriter writer =
+ *     new CsvLeaderboardWriter(Path.of("/home/user/.millions/leaderboard.csv"));
  * writer.writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1234L)));
  * }</pre>
  *

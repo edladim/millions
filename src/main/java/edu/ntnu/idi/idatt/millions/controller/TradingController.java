@@ -54,7 +54,7 @@ public class TradingController {
     view.setOnAction(this::handleTrade);
     view.setOnPercentSelected(this::handlePercent);
 
-    view.getSearchField().textProperty().addListener((_, _, text) -> filterStocks(text));
+    view.getSearchField().textProperty().addListener((obs, old, text) -> filterStocks(text));
 
     view.onExchangeUpdated(exchange);
     updatePlayerInfo();
@@ -132,7 +132,9 @@ public class TradingController {
    * @param percent the percentage to apply, as a decimal (e.g. {@code 0.25})
    */
   private void handlePercent(BigDecimal percent) {
-    if (selectedSymbol == null) return;
+    if (selectedSymbol == null) {
+      return;
+    }
 
     if (view.getMode() == TradingView.Mode.BUY) {
       BigDecimal price = exchange.getStock(selectedSymbol).getSalesPrice();
@@ -157,7 +159,9 @@ public class TradingController {
    */
   private BigDecimal effectiveQuantity(BigDecimal price) {
     BigDecimal raw = view.getInputValue();
-    if (raw.signum() <= 0) return BigDecimal.ZERO;
+    if (raw.signum() <= 0) {
+      return BigDecimal.ZERO;
+    }
     if (view.isAmountMode()) {
       return raw.divide(price, 8, RoundingMode.HALF_UP);
     }
@@ -170,7 +174,9 @@ public class TradingController {
    * CostPreviewCalculator}.
    */
   private void updateCostPreview() {
-    if (selectedSymbol == null) return;
+    if (selectedSymbol == null) {
+      return;
+    }
 
     ReadOnlyStock stock = exchange.getStock(selectedSymbol);
     BigDecimal price = stock.getSalesPrice();
@@ -242,7 +248,9 @@ public class TradingController {
    * @param mode the panel mode at the time of click
    */
   private void handleTrade(TradingView.Mode mode) {
-    if (selectedSymbol == null) return;
+    if (selectedSymbol == null) {
+      return;
+    }
 
     final String symbol = selectedSymbol;
     final boolean isBuy = mode == TradingView.Mode.BUY;
@@ -301,7 +309,9 @@ public class TradingController {
    */
   private void selectDefault() {
     List<? extends ReadOnlyStock> stocks = exchange.getStocks();
-    if (stocks.isEmpty()) return;
+    if (stocks.isEmpty()) {
+      return;
+    }
     view.selectStock(stocks.get(0));
   }
 
@@ -315,7 +325,9 @@ public class TradingController {
    * @param symbol the ticker symbol to focus
    */
   public void focusStock(String symbol) {
-    if (symbol == null || !exchange.hasStock(symbol)) return;
+    if (symbol == null || !exchange.hasStock(symbol)) {
+      return;
+    }
     view.setMode(TradingView.Mode.BUY);
     view.getSearchField().setText(symbol);
     view.setHighlightedStock(symbol);
@@ -329,12 +341,14 @@ public class TradingController {
    * outside.
    */
   private void refreshChart() {
-    if (selectedSymbol == null) return;
+    if (selectedSymbol == null) {
+      return;
+    }
     try {
       ReadOnlyStock stock = exchange.getStock(selectedSymbol);
       view.getStockChart().setStockInfo(stock.getSymbol(), stock.getCompany());
       view.getStockChart().setData(stock.getHistoricalPrices(), exchange.getWeek());
-    } catch (IllegalArgumentException _) {
+    } catch (IllegalArgumentException ignore) {
       // Expected: the previously-selected symbol is no longer in the exchange.
       // The list-refresh that runs alongside will drop the stale highlight.
     }

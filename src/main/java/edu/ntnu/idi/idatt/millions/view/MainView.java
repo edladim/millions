@@ -71,12 +71,16 @@ public class MainView {
 
     sidebar.setOnAdvanceWeek(
         () -> {
-          if (onAdvanceWeek != null) onAdvanceWeek.run();
+          if (onAdvanceWeek != null) {
+            onAdvanceWeek.run();
+          }
         });
 
     sidebar.setOnRetire(
         () -> {
-          if (onRetire != null) onRetire.run();
+          if (onRetire != null) {
+            onRetire.run();
+          }
         });
   }
 
@@ -99,6 +103,7 @@ public class MainView {
       case DASHBOARD -> root.setCenter(dashboardScroll);
       case PORTFOLIO -> root.setCenter(portfolioScroll);
       case TRADING -> root.setCenter(tradingScroll);
+      default -> throw new AssertionError("Unhandled page: " + page);
     }
     sidebar.setActivePage(page);
   }

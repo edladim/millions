@@ -39,6 +39,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Button portfolioBtn;
   private Button tradingBtn;
   private Label weekLabel;
+  private Label weeksLeftLabel;
 
   private Runnable onAdvanceWeek;
   private Runnable onRetire;
@@ -186,10 +187,13 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     weekLabel = new Label(ViewFormatter.week(1));
     weekLabel.getStyleClass().add("week-box-value");
 
+    weeksLeftLabel = new Label(weeksLeftText(1));
+    weeksLeftLabel.getStyleClass().add("week-box-subtitle");
+
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
     weekIcon.getStyleClass().add("week-box-icon");
 
-    VBox textBox = new VBox(2, currentWeekLabel, weekLabel);
+    VBox textBox = new VBox(2, currentWeekLabel, weekLabel, weeksLeftLabel);
 
     HBox weekBox = new HBox(10, weekIcon, textBox);
     weekBox.setAlignment(Pos.CENTER_LEFT);
@@ -233,8 +237,16 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
    *
    * @param week the current week number to display
    */
+  private static final int TOTAL_WEEKS = 520;
+
+  private static String weeksLeftText(int currentWeek) {
+    int left = TOTAL_WEEKS - currentWeek;
+    return left + " weeks left";
+  }
+
   private void setWeek(int week) {
     weekLabel.setText(ViewFormatter.week(week));
+    weeksLeftLabel.setText(weeksLeftText(week));
   }
 
   /**

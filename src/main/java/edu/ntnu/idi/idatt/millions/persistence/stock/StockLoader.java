@@ -3,7 +3,6 @@ package edu.ntnu.idi.idatt.millions.persistence.stock;
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -41,8 +40,7 @@ public final class StockLoader {
       }
     }
 
-    InputStream stream = StockLoader.class.getResourceAsStream(DEFAULT_STOCK_FILE);
-    if (stream == null) {
+    if (StockLoader.class.getResource(DEFAULT_STOCK_FILE) == null) {
       throw new PersistenceException(
           "Default StockData.csv not found. Please select a file manually.");
     }

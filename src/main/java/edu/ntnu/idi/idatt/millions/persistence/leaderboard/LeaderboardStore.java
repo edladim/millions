@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
  *
  * <p>Hides the underlying CSV reader and writer behind a small static API and owns the canonical
  * leaderboard file location at {@code ~/.millions/leaderboard.csv}. Mirrors the role of {@link
- * StockLoader} for stock data.
+ * edu.ntnu.idi.idatt.millions.persistence.stock.StockLoader} for stock data.
  *
  * <p>UI code should call these methods directly, if the underlying file is corrupt or unreadable,
  * errors are logged and the leaderboard is treated as empty rather than propagating exceptions to

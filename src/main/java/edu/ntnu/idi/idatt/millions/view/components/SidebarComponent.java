@@ -98,7 +98,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     btn.getStyleClass().add("nav-btn");
     btn.setMaxWidth(Double.MAX_VALUE);
     btn.setOnAction(
-        e -> {
+        _ -> {
           setActivePage(page);
           if (onNavigate != null) {
             onNavigate.accept(page);
@@ -125,7 +125,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     advanceBtn.getStyleClass().add("advance-btn");
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
     advanceBtn.setOnAction(
-        e -> {
+        _ -> {
           if (onAdvanceWeek != null) {
             onAdvanceWeek.run();
           }
@@ -134,7 +134,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     Button retireBtn = new Button("Retire");
     retireBtn.getStyleClass().add("sell-all-btn");
     retireBtn.setMaxWidth(Double.MAX_VALUE);
-    retireBtn.setOnAction(e -> confirmAndRetire());
+    retireBtn.setOnAction(_ -> confirmAndRetire());
 
     HBox weekBox = buildWeekBox();
 
@@ -226,11 +226,6 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     return r;
   }
 
-  /**
-   * Updates the displayed week number in the sidebar.
-   *
-   * @param week the current week number to display
-   */
   private static final int TOTAL_WEEKS = 520;
 
   private static String weeksLeftText(int currentWeek) {
@@ -238,6 +233,11 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     return left + " weeks left";
   }
 
+  /**
+   * Updates the displayed week number in the sidebar.
+   *
+   * @param week the current week number to display
+   */
   private void setWeek(int week) {
     weekLabel.setText(ViewFormatter.week(week));
     weeksLeftLabel.setText(weeksLeftText(week));

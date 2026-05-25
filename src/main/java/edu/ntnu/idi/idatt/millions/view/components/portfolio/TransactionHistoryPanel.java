@@ -58,7 +58,7 @@ public class TransactionHistoryPanel extends VBox {
     table.setPlaceholder(new Label("No transactions yet. Buy or sell stocks to see your history."));
 
     table.setRowFactory(
-        tv ->
+        _ ->
             new TableRow<>() {
               @Override
               protected void updateItem(Transaction tx, boolean empty) {
@@ -117,7 +117,7 @@ public class TransactionHistoryPanel extends VBox {
     TableColumn<Transaction, BigDecimal> col = new TableColumn<>(title);
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(BigDecimal item, boolean empty) {
@@ -138,7 +138,7 @@ public class TransactionHistoryPanel extends VBox {
     TableColumn<Transaction, Transaction> col = new TableColumn<>("Type");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(Transaction item, boolean empty) {
@@ -167,7 +167,7 @@ public class TransactionHistoryPanel extends VBox {
     TableColumn<Transaction, Integer> col = new TableColumn<>("Week");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getWeek()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(Integer item, boolean empty) {

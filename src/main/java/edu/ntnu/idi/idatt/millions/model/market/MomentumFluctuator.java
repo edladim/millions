@@ -107,7 +107,7 @@ public final class MomentumFluctuator implements PriceFluctuator {
   public BigDecimal nextPrice(String symbol, BigDecimal currentPrice, Random random) {
     double vol =
         volatility.computeIfAbsent(
-            symbol, k -> VOL_MIN + random.nextDouble() * (VOL_MAX - VOL_MIN));
+            symbol, _ -> VOL_MIN + random.nextDouble() * (VOL_MAX - VOL_MIN));
 
     double m = momentum.getOrDefault(symbol, 0.0);
 

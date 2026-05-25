@@ -75,7 +75,7 @@ public final class ScoreCalculator {
 
     // Fraction of starting capital still in the player's hands, capped at 1
     // so gains do not double-count (those are rewarded via performance).
-    double preservationFactor = Math.min(1.0, Math.max(0.0, 1 + r));
+    double preservationFactor = Math.clamp(1 + r, 0.0, 1.0);
 
     double performance = PERFORMANCE_WEIGHT * Math.log10(1 + Math.max(0, annualReturn));
     double survival = SURVIVAL_WEIGHT * Math.log10(1 + weeks) * preservationFactor;

@@ -40,18 +40,18 @@ public class BuyPanel extends VBox {
   private Label buyChangeLabel;
   private Button buyTab;
   private Button sellTab;
-  private Label panelTitle;
+  private final Label panelTitle;
   private Label cashBalanceLabel;
   private Label ownedValueLabel;
   private Label inputLabel;
 
-  private Spinner<Double> inputSpinner;
-  private Label derivedLabel;
+  private final Spinner<Double> inputSpinner;
+  private final Label derivedLabel;
   private BigDecimal currentPrice;
   private Label estimatedCostLabel;
   private Label commissionLabel;
   private Label totalCostLabel;
-  private Button actionButton;
+  private final Button actionButton;
 
   private Mode currentMode = Mode.BUY;
   private boolean amountMode = false;
@@ -94,7 +94,7 @@ public class BuyPanel extends VBox {
     actionButton.setMaxWidth(Double.MAX_VALUE);
     actionButton.setDisable(true);
     actionButton.setOnAction(
-        e -> {
+        _ -> {
           if (onAction != null) {
             onAction.accept(currentMode);
           }
@@ -125,12 +125,12 @@ public class BuyPanel extends VBox {
     buyTab = new Button("Buy");
     buyTab.getStyleClass().addAll("mode-tab", "mode-tab-active");
     buyTab.setMaxWidth(Double.MAX_VALUE);
-    buyTab.setOnAction(e -> setMode(Mode.BUY));
+    buyTab.setOnAction(_ -> setMode(Mode.BUY));
 
     sellTab = new Button("Sell");
     sellTab.getStyleClass().add("mode-tab");
     sellTab.setMaxWidth(Double.MAX_VALUE);
-    sellTab.setOnAction(e -> setMode(Mode.SELL));
+    sellTab.setOnAction(_ -> setMode(Mode.SELL));
 
     HBox.setHgrow(buyTab, Priority.ALWAYS);
     HBox.setHgrow(sellTab, Priority.ALWAYS);
@@ -199,7 +199,7 @@ public class BuyPanel extends VBox {
     Button swapBtn = new Button();
     swapBtn.setGraphic(swapIcon);
     swapBtn.getStyleClass().add("swap-btn");
-    swapBtn.setOnAction(e -> toggleInputMode());
+    swapBtn.setOnAction(_ -> toggleInputMode());
 
     HBox header = new HBox(inputLabel, spacer, swapBtn);
     header.setAlignment(Pos.CENTER_LEFT);
@@ -242,7 +242,7 @@ public class BuyPanel extends VBox {
         .getEditor()
         .textProperty()
         .addListener(
-            (obs, old, nw) -> {
+            (_, _, _) -> {
               if (onInputChanged != null) {
                 onInputChanged.run();
               }
@@ -266,7 +266,7 @@ public class BuyPanel extends VBox {
       Button btn = new Button(labels[i]);
       btn.getStyleClass().add("mode-tab");
       btn.setMaxWidth(Double.MAX_VALUE);
-      btn.setOnAction(e -> firePercent(pct));
+      btn.setOnAction(_ -> firePercent(pct));
       HBox.setHgrow(btn, Priority.ALWAYS);
       card.getChildren().add(btn);
     }

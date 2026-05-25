@@ -205,10 +205,10 @@ public class StartupPage extends StackPane {
     Button startBtn = new Button("Start Game  →");
     startBtn.getStyleClass().add("startup-start-btn");
     startBtn.setMaxWidth(Double.MAX_VALUE);
-    startBtn.setOnAction(e -> handleStart());
+    startBtn.setOnAction(_ -> handleStart());
 
-    nameField.setOnAction(e -> handleStart());
-    capitalField.setOnAction(e -> handleStart());
+    nameField.setOnAction(_ -> handleStart());
+    capitalField.setOnAction(_ -> handleStart());
 
     body.getChildren()
         .addAll(
@@ -236,7 +236,7 @@ public class StartupPage extends StackPane {
     Button browseBtn = new Button("Browse…");
     browseBtn.getStyleClass().add("startup-browse-btn");
     browseBtn.setOnAction(
-        e -> {
+        _ -> {
           if (onBrowse != null) {
             onBrowse.run();
           }

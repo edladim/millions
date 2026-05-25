@@ -48,7 +48,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   private final StockListPanel stockListPanel;
   private final BuyPanel buyPanel;
   private final StockChartComponent stockChart;
-  private VBox buyPanelWrapper;
 
   private Consumer<String> onSelectStock;
   private Runnable onRefresh;
@@ -134,7 +133,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   private VBox buildBuyPanelWrapper() {
-    buyPanelWrapper = new VBox(buyPanel);
+    VBox buyPanelWrapper = new VBox(buyPanel);
     buyPanelWrapper.getStyleClass().add("buy-panel-wrapper");
     buyPanelWrapper.setPadding(new Insets(24, 24, 24, 0));
     buyPanelWrapper.setMinWidth(WRAPPER_MIN_WIDTH);
@@ -232,11 +231,6 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   /** Delegates to {@link BuyPanel#setActionEnabled(boolean)}. */
   public void setActionEnabled(boolean enabled) {
     buyPanel.setActionEnabled(enabled);
-  }
-
-  /** Delegates to {@link BuyPanel#clearInput()}. */
-  public void clearInput() {
-    buyPanel.clearInput();
   }
 
   /** Delegates to {@link BuyPanel#setCurrentPrice(BigDecimal)}. */

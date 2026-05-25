@@ -247,7 +247,7 @@ class PlayerTest {
   @Test
   void addObserver_notifiedOnAddMoney() {
     int[] callCount = {0};
-    player.addObserver(p -> callCount[0]++);
+    player.addObserver(_ -> callCount[0]++);
     player.addMoney(new BigDecimal("100"));
     assertEquals(1, callCount[0]);
   }
@@ -256,7 +256,7 @@ class PlayerTest {
   @Test
   void addObserver_notifiedOnWithdrawMoney() {
     int[] callCount = {0};
-    player.addObserver(p -> callCount[0]++);
+    player.addObserver(_ -> callCount[0]++);
     player.withdrawMoney(new BigDecimal("100"));
     assertEquals(1, callCount[0]);
   }
@@ -265,7 +265,7 @@ class PlayerTest {
   @Test
   void addObserver_duplicateObserver_notifiedOnce() {
     int[] callCount = {0};
-    var observer = (edu.ntnu.idi.idatt.millions.observer.PlayerObserver) p -> callCount[0]++;
+    var observer = (edu.ntnu.idi.idatt.millions.observer.PlayerObserver) _ -> callCount[0]++;
     player.addObserver(observer);
     player.addObserver(observer);
     player.addMoney(new BigDecimal("100"));

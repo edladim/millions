@@ -43,7 +43,7 @@ public record Holding(
     if (lots.isEmpty()) {
       throw new IllegalArgumentException("Cannot aggregate an empty list of lots");
     }
-    ReadOnlyStock stock = lots.get(0).getStock();
+    ReadOnlyStock stock = lots.getFirst().getStock();
     BigDecimal totalQuantity =
         lots.stream().map(Share::getQuantity).reduce(BigDecimal.ZERO, BigDecimal::add);
     BigDecimal totalInvestment =

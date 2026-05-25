@@ -19,9 +19,9 @@ public interface LeaderboardReader {
   /**
    * Reads and returns all valid leaderboard entries from the data source.
    *
-   * <p>Unlike {@link StockReader}, an empty result is valid, a fresh installation has no recorded
-   * scores. Implementations should also treat a missing file as an empty list rather than as an
-   * error.
+   * <p>Unlike {@link edu.ntnu.idi.idatt.millions.persistence.stock.StockLoader}, an empty result is
+   * valid, a fresh installation has no recorded scores. Implementations should also treat a missing
+   * file as an empty list rather than as an error.
    *
    * @return a non-null list of entries (possibly empty)
    * @throws PersistenceException if the source cannot be read due to an I/O error

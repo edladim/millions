@@ -22,7 +22,6 @@ public final class Player implements ReadOnlyPlayer {
 
   private static final BigDecimal WORST_REQIREMENT = new BigDecimal("-0.50");
   private static final BigDecimal BAD_REQIREMEMENT = new BigDecimal("-0.20");
-  private static final BigDecimal AVRAGE_INVESTOR = BigDecimal.ZERO;
   private static final BigDecimal ALRIGHT_REQUIREMENT = new BigDecimal("0.20");
   private static final BigDecimal GOOD_REQUIREMENT = new BigDecimal("1.00");
   private static final BigDecimal EXCELLENT_REQUIREMENT = new BigDecimal("2.00");
@@ -81,7 +80,7 @@ public final class Player implements ReadOnlyPlayer {
    * @throws IllegalArgumentException if amount is negative
    */
   public void addMoney(BigDecimal amount) {
-    amount = validateAmount(amount);
+    validateAmount(amount);
     money = money.add(amount);
     notifyObservers();
   }
@@ -95,7 +94,7 @@ public final class Player implements ReadOnlyPlayer {
    * @throws IllegalStateException if the player has insufficient funds
    */
   public void withdrawMoney(BigDecimal amount) {
-    amount = validateAmount(amount);
+    validateAmount(amount);
     if (money.compareTo(amount) < 0) {
       throw new IllegalStateException("Insufficient funds");
     }

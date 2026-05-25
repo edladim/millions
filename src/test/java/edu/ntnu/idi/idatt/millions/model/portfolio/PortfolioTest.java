@@ -266,7 +266,7 @@ class PortfolioTest {
   @Test
   void addObserver_duplicateObserver_notifiedOnce() {
     AtomicInteger updates = new AtomicInteger();
-    PortfolioObserver observer = p -> updates.incrementAndGet();
+    PortfolioObserver observer = _ -> updates.incrementAndGet();
 
     portfolio.addObserver(observer);
     portfolio.addObserver(observer);
@@ -278,7 +278,7 @@ class PortfolioTest {
   @Test
   void notifyObservers_onlyOnSuccessfulRemove() {
     AtomicInteger updates = new AtomicInteger();
-    PortfolioObserver observer = p -> updates.incrementAndGet();
+    PortfolioObserver observer = _ -> updates.incrementAndGet();
 
     portfolio.addObserver(observer);
     portfolio.addShare(share1);

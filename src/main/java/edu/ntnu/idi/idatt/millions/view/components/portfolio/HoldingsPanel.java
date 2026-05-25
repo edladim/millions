@@ -135,7 +135,7 @@ public class HoldingsPanel extends VBox {
     TableColumn<Holding, BigDecimal> col = new TableColumn<>(title);
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(BigDecimal item, boolean empty) {
@@ -165,7 +165,7 @@ public class HoldingsPanel extends VBox {
     TableColumn<Holding, BigDecimal> col = new TableColumn<>("Gain / Loss");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getGainOrLoss()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(BigDecimal item, boolean empty) {
@@ -199,7 +199,7 @@ public class HoldingsPanel extends VBox {
     TableColumn<Holding, Holding> col = new TableColumn<>("");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               private final Button btn = new Button();
 
@@ -221,7 +221,7 @@ public class HoldingsPanel extends VBox {
                   setGraphic(null);
                 } else {
                   btn.setOnAction(
-                      e -> {
+                      _ -> {
                         if (onSell != null) {
                           onSell.accept(item.stock().getSymbol(), item.totalQuantity());
                         }
@@ -251,7 +251,7 @@ public class HoldingsPanel extends VBox {
     table
         .widthProperty()
         .addListener(
-            (obs, oldW, newW) -> {
+            (_, oldW, newW) -> {
               boolean wasCompact = oldW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
               boolean isCompact = newW.doubleValue() < TableStyleUtils.COMPACT_THRESHOLD;
               if (wasCompact != isCompact) {

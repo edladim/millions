@@ -50,7 +50,11 @@ public final class AppIcon {
       return;
     }
     try {
-      BufferedImage src = ImageIO.read(AppIcon.class.getResource(ICON_PATH));
+      var resource = AppIcon.class.getResource(ICON_PATH);
+      if (resource == null) {
+        return;
+      }
+      BufferedImage src = ImageIO.read(resource);
       taskbar.setIconImage(roundedIcon(src));
     } catch (Exception ignore) {
       // Taskbar icon not supported on this platform.

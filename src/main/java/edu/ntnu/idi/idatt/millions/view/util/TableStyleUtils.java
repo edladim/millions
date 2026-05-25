@@ -53,7 +53,7 @@ public final class TableStyleUtils {
   public static void wireSortHeaderHighlight(TableView<?> table) {
     table
         .getSortOrder()
-        .addListener((ListChangeListener<TableColumn<?, ?>>) c -> applyHeaderStyles(table));
+        .addListener((ListChangeListener<TableColumn<?, ?>>) _ -> applyHeaderStyles(table));
     Platform.runLater(() -> applyHeaderStyles(table));
   }
 
@@ -154,7 +154,7 @@ public final class TableStyleUtils {
     TableColumn<T, T> col = new TableColumn<>("Stock");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(T item, boolean empty) {

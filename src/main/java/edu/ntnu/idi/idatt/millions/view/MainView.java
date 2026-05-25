@@ -141,7 +141,7 @@ public class MainView {
 
     DoubleBinding sidebarWidth =
         Bindings.createDoubleBinding(
-            () -> Math.max(170, Math.min(260, scene.getWidth() * 0.18)), scene.widthProperty());
+            () -> Math.clamp(scene.getWidth() * 0.18, 170, 260), scene.widthProperty());
     sidebar.prefWidthProperty().bind(sidebarWidth);
     sidebar.maxWidthProperty().bind(sidebarWidth);
 

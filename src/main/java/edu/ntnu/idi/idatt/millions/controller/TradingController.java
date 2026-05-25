@@ -54,7 +54,7 @@ public class TradingController {
     view.setOnAction(this::handleTrade);
     view.setOnPercentSelected(this::handlePercent);
 
-    view.getSearchField().textProperty().addListener((obs, old, text) -> filterStocks(text));
+    view.getSearchField().textProperty().addListener((_, _, text) -> filterStocks(text));
 
     view.onExchangeUpdated(exchange);
     updatePlayerInfo();
@@ -312,7 +312,7 @@ public class TradingController {
     if (stocks.isEmpty()) {
       return;
     }
-    view.selectStock(stocks.get(0));
+    view.selectStock(stocks.getFirst());
   }
 
   /**

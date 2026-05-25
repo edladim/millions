@@ -26,8 +26,6 @@ public class GameController {
   private final Player player;
   private final Exchange exchange;
   private final TradingController tradingController;
-  private final PortfolioController portfolioController;
-  private final DashboardController dashboardController;
   private boolean gameOver = false;
 
   /**
@@ -47,16 +45,15 @@ public class GameController {
     view.getSidebar().onExchangeUpdated(exchange);
 
     tradingController = new TradingController(view.getTradingView(), exchange, player);
-    portfolioController = new PortfolioController(view.getPortfolioView(), exchange, player);
-    dashboardController =
-        new DashboardController(
-            view.getDashboardView(),
-            exchange,
-            player,
-            symbol -> {
-              view.navigateTo(Page.TRADING);
-              tradingController.focusStock(symbol);
-            });
+    new PortfolioController(view.getPortfolioView(), exchange, player);
+    new DashboardController(
+        view.getDashboardView(),
+        exchange,
+        player,
+        symbol -> {
+          view.navigateTo(Page.TRADING);
+          tradingController.focusStock(symbol);
+        });
 
     view.setOnAdvanceWeek(this::advanceWeek);
     view.setOnRetire(this::retire);

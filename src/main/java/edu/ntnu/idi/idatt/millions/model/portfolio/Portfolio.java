@@ -113,7 +113,7 @@ public final class Portfolio implements ReadOnlyPortfolio {
   public List<Holding> getHoldings() {
     Map<String, List<Share>> grouped = new LinkedHashMap<>();
     for (Share s : shares) {
-      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
+      grouped.computeIfAbsent(s.getStock().getSymbol(), _ -> new ArrayList<>()).add(s);
     }
     return grouped.values().stream().map(Holding::aggregate).toList();
   }

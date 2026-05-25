@@ -189,7 +189,7 @@ public class DashboardView extends VBox
     moversRow
         .widthProperty()
         .addListener(
-            (obs, old, newVal) -> {
+            (_, _, newVal) -> {
               double w = newVal.doubleValue();
               if (w < 1) {
                 return;
@@ -383,7 +383,7 @@ public class DashboardView extends VBox
     row.getStyleClass().add("mover-row");
     row.setPadding(new Insets(8, 8, 8, 0));
     row.setOnMouseClicked(
-        e -> {
+        _ -> {
           if (onStockClicked != null) {
             onStockClicked.accept(stock.getSymbol());
           }

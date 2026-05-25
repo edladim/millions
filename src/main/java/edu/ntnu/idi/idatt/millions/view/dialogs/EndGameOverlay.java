@@ -128,12 +128,6 @@ public class EndGameOverlay extends StackPane {
     setManaged(true);
   }
 
-  /** Hides the overlay and releases it from layout. */
-  public void hide() {
-    setVisible(false);
-    setManaged(false);
-  }
-
   /**
    * Registers a handler for the "New Game" action.
    *

@@ -71,7 +71,7 @@ class ExchangeTest {
   @Test
   void addObserver_duplicateObserver_notifiedOnce() {
     AtomicInteger notifications = new AtomicInteger();
-    ExchangeObserver observer = ex -> notifications.incrementAndGet();
+    ExchangeObserver observer = _ -> notifications.incrementAndGet();
 
     exchange.addObserver(observer);
     exchange.addObserver(observer);

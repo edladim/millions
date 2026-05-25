@@ -71,18 +71,6 @@ public final class ViewFormatter {
   }
 
   /**
-   * Formats a value as a directional price change with an arrow indicator but without a percentage
-   * sign, e.g. {@code "↗ +12.34"} or {@code "↘ -12.34"}.
-   *
-   * @param value the price change value to format
-   * @return the formatted directional price change string
-   */
-  public static String priceChangeArrow(BigDecimal value) {
-    boolean positive = value.compareTo(BigDecimal.ZERO) >= 0;
-    return (positive ? "↗ " : "↘ ") + signedAmount(value);
-  }
-
-  /**
    * Computes the percentage change from {@code currentPrice} and formats it with a directional
    * arrow, e.g. {@code "↗ +5.42%"} or {@code "↘ -3.17%"}.
    *

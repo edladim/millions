@@ -203,14 +203,14 @@ class StockTest {
   @Test
   void equals_null_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertFalse(stock.equals(null));
+    assertNotEquals(null, stock);
   }
 
   /** Ensures equals returns false for unrelated types. */
   @Test
   void equals_differentType_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertFalse(stock.equals("not a stock"));
+    assertNotEquals("not a stock", stock);
   }
 
   /** Verifies that the price history preserves insertion order. */
@@ -248,6 +248,6 @@ class StockTest {
   void equals_sameInstance_returnsTrue() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
 
-    assertEquals(stock, stock);
+    assertTrue(stock.equals(stock));
   }
 }

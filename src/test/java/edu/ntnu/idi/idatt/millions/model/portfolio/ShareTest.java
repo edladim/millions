@@ -130,7 +130,7 @@ class ShareTest {
   void equals_sameInstance_returnsTrue() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
 
-    assertTrue(share.equals(share));
+    assertSame(share, share);
   }
 
   /** Ensures equals returns false when quantity differs. */
@@ -139,7 +139,7 @@ class ShareTest {
     Share s1 = new Share(stock, new BigDecimal("1"), BigDecimal.ONE);
     Share s2 = new Share(stock, new BigDecimal("2"), BigDecimal.ONE);
 
-    assertFalse(s1.equals(s2));
+    assertNotEquals(s1, s2);
   }
 
   /** Ensures equals returns false when purchase price differs. */
@@ -148,21 +148,21 @@ class ShareTest {
     Share s1 = new Share(stock, BigDecimal.ONE, new BigDecimal("10"));
     Share s2 = new Share(stock, BigDecimal.ONE, new BigDecimal("11"));
 
-    assertFalse(s1.equals(s2));
+    assertNotEquals(s1, s2);
   }
 
   /** Ensures equals safely handles null. */
   @Test
   void equals_null_returnsFalse() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertFalse(share.equals(null));
+    assertNotEquals(null, share);
   }
 
   /** Ensures equals returns false for unrelated types. */
   @Test
   void equals_differentType_returnsFalse() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertFalse(share.equals("not share"));
+    assertNotEquals("not share", share);
   }
 
   /** Verifies hashCode is consistent with value equality. */

@@ -122,7 +122,7 @@ public class StockListPanel extends VBox {
     table
         .widthProperty()
         .addListener(
-            (obs, oldW, newW) -> {
+            (_, _, newW) -> {
               boolean compact = newW.doubleValue() < COMPACT_THRESHOLD;
               highCol.setVisible(!compact);
               lowCol.setVisible(!compact);
@@ -132,7 +132,7 @@ public class StockListPanel extends VBox {
         .getSelectionModel()
         .selectedItemProperty()
         .addListener(
-            (obs, oldSel, sel) -> {
+            (_, _, sel) -> {
               if (sel == null) {
                 return;
               }
@@ -146,9 +146,7 @@ public class StockListPanel extends VBox {
             });
 
     TableStyleUtils.wireSortHeaderHighlight(table);
-    table
-        .comparatorProperty()
-        .addListener((obs, old, neu) -> TableStyleUtils.applyHeaderStyles(table));
+    table.comparatorProperty().addListener((_, _, _) -> TableStyleUtils.applyHeaderStyles(table));
 
     return table;
   }
@@ -166,7 +164,7 @@ public class StockListPanel extends VBox {
     TableColumn<ReadOnlyStock, BigDecimal> col = new TableColumn<>(title);
     col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(extractor.apply(c.getValue())));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(BigDecimal value, boolean empty) {
@@ -194,7 +192,7 @@ public class StockListPanel extends VBox {
     TableColumn<ReadOnlyStock, ReadOnlyStock> col = new TableColumn<>("Change");
     col.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue()));
     col.setCellFactory(
-        c ->
+        _ ->
             new TableCell<>() {
               @Override
               protected void updateItem(ReadOnlyStock stock, boolean empty) {

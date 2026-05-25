@@ -5,8 +5,7 @@ import java.math.BigDecimal;
 /**
  * Defines calculation methods for financial transactions.
  *
- * <p>Implementations compute the financial values associated with
- * buying or selling shares.</p>
+ * <p>Implementations compute the financial values associated with buying or selling shares.
  */
 public interface TransactionCalculator {
 

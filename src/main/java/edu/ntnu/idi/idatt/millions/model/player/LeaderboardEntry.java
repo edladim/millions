@@ -3,11 +3,10 @@ package edu.ntnu.idi.idatt.millions.model.player;
 import java.util.Objects;
 
 /**
- * <p>Immutable record representing a single leaderboard entry.</p>
+ * Immutable record representing a single leaderboard entry.
  *
- * <p>Each entry pairs a player name with their final Millions Score. Entries
- * are persisted between sessions so the all-time top scores survive
- * application restarts.</p>
+ * <p>Each entry pairs a player name with their final Millions Score. Entries are persisted between
+ * sessions so the all-time top scores survive application restarts.
  *
  * @param name the player's display name; must be non-null and non-blank
  * @param score the player's final Millions Score; must be {@code >= 0}
@@ -15,7 +14,7 @@ import java.util.Objects;
 public record LeaderboardEntry(String name, long score) {
 
   /**
-   * <p>Compact constructor validating that the entry's fields are well-formed.</p>
+   * Compact constructor validating that the entry's fields are well-formed.
    *
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if {@code name} is blank or {@code score} is negative

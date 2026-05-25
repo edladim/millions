@@ -1,37 +1,34 @@
 package edu.ntnu.idi.idatt.millions.model.market;
 
-import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
+import static org.junit.jupiter.api.Assertions.*;
 
 import edu.ntnu.idi.idatt.millions.model.player.Player;
-
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
 import edu.ntnu.idi.idatt.millions.model.transaction.Sale;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link Exchange}.
  *
- * <p>The tests verify that the exchange correctly:</p>
+ * <p>The tests verify that the exchange correctly:
+ *
  * <ul>
- *   <li>Initializes with stocks</li>
- *   <li>Retrieves stocks</li>
- *   <li>Searches for stocks</li>
- *   <li>Executes and commits buy transactions</li>
- *   <li>Executes and commits sell transactions</li>
- *   <li>Advances weeks and updates prices</li>
+ *   <li>Initializes with stocks
+ *   <li>Retrieves stocks
+ *   <li>Searches for stocks
+ *   <li>Executes and commits buy transactions
+ *   <li>Executes and commits sell transactions
+ *   <li>Advances weeks and updates prices
  * </ul>
  *
- * <p>Validation and exceptional cases are also tested to ensure
- * robust behavior.</p>
+ * <p>Validation and exceptional cases are also tested to ensure robust behavior.
  */
 class ExchangeTest {
 
@@ -43,36 +40,31 @@ class ExchangeTest {
   /** Verifies that hasStock rejects a null symbol. */
   @Test
   void hasStock_nullSymbol_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.hasStock(null));
+    assertThrows(NullPointerException.class, () -> exchange.hasStock(null));
   }
 
   /** Verifies that hasStock rejects a blank symbol. */
   @Test
   void hasStock_blankSymbol_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.hasStock("  "));
+    assertThrows(IllegalArgumentException.class, () -> exchange.hasStock("  "));
   }
 
   /** Verifies that getStock rejects a null symbol. */
   @Test
   void getStock_nullSymbol_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.getStock(null));
+    assertThrows(NullPointerException.class, () -> exchange.getStock(null));
   }
 
   /** Verifies that getStock rejects a blank symbol. */
   @Test
   void getStock_blankSymbol_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getStock(" "));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getStock(" "));
   }
 
   /** Verifies that adding a null observer throws an exception. */
   @Test
   void addObserver_nullObserver_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.addObserver(null));
+    assertThrows(NullPointerException.class, () -> exchange.addObserver(null));
   }
 
   /** Verifies that adding the same observer twice only notifies once. */
@@ -119,15 +111,13 @@ class ExchangeTest {
   /** Verifies that an invalid limit in top performers throws an exception. */
   @Test
   void getTopPerformers_invalidLimit_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getTopPerformers(0));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getTopPerformers(0));
   }
 
   /** Verifies that an invalid limit in bottom performers throws an exception. */
   @Test
   void getBottomPerformers_invalidLimit_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getBottomPerformers(0));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getBottomPerformers(0));
   }
 
   /** Verifies that sell by symbol handles full and partial lots. */
@@ -148,21 +138,20 @@ class ExchangeTest {
   void sellBySymbol_invalidOrExcessiveQuantity_throwsException() {
     exchange.buy("AAPL", new BigDecimal("5"), player);
 
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.sell("AAPL", BigDecimal.ZERO, player));
-    assertThrows(IllegalStateException.class,
-        () -> exchange.sell("AAPL", new BigDecimal("6"), player));
+    assertThrows(
+        IllegalArgumentException.class, () -> exchange.sell("AAPL", BigDecimal.ZERO, player));
+    assertThrows(
+        IllegalStateException.class, () -> exchange.sell("AAPL", new BigDecimal("6"), player));
   }
 
   /** Verifies that sell by symbol rejects null arguments. */
   @Test
   void sellBySymbol_nullArguments_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.sell(null, new BigDecimal("1"), player));
-    assertThrows(NullPointerException.class,
-        () -> exchange.sell("AAPL", null, player));
-    assertThrows(NullPointerException.class,
-        () -> exchange.sell("AAPL", new BigDecimal("1"), null));
+    assertThrows(
+        NullPointerException.class, () -> exchange.sell(null, new BigDecimal("1"), player));
+    assertThrows(NullPointerException.class, () -> exchange.sell("AAPL", null, player));
+    assertThrows(
+        NullPointerException.class, () -> exchange.sell("AAPL", new BigDecimal("1"), null));
   }
 
   /** Verifies that sell by symbol breaks when remaining reaches zero before the last lot. */
@@ -179,9 +168,7 @@ class ExchangeTest {
     assertEquals(new BigDecimal("4"), remaining.getFirst().getQuantity());
   }
 
-  /**
-   * Creates an exchange with two stocks and a player before each test.
-   */
+  /** Creates an exchange with two stocks and a player before each test. */
   @BeforeEach
   void setUp() {
     apple = new Stock("AAPL", "Apple Inc.", new BigDecimal("150"));
@@ -205,37 +192,33 @@ class ExchangeTest {
   /** Verifies that a null name throws a NullPointerException. */
   @Test
   void constructor_nullName_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Exchange(null, List.of(apple)));
+    assertThrows(NullPointerException.class, () -> new Exchange(null, List.of(apple)));
   }
 
   /** Verifies that a blank name throws an IllegalArgumentException. */
   @Test
   void constructor_blankName_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Exchange("  ", List.of(apple)));
+    assertThrows(IllegalArgumentException.class, () -> new Exchange("  ", List.of(apple)));
   }
 
   /** Verifies that an empty stock list throws an IllegalArgumentException. */
   @Test
   void constructor_emptyStockList_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Exchange("NASDAQ", List.of()));
+    assertThrows(IllegalArgumentException.class, () -> new Exchange("NASDAQ", List.of()));
   }
 
   /** Verifies that a null stock list throws a NullPointerException. */
   @Test
   void constructor_nullStockList_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Exchange("NASDAQ", null));
+    assertThrows(NullPointerException.class, () -> new Exchange("NASDAQ", null));
   }
 
   /** Verifies that duplicate stock symbols throw an IllegalArgumentException. */
   @Test
   void constructor_duplicateSymbol_throwsException() {
     Stock duplicate = new Stock("AAPL", "Apple Clone", new BigDecimal("100"));
-    assertThrows(IllegalArgumentException.class,
-        () -> new Exchange("NASDAQ", List.of(apple, duplicate)));
+    assertThrows(
+        IllegalArgumentException.class, () -> new Exchange("NASDAQ", List.of(apple, duplicate)));
   }
 
   /** Verifies that getStocks returns all registered stocks. */
@@ -251,7 +234,8 @@ class ExchangeTest {
   @Test
   void getStocks_returnsUnmodifiableList() {
     List<Stock> stocks = exchange.getStocks();
-    assertThrows(UnsupportedOperationException.class,
+    assertThrows(
+        UnsupportedOperationException.class,
         () -> stocks.add(new Stock("MSFT", "Microsoft", new BigDecimal("100"))));
   }
 
@@ -277,10 +261,8 @@ class ExchangeTest {
   /** Verifies that requesting a non-existent stock throws an exception. */
   @Test
   void getStock_invalidSymbol_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getStock("MSFT"));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getStock("MSFT"));
   }
-
 
   /** Verifies that searching by symbol returns matching stocks. */
   @Test
@@ -299,8 +281,7 @@ class ExchangeTest {
   /** Verifies that searching with a null term throws an exception. */
   @Test
   void findStocks_nullSearchTerm_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.findStocks(null));
+    assertThrows(NullPointerException.class, () -> exchange.findStocks(null));
   }
 
   /** Verifies that buy returns a committed Purchase transaction. */
@@ -338,36 +319,34 @@ class ExchangeTest {
   @Test
   void buy_insufficientFunds_throwsException() {
     Player poorPlayer = new Player("Poor", new BigDecimal("1"));
-    assertThrows(IllegalStateException.class,
-        () -> exchange.buy("AAPL", new BigDecimal("100"), poorPlayer));
+    assertThrows(
+        IllegalStateException.class, () -> exchange.buy("AAPL", new BigDecimal("100"), poorPlayer));
   }
 
   /** Verifies that buy with zero quantity throws an exception. */
   @Test
   void buy_invalidQuantity_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.buy("AAPL", BigDecimal.ZERO, player));
+    assertThrows(
+        IllegalArgumentException.class, () -> exchange.buy("AAPL", BigDecimal.ZERO, player));
   }
 
   /** Verifies that buy with a null player throws an exception. */
   @Test
   void buy_nullPlayer_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.buy("AAPL", new BigDecimal("5"), null));
+    assertThrows(NullPointerException.class, () -> exchange.buy("AAPL", new BigDecimal("5"), null));
   }
 
   /** Verifies that buy with a null quantity throws an exception. */
   @Test
   void buy_nullQuantity_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.buy("AAPL", null, player));
+    assertThrows(NullPointerException.class, () -> exchange.buy("AAPL", null, player));
   }
 
   /** Verifies that buy with an unknown symbol throws an exception. */
   @Test
   void buy_unknownSymbol_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.buy("MSFT", new BigDecimal("5"), player));
+    assertThrows(
+        IllegalArgumentException.class, () -> exchange.buy("MSFT", new BigDecimal("5"), player));
   }
 
   /** Verifies that sell returns a committed Sale transaction. */
@@ -417,23 +396,20 @@ class ExchangeTest {
   @Test
   void sell_shareNotOwnedByPlayer_throwsException() {
     Share unownedShare = new Share(apple, new BigDecimal("5"), new BigDecimal("150"));
-    assertThrows(IllegalStateException.class,
-        () -> exchange.sell(unownedShare, player));
+    assertThrows(IllegalStateException.class, () -> exchange.sell(unownedShare, player));
   }
 
   /** Verifies that a null share in sell throws an exception. */
   @Test
   void sell_nullShare_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> exchange.sell(null, player));
+    assertThrows(NullPointerException.class, () -> exchange.sell(null, player));
   }
 
   /** Verifies that a null player in sell throws an exception. */
   @Test
   void sell_nullPlayer_throwsException() {
     Share share = new Share(apple, new BigDecimal("5"), new BigDecimal("150"));
-    assertThrows(NullPointerException.class,
-        () -> exchange.sell(share, null));
+    assertThrows(NullPointerException.class, () -> exchange.sell(share, null));
   }
 
   /** Verifies that advancing the exchange increments the week. */
@@ -457,13 +433,14 @@ class ExchangeTest {
     for (int i = 0; i < 100; i++) {
       exchange.advance();
     }
-    exchange.getStocks().forEach(stock ->
-        assertTrue(stock.getSalesPrice().compareTo(BigDecimal.ZERO) > 0));
+    exchange
+        .getStocks()
+        .forEach(stock -> assertTrue(stock.getSalesPrice().compareTo(BigDecimal.ZERO) > 0));
   }
 
   /**
-   * Verifies that getGainers returns stocks with positive price change,
-   * sorted descending by change, and respects the limit.
+   * Verifies that getGainers returns stocks with positive price change, sorted descending by
+   * change, and respects the limit.
    */
   @Test
   void getGainers_returnsTopGainersSortedDescending() {
@@ -514,13 +491,12 @@ class ExchangeTest {
   /** Verifies that an invalid limit throws an exception. */
   @Test
   void getGainers_invalidLimit_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getGainers(0));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getGainers(0));
   }
 
   /**
-   * Verifies that getLosers returns stocks with negative price change,
-   * sorted ascending by change, and respects the limit.
+   * Verifies that getLosers returns stocks with negative price change, sorted ascending by change,
+   * and respects the limit.
    */
   @Test
   void getLosers_returnsTopLosersSortedAscending() {
@@ -571,7 +547,6 @@ class ExchangeTest {
   /** Verifies that an invalid limit throws an exception. */
   @Test
   void getLosers_invalidLimit_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> exchange.getLosers(0));
+    assertThrows(IllegalArgumentException.class, () -> exchange.getLosers(0));
   }
 }

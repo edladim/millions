@@ -1,38 +1,35 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
+import static org.junit.jupiter.api.Assertions.*;
+
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link PurchaseCalculator}.
  *
- * <p>The tests verify that the calculator correctly computes financial
- * values for purchase transactions including:</p>
+ * <p>The tests verify that the calculator correctly computes financial values for purchase
+ * transactions including:
  *
  * <ul>
- *   <li>Gross purchase value</li>
- *   <li>Broker commission</li>
- *   <li>Tax (should always be zero)</li>
- *   <li>Total transaction cost</li>
+ *   <li>Gross purchase value
+ *   <li>Broker commission
+ *   <li>Tax (should always be zero)
+ *   <li>Total transaction cost
  * </ul>
  *
- * <p>The tests also verify constructor validation and ensure that
- * all calculations follow the financial rules defined for purchases.</p>
+ * <p>The tests also verify constructor validation and ensure that all calculations follow the
+ * financial rules defined for purchases.
  */
 class PurchaseCalculatorTest {
 
   private PurchaseCalculator calculator;
   private Share share;
 
-  /**
-   * Creates a sample share used for testing purchase calculations.
-   */
+  /** Creates a sample share used for testing purchase calculations. */
   @BeforeEach
   void setUp() {
 
@@ -45,7 +42,7 @@ class PurchaseCalculatorTest {
   /**
    * Verifies that the gross purchase value is calculated correctly.
    *
-   * <p>Formula: purchasePrice × quantity</p>
+   * <p>Formula: purchasePrice × quantity
    */
   @Test
   void calculateGross_returnsCorrectValue() {
@@ -60,7 +57,7 @@ class PurchaseCalculatorTest {
   /**
    * Verifies that the broker commission is calculated correctly.
    *
-   * <p>Formula: 0.5% of gross value</p>
+   * <p>Formula: 0.5% of gross value
    */
   @Test
   void calculateCommission_returnsCorrectValue() {
@@ -72,9 +69,7 @@ class PurchaseCalculatorTest {
     assertEquals(0, expected.compareTo(result));
   }
 
-  /**
-   * Verifies that purchase transactions never incur tax.
-   */
+  /** Verifies that purchase transactions never incur tax. */
   @Test
   void calculateTax_returnsZero() {
 
@@ -86,7 +81,7 @@ class PurchaseCalculatorTest {
   /**
    * Verifies that the total transaction cost is calculated correctly.
    *
-   * <p>Formula: gross + commission</p>
+   * <p>Formula: gross + commission
    */
   @Test
   void calculateTotal_returnsCorrectValue() {
@@ -98,13 +93,10 @@ class PurchaseCalculatorTest {
     assertEquals(0, expected.compareTo(result));
   }
 
-  /**
-   * Ensures that the constructor rejects null input.
-   */
+  /** Ensures that the constructor rejects null input. */
   @Test
   void constructor_nullShare_throwsException() {
 
-    assertThrows(NullPointerException.class,
-        () -> new PurchaseCalculator(null));
+    assertThrows(NullPointerException.class, () -> new PurchaseCalculator(null));
   }
 }

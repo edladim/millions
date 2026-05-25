@@ -1,27 +1,27 @@
 package edu.ntnu.idi.idatt.millions.model.portfolio;
 
 import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
-
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Represents ownership of a given quantity of a specific {@link Stock}.
  *
- * <p>A {@code Share} contains information about:</p>
+ * <p>A {@code Share} contains information about:
+ *
  * <ul>
- *   <li>The stock that was purchased</li>
- *   <li>The quantity purchased</li>
- *   <li>The purchase price per unit at the time of purchase</li>
+ *   <li>The stock that was purchased
+ *   <li>The quantity purchased
+ *   <li>The purchase price per unit at the time of purchase
  * </ul>
  *
- * <p>This class is immutable and guarantees that:</p>
+ * <p>This class is immutable and guarantees that:
+ *
  * <ul>
- *   <li>Stock is never null</li>
- *   <li>Quantity is positive</li>
- *   <li>Purchase price is non-negative</li>
+ *   <li>Stock is never null
+ *   <li>Quantity is positive
+ *   <li>Purchase price is non-negative
  * </ul>
  */
 public final class Share {
@@ -33,13 +33,12 @@ public final class Share {
   /**
    * Constructs a new {@code Share}.
    *
-   * @param stock         the stock being owned, cannot be null
-   * @param quantity      the amount of stock purchased, must be positive
-   * @param purchasePrice the price per stock at purchase time,
-   *                      cannot be null or negative
-   * @throws NullPointerException     if {@code stock} or {@code purchasePrice} is null
-   * @throws IllegalArgumentException if {@code quantity} is zero or negative,
-   *                                  or if {@code purchasePrice} is negative
+   * @param stock the stock being owned, cannot be null
+   * @param quantity the amount of stock purchased, must be positive
+   * @param purchasePrice the price per stock at purchase time, cannot be null or negative
+   * @throws NullPointerException if {@code stock} or {@code purchasePrice} is null
+   * @throws IllegalArgumentException if {@code quantity} is zero or negative, or if {@code
+   *     purchasePrice} is negative
    */
   public Share(Stock stock, BigDecimal quantity, BigDecimal purchasePrice) {
     this.stock = Objects.requireNonNull(stock, "Stock cannot be null");
@@ -86,7 +85,7 @@ public final class Share {
   /**
    * Calculates the current market value of this share.
    *
-   * <p>The current price is retrieved from the associated {@link Stock}.</p>
+   * <p>The current price is retrieved from the associated {@link Stock}.
    *
    * @return current stock price multiplied by quantity
    */
@@ -104,9 +103,8 @@ public final class Share {
   }
 
   /**
-   * Indicates whether some other object is equal to this share.
-   * Two shares are considered equal if they refer to the same stock
-   * and have the same quantity and purchase price regardless of time
+   * Indicates whether some other object is equal to this share. Two shares are considered equal if
+   * they refer to the same stock and have the same quantity and purchase price regardless of time
    * of purchase, owner etc.
    *
    * @param o the object to compare with
@@ -131,9 +129,7 @@ public final class Share {
     return Objects.hash(stock, quantity.stripTrailingZeros(), purchasePrice.stripTrailingZeros());
   }
 
-  /**
-   * Validates that quantity is non-null and strictly positive.
-   */
+  /** Validates that quantity is non-null and strictly positive. */
   private static BigDecimal validateQuantity(BigDecimal quantity) {
     Objects.requireNonNull(quantity, "Quantity cannot be null");
     if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
@@ -142,9 +138,7 @@ public final class Share {
     return quantity;
   }
 
-  /**
-   * Validates that a monetary value is non-null and not negative.
-   */
+  /** Validates that a monetary value is non-null and not negative. */
   private static BigDecimal validateNonNegative(BigDecimal value, String fieldName) {
     Objects.requireNonNull(value, fieldName + " cannot be null");
     if (value.compareTo(BigDecimal.ZERO) < 0) {

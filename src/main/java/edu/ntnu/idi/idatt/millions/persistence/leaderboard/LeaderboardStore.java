@@ -1,8 +1,7 @@
 package edu.ntnu.idi.idatt.millions.persistence.leaderboard;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,16 +14,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * <p>Facade for persisting and retrieving the leaderboard.</p>
+ * Facade for persisting and retrieving the leaderboard.
  *
- * <p>Hides the underlying CSV reader and writer behind a small static API and
- * owns the canonical leaderboard file location at
- * {@code ~/.millions/leaderboard.csv}. Mirrors the role of
- * {@link StockLoader} for stock data.</p>
+ * <p>Hides the underlying CSV reader and writer behind a small static API and owns the canonical
+ * leaderboard file location at {@code ~/.millions/leaderboard.csv}. Mirrors the role of {@link
+ * StockLoader} for stock data.
  *
- * <p>UI code should call these methods directly, if the underlying file is
- * corrupt or unreadable, errors are logged and the leaderboard is treated as
- * empty rather than propagating exceptions to the view layer.</p>
+ * <p>UI code should call these methods directly, if the underlying file is corrupt or unreadable,
+ * errors are logged and the leaderboard is treated as empty rather than propagating exceptions to
+ * the view layer.
  */
 public final class LeaderboardStore {
 
@@ -42,10 +40,10 @@ public final class LeaderboardStore {
   }
 
   /**
-   * <p>Loads the current top-{@value #MAX_ENTRIES} entries sorted by score descending.</p>
+   * Loads the current top-{@value #MAX_ENTRIES} entries sorted by score descending.
    *
-   * <p>Returns an empty list if no leaderboard file exists yet or if the file
-   * cannot be read. UI code can rely on this method never throwing.</p>
+   * <p>Returns an empty list if no leaderboard file exists yet or if the file cannot be read. UI
+   * code can rely on this method never throwing.
    *
    * @return a non-null list of at most {@value #MAX_ENTRIES} entries
    */
@@ -64,19 +62,17 @@ public final class LeaderboardStore {
   }
 
   /**
-   * <p>Submits a new entry to the leaderboard and persists the updated top list.</p>
+   * Submits a new entry to the leaderboard and persists the updated top list.
    *
-   * <p>The submitted entry is inserted into the existing list, the list is
-   * sorted by score descending, trimmed to {@value #MAX_ENTRIES}, and written
-   * back to disk. If the submitted entry survives the trim, its 1-based rank
-   * (1–{@value #MAX_ENTRIES}) is returned; otherwise an empty
-   * {@link OptionalInt} is returned.</p>
+   * <p>The submitted entry is inserted into the existing list, the list is sorted by score
+   * descending, trimmed to {@value #MAX_ENTRIES}, and written back to disk. If the submitted entry
+   * survives the trim, its 1-based rank (1–{@value #MAX_ENTRIES}) is returned; otherwise an empty
+   * {@link OptionalInt} is returned.
    *
-   * <p>If writing fails the error is logged but the rank is still returned —
-   * UI code should not be blocked from displaying the result of the game just
-   * because persistence failed.</p>
+   * <p>If writing fails the error is logged but the rank is still returned — UI code should not be
+   * blocked from displaying the result of the game just because persistence failed.
    *
-   * @param name  the player's name; must be non-null and non-blank
+   * @param name the player's name; must be non-null and non-blank
    * @param score the player's final score; must be {@code >= 0}
    * @return the player's 1-based rank if they made the top {@value #MAX_ENTRIES}, else empty
    * @throws NullPointerException if {@code name} is null

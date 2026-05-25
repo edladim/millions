@@ -1,31 +1,30 @@
 package edu.ntnu.idi.idatt.millions.model.portfolio;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link Portfolio}.
  *
- * <p>The tests verify that the portfolio correctly manages shares,
- * enforces validation rules, and calculates portfolio values.</p>
+ * <p>The tests verify that the portfolio correctly manages shares, enforces validation rules, and
+ * calculates portfolio values.
  *
- * <p>The following behaviors are tested:</p>
+ * <p>The following behaviors are tested:
+ *
  * <ul>
- *   <li>Adding and removing shares</li>
- *   <li>Checking if shares exist in the portfolio</li>
- *   <li>Filtering shares by stock symbol</li>
- *   <li>Defensive copying of returned collections</li>
- *   <li>Portfolio value calculations</li>
- *   <li>Validation and exceptional cases</li>
+ *   <li>Adding and removing shares
+ *   <li>Checking if shares exist in the portfolio
+ *   <li>Filtering shares by stock symbol
+ *   <li>Defensive copying of returned collections
+ *   <li>Portfolio value calculations
+ *   <li>Validation and exceptional cases
  * </ul>
  */
 class PortfolioTest {
@@ -36,9 +35,7 @@ class PortfolioTest {
   private Stock apple;
   private Stock google;
 
-  /**
-   * Creates a portfolio and sample shares before each test.
-   */
+  /** Creates a portfolio and sample shares before each test. */
   @BeforeEach
   void setUp() {
     portfolio = new Portfolio();
@@ -51,9 +48,7 @@ class PortfolioTest {
     share3 = new Share(google, new BigDecimal("3"), new BigDecimal("80"));
   }
 
-  /**
-   * Verifies that shares can be added to the portfolio.
-   */
+  /** Verifies that shares can be added to the portfolio. */
   @Test
   void addShare_addsShareSuccessfully() {
     portfolio.addShare(share1);
@@ -61,18 +56,13 @@ class PortfolioTest {
     assertTrue(portfolio.contains(share1));
   }
 
-  /**
-   * Ensures null shares cannot be added.
-   */
+  /** Ensures null shares cannot be added. */
   @Test
   void addShare_nullShare_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> portfolio.addShare(null));
+    assertThrows(NullPointerException.class, () -> portfolio.addShare(null));
   }
 
-  /**
-   * Verifies that shares can be removed from the portfolio.
-   */
+  /** Verifies that shares can be removed from the portfolio. */
   @Test
   void removeShare_existingShare_removesShare() {
     portfolio.addShare(share1);
@@ -81,9 +71,7 @@ class PortfolioTest {
     assertEquals(0, portfolio.size());
   }
 
-  /**
-   * Removing a non-existing share should return false.
-   */
+  /** Removing a non-existing share should return false. */
   @Test
   void removeShare_nonExistingShare_returnsFalse() {
     portfolio.addShare(share1);
@@ -91,18 +79,13 @@ class PortfolioTest {
     assertFalse(portfolio.removeShare(share2));
   }
 
-  /**
-   * Ensures null shares cannot be removed.
-   */
+  /** Ensures null shares cannot be removed. */
   @Test
   void removeShare_nullShare_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> portfolio.removeShare(null));
+    assertThrows(NullPointerException.class, () -> portfolio.removeShare(null));
   }
 
-  /**
-   * Verifies the contains method works correctly.
-   */
+  /** Verifies the contains method works correctly. */
   @Test
   void contains_returnsCorrectResult() {
     portfolio.addShare(share1);
@@ -111,18 +94,13 @@ class PortfolioTest {
     assertFalse(portfolio.contains(share2));
   }
 
-  /**
-   * Ensures contains rejects null values.
-   */
+  /** Ensures contains rejects null values. */
   @Test
   void contains_nullShare_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> portfolio.contains(null));
+    assertThrows(NullPointerException.class, () -> portfolio.contains(null));
   }
 
-  /**
-   * Verifies that getShares returns all shares.
-   */
+  /** Verifies that getShares returns all shares. */
   @Test
   void getShares_returnsAllShares() {
     portfolio.addShare(share1);
@@ -133,22 +111,17 @@ class PortfolioTest {
     assertEquals(2, shares.size());
   }
 
-  /**
-   * Ensures the returned share list cannot be modified externally.
-   */
+  /** Ensures the returned share list cannot be modified externally. */
   @Test
   void getShares_returnsUnmodifiableList() {
     portfolio.addShare(share1);
 
     List<Share> shares = portfolio.getShares();
 
-    assertThrows(UnsupportedOperationException.class,
-        () -> shares.add(share2));
+    assertThrows(UnsupportedOperationException.class, () -> shares.add(share2));
   }
 
-  /**
-   * Verifies filtering shares by stock symbol.
-   */
+  /** Verifies filtering shares by stock symbol. */
   @Test
   void getSharesBySymbol_returnsMatchingShares() {
     portfolio.addShare(share1);
@@ -160,9 +133,7 @@ class PortfolioTest {
     assertEquals(2, appleShares.size());
   }
 
-  /**
-   * Ensures filtering with a symbol that does not exist returns an empty list.
-   */
+  /** Ensures filtering with a symbol that does not exist returns an empty list. */
   @Test
   void getSharesBySymbol_nonExistingSymbol_returnsEmptyList() {
     portfolio.addShare(share1);
@@ -172,21 +143,15 @@ class PortfolioTest {
     assertTrue(result.isEmpty());
   }
 
-  /**
-   * Ensures invalid symbol input is rejected.
-   */
+  /** Ensures invalid symbol input is rejected. */
   @Test
   void getSharesBySymbol_invalidSymbol_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> portfolio.getShares(null));
+    assertThrows(NullPointerException.class, () -> portfolio.getShares(null));
 
-    assertThrows(IllegalArgumentException.class,
-        () -> portfolio.getShares(" "));
+    assertThrows(IllegalArgumentException.class, () -> portfolio.getShares(" "));
   }
 
-  /**
-   * Verifies the constructor that accepts a list of shares.
-   */
+  /** Verifies the constructor that accepts a list of shares. */
   @Test
   void constructor_withShares_initializesPortfolio() {
     Portfolio portfolioWithShares = new Portfolio(List.of(share1, share2));
@@ -194,18 +159,13 @@ class PortfolioTest {
     assertEquals(2, portfolioWithShares.size());
   }
 
-  /**
-   * Ensures constructor rejects null lists.
-   */
+  /** Ensures constructor rejects null lists. */
   @Test
   void constructor_nullList_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Portfolio(null));
+    assertThrows(NullPointerException.class, () -> new Portfolio(null));
   }
 
-  /**
-   * Verifies calculation of total portfolio value.
-   */
+  /** Verifies calculation of total portfolio value. */
   @Test
   void getTotalValue_calculatesCorrectValue() {
     portfolio.addShare(share1);
@@ -216,9 +176,7 @@ class PortfolioTest {
     assertEquals(new BigDecimal("2300"), value);
   }
 
-  /**
-   * Verifies calculation of total invested capital.
-   */
+  /** Verifies calculation of total invested capital. */
   @Test
   void getTotalInvestment_calculatesCorrectValue() {
     portfolio.addShare(share1);
@@ -229,9 +187,7 @@ class PortfolioTest {
     assertEquals(new BigDecimal("1740"), investment);
   }
 
-  /**
-   * Verifies calculation of gain or loss.
-   */
+  /** Verifies calculation of gain or loss. */
   @Test
   void getTotalGainOrLoss_calculatesCorrectValue() {
     portfolio.addShare(share1);
@@ -242,9 +198,7 @@ class PortfolioTest {
     assertEquals(new BigDecimal("560"), gain);
   }
 
-  /**
-   * Verifies correct net worth calculation
-   */
+  /** Verifies correct net worth calculation */
   @Test
   void testGetNetWorth_returnsCorrectValue() {
     portfolio.addShare(share1);
@@ -258,8 +212,7 @@ class PortfolioTest {
 
   @Test
   void constructor_withNullShare_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Portfolio(List.of(share1, null)));
+    assertThrows(NullPointerException.class, () -> new Portfolio(List.of(share1, null)));
   }
 
   @Test
@@ -271,14 +224,16 @@ class PortfolioTest {
     List<Holding> holdings = portfolio.getHoldings();
 
     assertEquals(2, holdings.size());
-    Holding appleHolding = holdings.stream()
-        .filter(h -> h.stock().getSymbol().equals("AAPL"))
-        .findFirst()
-        .orElseThrow();
-    Holding googleHolding = holdings.stream()
-        .filter(h -> h.stock().getSymbol().equals("GOOGL"))
-        .findFirst()
-        .orElseThrow();
+    Holding appleHolding =
+        holdings.stream()
+            .filter(h -> h.stock().getSymbol().equals("AAPL"))
+            .findFirst()
+            .orElseThrow();
+    Holding googleHolding =
+        holdings.stream()
+            .filter(h -> h.stock().getSymbol().equals("GOOGL"))
+            .findFirst()
+            .orElseThrow();
 
     assertEquals(0, appleHolding.totalQuantity().compareTo(new BigDecimal("15")));
     assertEquals(0, appleHolding.totalInvestment().compareTo(new BigDecimal("2200")));
@@ -305,8 +260,7 @@ class PortfolioTest {
 
   @Test
   void addObserver_nullObserver_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> portfolio.addObserver(null));
+    assertThrows(NullPointerException.class, () -> portfolio.addObserver(null));
   }
 
   @Test

@@ -1,28 +1,25 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
+import static org.junit.jupiter.api.Assertions.*;
 
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Unit tests for {@link CsvStockReader}.
  *
- * <p>Tests focus on CSV parsing correctness. A temporary directory is used
- * to avoid coupling the tests to any specific file on the developer's machine.</p>
+ * <p>Tests focus on CSV parsing correctness. A temporary directory is used to avoid coupling the
+ * tests to any specific file on the developer's machine.
  */
 class CsvStockReaderTest {
 
-  @TempDir
-  Path tempDir;
+  @TempDir Path tempDir;
 
   // Positive tests
 
@@ -147,15 +144,13 @@ class CsvStockReaderTest {
     Path csv = tempDir.resolve("stocks.csv");
     Files.writeString(csv, "# only comments\n\n");
 
-    assertThrows(PersistenceException.class,
-        () -> new CsvStockReader(csv).readStockData());
+    assertThrows(PersistenceException.class, () -> new CsvStockReader(csv).readStockData());
   }
 
   @Test
   void constructor_nonExistentFile_throwsPersistenceException() {
     Path missing = tempDir.resolve("does_not_exist.csv");
 
-    assertThrows(PersistenceException.class,
-        () -> new CsvStockReader(missing));
+    assertThrows(PersistenceException.class, () -> new CsvStockReader(missing));
   }
 }

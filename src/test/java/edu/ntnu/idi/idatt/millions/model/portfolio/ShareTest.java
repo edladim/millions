@@ -1,42 +1,39 @@
 package edu.ntnu.idi.idatt.millions.model.portfolio;
 
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import static org.junit.jupiter.api.Assertions.*;
 
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Share}.
  *
- * <p>The tests verify that {@code Share}:</p>
+ * <p>The tests verify that {@code Share}:
+ *
  * <ul>
- *   <li>validates constructor and method arguments</li>
- *   <li>calculates investment, current value and gain/loss correctly</li>
- *   <li>implements value-based equality (scale-insensitive)</li>
+ *   <li>validates constructor and method arguments
+ *   <li>calculates investment, current value and gain/loss correctly
+ *   <li>implements value-based equality (scale-insensitive)
  * </ul>
  *
- * <p>Both valid cases and exceptional cases are tested to ensure full branch coverage.</p>
+ * <p>Both valid cases and exceptional cases are tested to ensure full branch coverage.
  */
 class ShareTest {
 
   private Stock stock;
 
   /**
-   * Creates a reusable stock instance with a known current market price
-   * to simplify value calculations in tests.
+   * Creates a reusable stock instance with a known current market price to simplify value
+   * calculations in tests.
    */
   @BeforeEach
   void setup() {
     stock = new Stock("AAPL", "Apple", new BigDecimal("200"));
   }
 
-  /**
-   * Verifies that a valid construction stores and exposes fields correctly.
-   */
+  /** Verifies that a valid construction stores and exposes fields correctly. */
   @Test
   void constructor_validInput_createsShare() {
     Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
@@ -46,63 +43,48 @@ class ShareTest {
     assertEquals(new BigDecimal("150"), share.getPurchasePrice());
   }
 
-  /**
-   * Ensures the associated stock reference is mandatory.
-   */
+  /** Ensures the associated stock reference is mandatory. */
   @Test
   void constructor_nullStock_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Share(null, BigDecimal.ONE, BigDecimal.ONE));
+    assertThrows(NullPointerException.class, () -> new Share(null, BigDecimal.ONE, BigDecimal.ONE));
   }
 
-  /**
-   * Ensures quantity is mandatory.
-   */
+  /** Ensures quantity is mandatory. */
   @Test
   void constructor_nullQuantity_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Share(stock, null, BigDecimal.ONE));
+    assertThrows(NullPointerException.class, () -> new Share(stock, null, BigDecimal.ONE));
   }
 
-  /**
-   * Ensures quantity must be strictly positive.
-   */
+  /** Ensures quantity must be strictly positive. */
   @Test
   void constructor_zeroQuantity_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Share(stock, BigDecimal.ZERO, BigDecimal.ONE));
+    assertThrows(
+        IllegalArgumentException.class, () -> new Share(stock, BigDecimal.ZERO, BigDecimal.ONE));
   }
 
-  /**
-   * Ensures negative quantity is rejected.
-   */
+  /** Ensures negative quantity is rejected. */
   @Test
   void constructor_negativeQuantity_throwsException() {
-    assertThrows(IllegalArgumentException.class,
+    assertThrows(
+        IllegalArgumentException.class,
         () -> new Share(stock, new BigDecimal("-1"), BigDecimal.ONE));
   }
 
-  /**
-   * Ensures purchase price is mandatory.
-   */
+  /** Ensures purchase price is mandatory. */
   @Test
   void constructor_nullPrice_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Share(stock, BigDecimal.ONE, null));
+    assertThrows(NullPointerException.class, () -> new Share(stock, BigDecimal.ONE, null));
   }
 
-  /**
-   * Ensures purchase price cannot be negative.
-   */
+  /** Ensures purchase price cannot be negative. */
   @Test
   void constructor_negativePrice_throwsException() {
-    assertThrows(IllegalArgumentException.class,
+    assertThrows(
+        IllegalArgumentException.class,
         () -> new Share(stock, BigDecimal.ONE, new BigDecimal("-1")));
   }
 
-  /**
-   * Verifies total investment equals purchase price multiplied by quantity.
-   */
+  /** Verifies total investment equals purchase price multiplied by quantity. */
   @Test
   void getTotalInvestment_returnsCorrectValue() {
     Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
@@ -110,9 +92,7 @@ class ShareTest {
     assertEquals(new BigDecimal("1500"), share.getTotalInvestment());
   }
 
-  /**
-   * Verifies current value equals current stock price multiplied by quantity.
-   */
+  /** Verifies current value equals current stock price multiplied by quantity. */
   @Test
   void getCurrentValue_returnsCorrectValue() {
     Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
@@ -120,9 +100,7 @@ class ShareTest {
     assertEquals(new BigDecimal("2000"), share.getCurrentValue());
   }
 
-  /**
-   * Verifies gain/loss equals current value minus original investment.
-   */
+  /** Verifies gain/loss equals current value minus original investment. */
   @Test
   void getGainOrLoss_returnsCorrectValue() {
     Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
@@ -131,21 +109,17 @@ class ShareTest {
   }
 
   /**
-   * Verifies value equality is numeric (scale-insensitive) rather than based on
-   * {@link BigDecimal#equals(Object)} (which is scale-sensitive).
+   * Verifies value equality is numeric (scale-insensitive) rather than based on {@link
+   * BigDecimal#equals(Object)} (which is scale-sensitive).
    *
-   * <p>This guards against cases such as 10.0 and 10.00 being considered different
-   * when they represent the same numeric value.</p>
+   * <p>This guards against cases such as 10.0 and 10.00 being considered different when they
+   * represent the same numeric value.
    */
   @Test
   void equals_sameValuesDifferentScale_returnsTrue() {
-    Share s1 = new Share(stock,
-        new BigDecimal("10.0"),
-        new BigDecimal("150.00"));
+    Share s1 = new Share(stock, new BigDecimal("10.0"), new BigDecimal("150.00"));
 
-    Share s2 = new Share(stock,
-        new BigDecimal("10.00"),
-        new BigDecimal("150.0"));
+    Share s2 = new Share(stock, new BigDecimal("10.00"), new BigDecimal("150.0"));
 
     assertEquals(s1, s2);
     assertEquals(s1.hashCode(), s2.hashCode());
@@ -201,8 +175,8 @@ class ShareTest {
   }
 
   /**
-   * Ensures two shares with different underlying stocks are not equal,
-   * even if the numeric fields match.
+   * Ensures two shares with different underlying stocks are not equal, even if the numeric fields
+   * match.
    */
   @Test
   void equals_differentStock_returnsFalse() {

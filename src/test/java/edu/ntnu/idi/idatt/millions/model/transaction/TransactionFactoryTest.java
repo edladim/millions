@@ -1,23 +1,24 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
- * Unit tests for {@link TransactionFactory} and its concrete subclasses
- * {@link PurchaseFactory} and {@link SaleFactory}.
+ * Unit tests for {@link TransactionFactory} and its concrete subclasses {@link PurchaseFactory} and
+ * {@link SaleFactory}.
  *
- * <p>The tests verify that each factory:</p>
+ * <p>The tests verify that each factory:
+ *
  * <ul>
- *   <li>Creates the correct concrete {@link Transaction} type</li>
- *   <li>Correctly commits the transaction via {@code createAndCommit}</li>
- *   <li>Rejects null and invalid arguments</li>
+ *   <li>Creates the correct concrete {@link Transaction} type
+ *   <li>Correctly commits the transaction via {@code createAndCommit}
+ *   <li>Rejects null and invalid arguments
  * </ul>
  */
 class TransactionFactoryTest {
@@ -25,9 +26,7 @@ class TransactionFactoryTest {
   private Share share;
   private Player player;
 
-  /**
-   * Creates a fresh share and a well-funded player before each test.
-   */
+  /** Creates a fresh share and a well-funded player before each test. */
   @BeforeEach
   void setUp() {
     Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("150"));
@@ -127,7 +126,6 @@ class TransactionFactoryTest {
   @Test
   void createAndCommit_nullPlayer_throwsException() {
     TransactionFactory factory = new PurchaseFactory();
-    assertThrows(NullPointerException.class,
-        () -> factory.createAndCommit(share, 1, null));
+    assertThrows(NullPointerException.class, () -> factory.createAndCommit(share, 1, null));
   }
 }

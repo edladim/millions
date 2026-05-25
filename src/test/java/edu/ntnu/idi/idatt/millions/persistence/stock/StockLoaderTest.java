@@ -1,39 +1,38 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Unit tests for {@link StockLoader}.
  *
- * <p>Verifies the two loading paths:</p>
+ * <p>Verifies the two loading paths:
+ *
  * <ul>
- *   <li>{@code file == null} — falls back to the bundled classpath resource</li>
- *   <li>{@code file != null} — reads from the supplied filesystem path</li>
+ *   <li>{@code file == null} — falls back to the bundled classpath resource
+ *   <li>{@code file != null} — reads from the supplied filesystem path
  * </ul>
  *
- * <p>Also verifies that missing or invalid files produce a
- * {@link PersistenceException} with a descriptive message.</p>
+ * <p>Also verifies that missing or invalid files produce a {@link PersistenceException} with a
+ * descriptive message.
  */
 class StockLoaderTest {
 
-  @TempDir
-  Path tempDir;
+  @TempDir Path tempDir;
 
   // Classpath fallback
 
   /**
-   * Verifies that passing {@code null} loads the bundled default stock data
-   * and returns a non-empty list.
+   * Verifies that passing {@code null} loads the bundled default stock data and returns a non-empty
+   * list.
    */
   @Test
   void load_nullFile_loadsDefaultClasspathResource() throws PersistenceException {
@@ -42,8 +41,8 @@ class StockLoaderTest {
   }
 
   /**
-   * Verifies that the stocks loaded from the classpath resource are valid
-   * (non-null symbols with positive prices).
+   * Verifies that the stocks loaded from the classpath resource are valid (non-null symbols with
+   * positive prices).
    */
   @Test
   void load_nullFile_stocksHaveValidSymbolsAndPositivePrices() throws PersistenceException {
@@ -56,9 +55,7 @@ class StockLoaderTest {
 
   // Filesystem path
 
-  /**
-   * Verifies that a valid CSV file on disk is read and all entries returned.
-   */
+  /** Verifies that a valid CSV file on disk is read and all entries returned. */
   @Test
   void load_validFile_returnsStocks() throws Exception {
     Path csv = tempDir.resolve("stocks.csv");
@@ -69,9 +66,7 @@ class StockLoaderTest {
     assertEquals(2, stocks.size());
   }
 
-  /**
-   * Verifies that the symbol from a custom file is parsed correctly.
-   */
+  /** Verifies that the symbol from a custom file is parsed correctly. */
   @Test
   void load_validFile_parsesSymbolCorrectly() throws Exception {
     Path csv = tempDir.resolve("stocks.csv");
@@ -84,18 +79,14 @@ class StockLoaderTest {
 
   // Error cases
 
-  /**
-   * Verifies that a non-existent file throws a {@link PersistenceException}.
-   */
+  /** Verifies that a non-existent file throws a {@link PersistenceException}. */
   @Test
   void load_nonExistentFile_throwsPersistenceException() {
     File missing = tempDir.resolve("no_such_file.csv").toFile();
     assertThrows(PersistenceException.class, () -> StockLoader.load(missing));
   }
 
-  /**
-   * Verifies that a file with no valid stock entries throws a {@link PersistenceException}.
-   */
+  /** Verifies that a file with no valid stock entries throws a {@link PersistenceException}. */
   @Test
   void load_fileWithNoValidEntries_throwsPersistenceException() throws Exception {
     Path csv = tempDir.resolve("stocks.csv");
@@ -104,9 +95,7 @@ class StockLoaderTest {
     assertThrows(PersistenceException.class, () -> StockLoader.load(csv.toFile()));
   }
 
-  /**
-   * Verifies that a file containing only malformed lines throws a {@link PersistenceException}.
-   */
+  /** Verifies that a file containing only malformed lines throws a {@link PersistenceException}. */
   @Test
   void load_fileWithOnlyMalformedLines_throwsPersistenceException() throws Exception {
     Path csv = tempDir.resolve("stocks.csv");
@@ -117,9 +106,7 @@ class StockLoaderTest {
 
   // Constant
 
-  /**
-   * Verifies that the default stock file constant points to the expected classpath path.
-   */
+  /** Verifies that the default stock file constant points to the expected classpath path. */
   @Test
   void defaultStockFile_constant_hasExpectedValue() {
     assertEquals("/data/StockData.csv", StockLoader.DEFAULT_STOCK_FILE);

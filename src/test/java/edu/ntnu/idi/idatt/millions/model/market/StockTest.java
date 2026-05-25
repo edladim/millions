@@ -1,29 +1,29 @@
 package edu.ntnu.idi.idatt.millions.model.market;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link Stock}.
  *
- * <p>These tests verify that {@code Stock}:</p>
+ * <p>These tests verify that {@code Stock}:
+ *
  * <ul>
- *   <li>validates constructor and method arguments</li>
- *   <li>protects its internal price list (defensive copy)</li>
- *   <li>implements {@code equals()} and {@code hashCode()} based on the symbol</li>
+ *   <li>validates constructor and method arguments
+ *   <li>protects its internal price list (defensive copy)
+ *   <li>implements {@code equals()} and {@code hashCode()} based on the symbol
  * </ul>
  *
- * <p>Both valid cases and exceptional cases are tested to ensure full branch coverage.</p>
+ * <p>Both valid cases and exceptional cases are tested to ensure full branch coverage.
  */
 class StockTest {
 
   /**
-   * Verifies that a valid construction initializes the object correctly and
-   * stores the initial sale price as the first element in the price history.
+   * Verifies that a valid construction initializes the object correctly and stores the initial sale
+   * price as the first element in the price history.
    */
   @Test
   void constructor_validInput_createsStock() {
@@ -35,54 +35,40 @@ class StockTest {
     assertEquals(1, stock.getHistoricalPrices().size());
   }
 
-  /**
-   * Ensures the ticker symbol is mandatory and null is rejected.
-   */
+  /** Ensures the ticker symbol is mandatory and null is rejected. */
   @Test
   void constructor_nullSymbol_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Stock(null, "Apple", BigDecimal.TEN));
+    assertThrows(NullPointerException.class, () -> new Stock(null, "Apple", BigDecimal.TEN));
   }
 
-  /**
-   * Ensures the ticker symbol cannot be blank (after trimming).
-   */
+  /** Ensures the ticker symbol cannot be blank (after trimming). */
   @Test
   void constructor_blankSymbol_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Stock("   ", "Apple", BigDecimal.TEN));
+    assertThrows(IllegalArgumentException.class, () -> new Stock("   ", "Apple", BigDecimal.TEN));
   }
 
-  /**
-   * Ensures the company name is mandatory and null is rejected.
-   */
+  /** Ensures the company name is mandatory and null is rejected. */
   @Test
   void constructor_nullCompany_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> new Stock("AAPL", null, BigDecimal.TEN));
+    assertThrows(NullPointerException.class, () -> new Stock("AAPL", null, BigDecimal.TEN));
   }
 
-  /**
-   * Ensures the company name cannot be blank (after trimming).
-   */
+  /** Ensures the company name cannot be blank (after trimming). */
   @Test
   void constructor_blankCompany_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Stock("AAPL", "   ", BigDecimal.TEN));
+    assertThrows(IllegalArgumentException.class, () -> new Stock("AAPL", "   ", BigDecimal.TEN));
   }
 
-  /**
-   * Ensures negative initial prices are rejected to keep the object in a valid state.
-   */
+  /** Ensures negative initial prices are rejected to keep the object in a valid state. */
   @Test
   void constructor_negativePrice_throwsException() {
-    assertThrows(IllegalArgumentException.class,
-        () -> new Stock("AAPL", "Apple", new BigDecimal("-1")));
+    assertThrows(
+        IllegalArgumentException.class, () -> new Stock("AAPL", "Apple", new BigDecimal("-1")));
   }
 
   /**
-   * Verifies that adding a valid new sales price appends to the history and
-   * updates the latest price returned by {@link Stock#getSalesPrice()}.
+   * Verifies that adding a valid new sales price appends to the history and updates the latest
+   * price returned by {@link Stock#getSalesPrice()}.
    */
   @Test
   void addNewSalesPrice_validPrice_addsPrice() {
@@ -94,44 +80,36 @@ class StockTest {
     assertEquals(2, stock.getHistoricalPrices().size());
   }
 
-  /**
-   * Ensures null prices are rejected.
-   */
+  /** Ensures null prices are rejected. */
   @Test
   void addNewSalesPrice_null_throwsException() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
 
-    assertThrows(NullPointerException.class,
-        () -> stock.addNewSalesPrice(null));
+    assertThrows(NullPointerException.class, () -> stock.addNewSalesPrice(null));
   }
 
-  /**
-   * Ensures negative sales prices are rejected.
-   */
+  /** Ensures negative sales prices are rejected. */
   @Test
   void addNewSalesPrice_negative_throwsException() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
 
-    assertThrows(IllegalArgumentException.class,
-        () -> stock.addNewSalesPrice(new BigDecimal("-5")));
+    assertThrows(
+        IllegalArgumentException.class, () -> stock.addNewSalesPrice(new BigDecimal("-5")));
   }
 
   /**
-   * Verifies that {@link Stock#getHistoricalPrices()} returns an unmodifiable snapshot/view.
-   * This prevents external callers from mutating internal state.
+   * Verifies that {@link Stock#getHistoricalPrices()} returns an unmodifiable snapshot/view. This
+   * prevents external callers from mutating internal state.
    */
   @Test
   void getHistoricalPrices_returnsUnmodifiableList() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
     List<BigDecimal> prices = stock.getHistoricalPrices();
 
-    assertThrows(UnsupportedOperationException.class,
-        () -> prices.add(BigDecimal.ONE));
+    assertThrows(UnsupportedOperationException.class, () -> prices.add(BigDecimal.ONE));
   }
 
-  /**
-   * Verifies that the highest price is correctly identified from the price history.
-   */
+  /** Verifies that the highest price is correctly identified from the price history. */
   @Test
   void getHighestPrice_multiplePrices_returnsMax() {
     Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
@@ -141,9 +119,7 @@ class StockTest {
     assertEquals(new BigDecimal("250"), stock.getHighestPrice());
   }
 
-  /**
-   * Verifies that a single recorded price is returned as the highest.
-   */
+  /** Verifies that a single recorded price is returned as the highest. */
   @Test
   void getHighestPrice_singlePrice_returnsThatPrice() {
     Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
@@ -151,9 +127,7 @@ class StockTest {
     assertEquals(new BigDecimal("100"), stock.getHighestPrice());
   }
 
-  /**
-   * Verifies that the lowest price is correctly identified from the price history.
-   */
+  /** Verifies that the lowest price is correctly identified from the price history. */
   @Test
   void getLowestPrice_multiplePrices_returnsMin() {
     Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
@@ -163,9 +137,7 @@ class StockTest {
     assertEquals(new BigDecimal("75"), stock.getLowestPrice());
   }
 
-  /**
-   * Verifies that a single recorded price is returned as the lowest.
-   */
+  /** Verifies that a single recorded price is returned as the lowest. */
   @Test
   void getLowestPrice_singlePrice_returnsThatPrice() {
     Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
@@ -174,8 +146,8 @@ class StockTest {
   }
 
   /**
-   * Verifies that the latest price change is the difference between
-   * the last and second-to-last recorded price.
+   * Verifies that the latest price change is the difference between the last and second-to-last
+   * recorded price.
    */
   @Test
   void getLatestPriceChange_multiplePrices_returnsDifference() {
@@ -185,9 +157,7 @@ class StockTest {
     assertEquals(new BigDecimal("30"), stock.getLatestPriceChange());
   }
 
-  /**
-   * Verifies that a price decrease is returned as a negative value.
-   */
+  /** Verifies that a price decrease is returned as a negative value. */
   @Test
   void getLatestPriceChange_priceDecreased_returnsNegative() {
     Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
@@ -197,8 +167,8 @@ class StockTest {
   }
 
   /**
-   * Verifies that a single recorded price results in zero change,
-   * as there is no previous price to compare against.
+   * Verifies that a single recorded price results in zero change, as there is no previous price to
+   * compare against.
    */
   @Test
   void getLatestPriceChange_singlePrice_returnsZero() {
@@ -208,8 +178,8 @@ class StockTest {
   }
 
   /**
-   * Verifies that equality is based exclusively on ticker symbol, independent of
-   * company name and price history, and that the hash code contract holds.
+   * Verifies that equality is based exclusively on ticker symbol, independent of company name and
+   * price history, and that the hash code contract holds.
    */
   @Test
   void equals_sameSymbol_returnsTrue() {
@@ -220,9 +190,7 @@ class StockTest {
     assertEquals(s1.hashCode(), s2.hashCode());
   }
 
-  /**
-   * Ensures two stocks with different ticker symbols are not considered equal.
-   */
+  /** Ensures two stocks with different ticker symbols are not considered equal. */
   @Test
   void equals_differentSymbol_returnsFalse() {
     Stock s1 = new Stock("AAPL", "Apple", BigDecimal.TEN);
@@ -231,18 +199,14 @@ class StockTest {
     assertNotEquals(s1, s2);
   }
 
-  /**
-   * Ensures the equals implementation safely handles null.
-   */
+  /** Ensures the equals implementation safely handles null. */
   @Test
   void equals_null_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
     assertFalse(stock.equals(null));
   }
 
-  /**
-   * Ensures equals returns false for unrelated types.
-   */
+  /** Ensures equals returns false for unrelated types. */
   @Test
   void equals_differentType_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
@@ -286,5 +250,4 @@ class StockTest {
 
     assertEquals(stock, stock);
   }
-
 }

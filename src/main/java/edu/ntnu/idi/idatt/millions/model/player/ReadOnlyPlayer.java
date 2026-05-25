@@ -1,22 +1,15 @@
 package edu.ntnu.idi.idatt.millions.model.player;
 
 import edu.ntnu.idi.idatt.millions.model.portfolio.ReadOnlyPortfolio;
-
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * <p>
- * Read-only view of a {@link Player} intended for use by observer classes
- * such as views.
- * </p>
+ * Read-only view of a {@link Player} intended for use by observer classes such as views.
  *
- * <p>
- * Exposing only getter methods ensures that observers can display player data
- * without being able to mutate the player's state. The full mutable
- * {@link Player} is only accessible to controllers.
- * </p>
+ * <p>Exposing only getter methods ensures that observers can display player data without being able
+ * to mutate the player's state. The full mutable {@link Player} is only accessible to controllers.
  */
 public interface ReadOnlyPlayer {
 

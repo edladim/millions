@@ -1,16 +1,15 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.util.List;
 
 /**
  * Defines the contract for reading stock data from a data source.
  *
- * <p>Implementations may read from different formats (CSV, JSON, XML) or sources
- * (filesystem, classpath, network). This interface allows the rest of the application
- * to remain independent of the specific format or source used.</p>
+ * <p>Implementations may read from different formats (CSV, JSON, XML) or sources (filesystem,
+ * classpath, network). This interface allows the rest of the application to remain independent of
+ * the specific format or source used.
  *
  * @see CsvStockReader
  */

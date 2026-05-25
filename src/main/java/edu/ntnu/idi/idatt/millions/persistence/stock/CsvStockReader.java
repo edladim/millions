@@ -1,8 +1,7 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,18 +22,20 @@ import org.apache.logging.log4j.Logger;
 /**
  * Reads stock data from a CSV file.
  *
- * <p>The CSV format expected by this reader:</p>
+ * <p>The CSV format expected by this reader:
+ *
  * <ul>
- *   <li>Lines starting with {@code #} are treated as comments and ignored.</li>
- *   <li>Blank lines are ignored.</li>
- *   <li>Data lines must follow the format: {@code SYMBOL,Company Name,price}</li>
- *   <li>The decimal separator must be a period ({@code .}).</li>
+ *   <li>Lines starting with {@code #} are treated as comments and ignored.
+ *   <li>Blank lines are ignored.
+ *   <li>Data lines must follow the format: {@code SYMBOL,Company Name,price}
+ *   <li>The decimal separator must be a period ({@code .}).
  * </ul>
  *
- * <p>Malformed lines are skipped with a warning rather than failing the entire read.
- * An exception is only thrown if the source cannot be opened or yields no valid stocks.</p>
+ * <p>Malformed lines are skipped with a warning rather than failing the entire read. An exception
+ * is only thrown if the source cannot be opened or yields no valid stocks.
  *
- * <p>Supports both filesystem paths and classpath resources:</p>
+ * <p>Supports both filesystem paths and classpath resources:
+ *
  * <pre>{@code
  * // From a user-selected file:
  * StockReader reader = new CsvStockReader(Path.of("/home/user/stocks.csv"));
@@ -58,7 +59,7 @@ public class CsvStockReader implements StockReader {
    * Creates a reader for a CSV file on the filesystem.
    *
    * @param path the path to the CSV file, cannot be null
-   * @throws PersistenceException   if the file cannot be opened
+   * @throws PersistenceException if the file cannot be opened
    * @throws NullPointerException if {@code path} is null
    */
   public CsvStockReader(Path path) throws PersistenceException {
@@ -79,11 +80,11 @@ public class CsvStockReader implements StockReader {
   /**
    * Creates a reader for a CSV resource on the classpath.
    *
-   * <p>Useful for loading the bundled default stock data at application startup.</p>
+   * <p>Useful for loading the bundled default stock data at application startup.
    *
    * @param resource classpath-relative path, e.g. {@code "/data/StockData.csv"}
    * @return a new {@code CsvStockReader} targeting the given resource
-   * @throws PersistenceException   if the resource cannot be found on the classpath
+   * @throws PersistenceException if the resource cannot be found on the classpath
    * @throws NullPointerException if {@code resource} is null
    */
   public static CsvStockReader fromClasspath(String resource) throws PersistenceException {
@@ -98,9 +99,8 @@ public class CsvStockReader implements StockReader {
   /**
    * Reads and returns all valid stock entries from the CSV source.
    *
-   * <p>Malformed and duplicate lines are skipped and logged as warnings. The
-   * method throws only if the source cannot be read at all, or if no valid
-   * stocks are found.</p>
+   * <p>Malformed and duplicate lines are skipped and logged as warnings. The method throws only if
+   * the source cannot be read at all, or if no valid stocks are found.
    *
    * @return a non-null, non-empty list of {@link Stock} objects
    * @throws PersistenceException if an I/O error occurs, or no valid stocks are found
@@ -110,8 +110,8 @@ public class CsvStockReader implements StockReader {
     List<Stock> stocks = new ArrayList<>();
     Set<String> seen = new HashSet<>();
 
-    try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
       String line;
       int lineNumber = 0;
@@ -128,8 +128,7 @@ public class CsvStockReader implements StockReader {
     }
 
     if (stocks.isEmpty()) {
-      throw new PersistenceException(
-          "No valid stock entries found in '" + sourceDescription + "'");
+      throw new PersistenceException("No valid stock entries found in '" + sourceDescription + "'");
     }
     return stocks;
   }
@@ -137,21 +136,26 @@ public class CsvStockReader implements StockReader {
   /**
    * Attempts to parse a single CSV line into a {@link Stock}.
    *
-   * <p>Returns an empty {@link Optional} and logs a warning if the line is malformed,
-   * so a single bad line does not abort the entire file read.</p>
+   * <p>Returns an empty {@link Optional} and logs a warning if the line is malformed, so a single
+   * bad line does not abort the entire file read.
    *
-   * @param line       the raw CSV line
+   * @param line the raw CSV line
    * @param lineNumber the 1-based line number, used in warning messages
-   * @param seen       set of symbols already accepted; lines with a duplicate
-   *                   symbol are skipped so the first occurrence wins
+   * @param seen set of symbols already accepted; lines with a duplicate symbol are skipped so the
+   *     first occurrence wins
    * @return an {@link Optional} containing the parsed stock, or empty if the line is invalid
    */
   private Optional<Stock> parseLine(String line, int lineNumber, Set<String> seen) {
     String[] fields = line.split(",");
 
     if (fields.length != EXPECTED_FIELD_COUNT) {
-      LOGGER.warn("Skipping line {} in '{}': expected {} fields but found {} — \"{}\"",
-          lineNumber, sourceDescription, EXPECTED_FIELD_COUNT, fields.length, line);
+      LOGGER.warn(
+          "Skipping line {} in '{}': expected {} fields but found {} — \"{}\"",
+          lineNumber,
+          sourceDescription,
+          EXPECTED_FIELD_COUNT,
+          fields.length,
+          line);
       return Optional.empty();
     }
 
@@ -164,13 +168,15 @@ public class CsvStockReader implements StockReader {
       return Optional.empty();
     }
     if (company.isBlank()) {
-      LOGGER.warn("Skipping line {} in '{}': company name is blank",
-          lineNumber, sourceDescription);
+      LOGGER.warn("Skipping line {} in '{}': company name is blank", lineNumber, sourceDescription);
       return Optional.empty();
     }
     if (!seen.add(symbol)) {
-      LOGGER.warn("Skipping duplicate symbol '{}' on line {} in '{}'",
-          symbol, lineNumber, sourceDescription);
+      LOGGER.warn(
+          "Skipping duplicate symbol '{}' on line {} in '{}'",
+          symbol,
+          lineNumber,
+          sourceDescription);
       return Optional.empty();
     }
 
@@ -178,14 +184,20 @@ public class CsvStockReader implements StockReader {
     try {
       price = new BigDecimal(priceRaw);
     } catch (NumberFormatException e) {
-      LOGGER.warn("Skipping line {} in '{}': invalid price value '{}'",
-          lineNumber, sourceDescription, priceRaw);
+      LOGGER.warn(
+          "Skipping line {} in '{}': invalid price value '{}'",
+          lineNumber,
+          sourceDescription,
+          priceRaw);
       return Optional.empty();
     }
 
     if (price.compareTo(BigDecimal.ZERO) <= 0) {
-      LOGGER.warn("Skipping line {} in '{}': price must be positive, got {}",
-          lineNumber, sourceDescription, price);
+      LOGGER.warn(
+          "Skipping line {} in '{}': price must be positive, got {}",
+          lineNumber,
+          sourceDescription,
+          price);
       return Optional.empty();
     }
 

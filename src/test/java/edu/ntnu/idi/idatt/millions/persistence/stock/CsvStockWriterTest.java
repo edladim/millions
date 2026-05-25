@@ -1,23 +1,19 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.*;
 
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-/**
- * Unit tests for {@link CsvStockWriter}.
- */
+/** Unit tests for {@link CsvStockWriter}. */
 class CsvStockWriterTest {
 
-  @TempDir
-  Path tempDir;
+  @TempDir Path tempDir;
 
   @Test
   void writeStockData_createsFileIfAbsent() throws Exception {

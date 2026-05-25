@@ -5,6 +5,9 @@ import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.pages.Page;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -18,20 +21,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-import javafx.beans.binding.Bindings;
-
 /**
- * <p>
- * Sidebar UI component that contains navigation buttons, a week indicator,
- * and an action to advance the week.
- * </p>
+ * Sidebar UI component that contains navigation buttons, a week indicator, and an action to advance
+ * the week.
  *
- * <p>
- * The component exposes callbacks for navigation and week-advance actions and
- * provides a method for updating the visible week label.
- * </p>
+ * <p>The component exposes callbacks for navigation and week-advance actions and provides a method
+ * for updating the visible week label.
  */
 public class SidebarComponent extends VBox implements ExchangeObserver {
 
@@ -45,25 +40,18 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Runnable onRetire;
   private Consumer<Page> onNavigate;
 
-  /**
-   * <p>Constructs the sidebar and builds its initial layout.</p>
-   */
+  /** Constructs the sidebar and builds its initial layout. */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
     setMinWidth(170);
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 
-    getChildren().addAll(
-            setLogo(),
-            buildSpacer(24),
-            buildNavSection(),
-            buildBottomSection()
-    );
+    getChildren().addAll(setLogo(), buildSpacer(24), buildNavSection(), buildBottomSection());
   }
 
   /**
-   * <p>Builds the logo section shown at the top of the sidebar.</p>
+   * Builds the logo section shown at the top of the sidebar.
    *
    * @return the logo container
    */
@@ -83,12 +71,13 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Builds the navigation section containing page buttons.</p>
+   * Builds the navigation section containing page buttons.
    *
    * @return the navigation container
    */
   private VBox buildNavSection() {
-    dashboardBtn = buildNavButton("Dashboard", new FontIcon("fas-digital-tachograph"), Page.DASHBOARD);
+    dashboardBtn =
+        buildNavButton("Dashboard", new FontIcon("fas-digital-tachograph"), Page.DASHBOARD);
     portfolioBtn = buildNavButton("My Portfolio", new FontIcon("fas-id-card"), Page.PORTFOLIO);
     tradingBtn = buildNavButton("Trading", new FontIcon("fas-chart-line"), Page.TRADING);
 
@@ -96,7 +85,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Creates a navigation button with icon and click handler.</p>
+   * Creates a navigation button with icon and click handler.
    *
    * @param text the button label
    * @param icon the icon to display
@@ -108,15 +97,16 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     btn.setGraphic(icon);
     btn.getStyleClass().add("nav-btn");
     btn.setMaxWidth(Double.MAX_VALUE);
-    btn.setOnAction(e -> {
-      setActivePage(page);
-      if (onNavigate != null) onNavigate.accept(page);
-    });
+    btn.setOnAction(
+        e -> {
+          setActivePage(page);
+          if (onNavigate != null) onNavigate.accept(page);
+        });
     return btn;
   }
 
   /**
-   * <p>Builds the bottom section containing the advance button and week box.</p>
+   * Builds the bottom section containing the advance button and week box.
    *
    * @return the bottom section container
    */
@@ -126,16 +116,16 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     bottom.setAlignment(Pos.BOTTOM_CENTER);
 
     Button advanceBtn = new Button();
-    advanceBtn.textProperty().bind(
-        Bindings.when(widthProperty().lessThan(190))
-            .then("Advance")
-            .otherwise("Advance Week")
-    );
+    advanceBtn
+        .textProperty()
+        .bind(
+            Bindings.when(widthProperty().lessThan(190)).then("Advance").otherwise("Advance Week"));
     advanceBtn.getStyleClass().add("advance-btn");
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
-    advanceBtn.setOnAction(e -> {
-      if (onAdvanceWeek != null) onAdvanceWeek.run();
-    });
+    advanceBtn.setOnAction(
+        e -> {
+          if (onAdvanceWeek != null) onAdvanceWeek.run();
+        });
 
     Button retireBtn = new Button("Retire");
     retireBtn.getStyleClass().add("sell-all-btn");
@@ -149,10 +139,10 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Shows a styled confirmation dialog before triggering retirement.</p>
+   * Shows a styled confirmation dialog before triggering retirement.
    *
-   * <p>If the user confirms, the registered retire handler is invoked, which
-   * causes the controller to liquidate the portfolio and end the game.</p>
+   * <p>If the user confirms, the registered retire handler is invoked, which causes the controller
+   * to liquidate the portfolio and end the game.
    */
   private void confirmAndRetire() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -161,8 +151,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     alert.setHeaderText("Are you sure you want to retire?");
     alert.setContentText("This will sell all your shares and end the game.");
 
-    alert.getDialogPane().getStylesheets()
-        .add(Stylesheets.load("/styles/main.css"));
+    alert.getDialogPane().getStylesheets().add(Stylesheets.load("/styles/main.css"));
     alert.getDialogPane().getStyleClass().add("retire-alert");
 
     ButtonType yes = new ButtonType("Retire", ButtonBar.ButtonData.OK_DONE);
@@ -176,7 +165,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Builds the week indicator box.</p>
+   * Builds the week indicator box.
    *
    * @return the week box container
    */
@@ -204,7 +193,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Marks the active page by updating the button style classes.</p>
+   * Marks the active page by updating the button style classes.
    *
    * @param page the page that should be highlighted as active
    */
@@ -221,7 +210,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Creates a spacer region with a fixed height.</p>
+   * Creates a spacer region with a fixed height.
    *
    * @param height the spacer height in pixels
    * @return the spacer region
@@ -233,7 +222,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Updates the displayed week number in the sidebar.</p>
+   * Updates the displayed week number in the sidebar.
    *
    * @param week the current week number to display
    */
@@ -250,7 +239,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when the "Advance Week" button is pressed.</p>
+   * Registers a handler that runs when the "Advance Week" button is pressed.
    *
    * @param handler the action to run on button press
    */
@@ -259,7 +248,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when a navigation button is selected.</p>
+   * Registers a handler that runs when a navigation button is selected.
    *
    * @param handler the consumer that receives the selected page
    */
@@ -268,7 +257,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs after the user confirms retirement.</p>
+   * Registers a handler that runs after the user confirms retirement.
    *
    * @param handler the action to run when retirement is confirmed
    */

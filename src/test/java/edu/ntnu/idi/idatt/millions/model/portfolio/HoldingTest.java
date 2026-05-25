@@ -1,13 +1,12 @@
 package edu.ntnu.idi.idatt.millions.model.portfolio;
 
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class HoldingTest {
 

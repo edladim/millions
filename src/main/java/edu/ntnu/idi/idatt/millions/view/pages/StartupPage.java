@@ -21,13 +21,14 @@ import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
- * <p>Startup screen view that collects initial player settings before the game starts.</p>
- * <p>Builds the background, card UI, and input fields, and exposes callbacks for browsing
- * and starting the game. Also renders the top-{@code N} leaderboard underneath the
- * Start Game button — entries are injected by the controller via
- * {@link #setLeaderboard(List)} so this view stays free of file I/O.</p>
+ * Startup screen view that collects initial player settings before the game starts.
+ *
+ * <p>Builds the background, card UI, and input fields, and exposes callbacks for browsing and
+ * starting the game. Also renders the top-{@code N} leaderboard underneath the Start Game button —
+ * entries are injected by the controller via {@link #setLeaderboard(List)} so this view stays free
+ * of file I/O.
  */
-public class StartupPage extends StackPane{
+public class StartupPage extends StackPane {
 
   private static final int LEADERBOARD_SIZE = 5;
 
@@ -39,17 +40,12 @@ public class StartupPage extends StackPane{
   private Runnable onBrowse;
   private BiConsumer<String, String> onStart;
 
-  /**
-   * <p>Creates the startup screen and initializes UI layout, styles, and fade-in animation.</p>
-   */
+  /** Creates the startup screen and initializes UI layout, styles, and fade-in animation. */
   public StartupPage() {
     getStyleClass().add("startup-root");
     setAlignment(Pos.CENTER);
 
-    getChildren().addAll(
-            buildBackground(),
-            buildCard()
-    );
+    getChildren().addAll(buildBackground(), buildCard());
 
     setLeaderboard(Collections.emptyList());
 
@@ -60,7 +56,7 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds the decorative background layer for the startup screen.</p>
+   * Builds the decorative background layer for the startup screen.
    *
    * @return background stack pane with blobs.
    */
@@ -69,17 +65,17 @@ public class StartupPage extends StackPane{
     bg.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     bg.getStyleClass().add("startup-bg");
 
-    bg.getChildren().addAll(
+    bg.getChildren()
+        .addAll(
             buildBlob(320, 320, "#6366f1", 0.18, -300, -200),
-            buildBlob(280, 280, "#818cf8", 0.14,  300,  250),
-            buildBlob(200, 200, "#a5b4fc", 0.12, -100,  300)
-    );
+            buildBlob(280, 280, "#818cf8", 0.14, 300, 250),
+            buildBlob(200, 200, "#a5b4fc", 0.12, -100, 300));
 
     return bg;
   }
 
   /**
-   * <p>Builds a single translucent blob used in the background.</p>
+   * Builds a single translucent blob used in the background.
    *
    * @param w width of the blob.
    * @param h height of the blob.
@@ -89,8 +85,8 @@ public class StartupPage extends StackPane{
    * @param ty translate Y offset.
    * @return a stack pane containing the blob rectangle.
    */
-  private StackPane buildBlob(double w, double h, String color,
-                              double opacity, double tx, double ty) {
+  private StackPane buildBlob(
+      double w, double h, String color, double opacity, double tx, double ty) {
     Rectangle blob = new Rectangle(w, h);
     blob.setArcWidth(w);
     blob.setArcHeight(h);
@@ -105,7 +101,7 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds the main card containing header and body sections.</p>
+   * Builds the main card containing header and body sections.
    *
    * @return card container.
    */
@@ -115,16 +111,13 @@ public class StartupPage extends StackPane{
     card.setMaxWidth(550);
     card.setMinWidth(550);
 
-    card.getChildren().addAll(
-            buildCardHeader(),
-            buildCardBody()
-    );
+    card.getChildren().addAll(buildCardHeader(), buildCardBody());
 
     return card;
   }
 
   /**
-   * <p>Builds the header section with logo, title, subtitle, and feature pills.</p>
+   * Builds the header section with logo, title, subtitle, and feature pills.
    *
    * @return header container.
    */
@@ -150,22 +143,23 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds the row of feature pills shown under the header.</p>
+   * Builds the row of feature pills shown under the header.
    *
    * @return pills container.
    */
   private HBox buildFeaturePills() {
-    HBox pills = new HBox(10,
+    HBox pills =
+        new HBox(
+            10,
             buildPill(new FontIcon("fas-dollar-sign"), "Live Prices"),
             buildPill(new FontIcon("fas-id-card"), "Portfolio"),
-            buildPill(new FontIcon("fas-chart-line"), "Trading")
-    );
+            buildPill(new FontIcon("fas-chart-line"), "Trading"));
     pills.setAlignment(Pos.CENTER);
     return pills;
   }
 
   /**
-   * <p>Builds a single feature pill with an icon and label.</p>
+   * Builds a single feature pill with an icon and label.
    *
    * @param icon icon to display in the pill.
    * @param text label text for the pill.
@@ -185,7 +179,7 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds the body section with input fields, file selection, start button, and leaderboard.</p>
+   * Builds the body section with input fields, file selection, start button, and leaderboard.
    *
    * @return body container.
    */
@@ -216,20 +210,20 @@ public class StartupPage extends StackPane{
     nameField.setOnAction(e -> handleStart());
     capitalField.setOnAction(e -> handleStart());
 
-    body.getChildren().addAll(
+    body.getChildren()
+        .addAll(
             buildFieldGroup("Your Name", nameField),
             buildFieldGroup("Starting Capital ($)", capitalField),
             buildFieldGroup("Stock Data File", fileSection),
             errorLabel,
             startBtn,
-            buildLeaderboardSection()
-    );
+            buildLeaderboardSection());
 
     return body;
   }
 
   /**
-   * <p>Builds the file selection row with filename label and browse button.</p>
+   * Builds the file selection row with filename label and browse button.
    *
    * @return file section container.
    */
@@ -241,7 +235,10 @@ public class StartupPage extends StackPane{
 
     Button browseBtn = new Button("Browse…");
     browseBtn.getStyleClass().add("startup-browse-btn");
-    browseBtn.setOnAction(e -> { if (onBrowse != null) onBrowse.run(); });
+    browseBtn.setOnAction(
+        e -> {
+          if (onBrowse != null) onBrowse.run();
+        });
 
     HBox fileRow = new HBox(12, fileNameLabel, browseBtn);
     fileRow.setAlignment(Pos.CENTER_LEFT);
@@ -255,11 +252,10 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds the leaderboard section shown beneath the Start Game button.</p>
+   * Builds the leaderboard section shown beneath the Start Game button.
    *
-   * <p>The row container is stored on the instance so that
-   * {@link #setLeaderboard(List)} can rebuild the rows without rebuilding the
-   * surrounding header.</p>
+   * <p>The row container is stored on the instance so that {@link #setLeaderboard(List)} can
+   * rebuild the rows without rebuilding the surrounding header.
    *
    * @return leaderboard section container.
    */
@@ -282,10 +278,10 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds a single leaderboard row with rank, name, and score.</p>
+   * Builds a single leaderboard row with rank, name, and score.
    *
-   * @param rank  the 1-based rank to display.
-   * @param name  the player's name, or {@code "—"} for an empty slot.
+   * @param rank the 1-based rank to display.
+   * @param name the player's name, or {@code "—"} for an empty slot.
    * @param score the score string to display, or {@code "—"} for an empty slot.
    * @param empty whether this row represents an empty slot (used for styling).
    * @return row container.
@@ -312,7 +308,7 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Builds a labeled field group for inputs.</p>
+   * Builds a labeled field group for inputs.
    *
    * @param labelText text shown above the input.
    * @param input input node to place under the label.
@@ -325,9 +321,7 @@ public class StartupPage extends StackPane{
     return group;
   }
 
-  /**
-   * <p>Validates inputs and triggers the start callback if valid.</p>
-   */
+  /** Validates inputs and triggers the start callback if valid. */
   private void handleStart() {
     hideError();
 
@@ -344,35 +338,43 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Registers a callback for the browse action.</p>
+   * Registers a callback for the browse action.
    *
    * @param handler runnable to execute when browsing for a file.
    */
-  public void setOnBrowse(Runnable handler) { this.onBrowse = handler; }
+  public void setOnBrowse(Runnable handler) {
+    this.onBrowse = handler;
+  }
 
   /**
-   * <p>Registers a callback for the start action.</p>
+   * Registers a callback for the start action.
    *
    * @param handler consumer receiving name and capital input.
    */
-  public void setOnStart(BiConsumer<String, String> handler) { this.onStart  = handler; }
+  public void setOnStart(BiConsumer<String, String> handler) {
+    this.onStart = handler;
+  }
 
   /**
-   * <p>Gets the trimmed name input from the field.</p>
+   * Gets the trimmed name input from the field.
    *
    * @return name input string.
    */
-  public String getNameInput()    { return nameField.getText().trim(); }
+  public String getNameInput() {
+    return nameField.getText().trim();
+  }
 
   /**
-   * <p>Gets the trimmed capital input from the field.</p>
+   * Gets the trimmed capital input from the field.
    *
    * @return capital input string.
    */
-  public String getCapitalInput() { return capitalField.getText().trim(); }
+  public String getCapitalInput() {
+    return capitalField.getText().trim();
+  }
 
   /**
-   * <p>Updates the displayed filename and applies the selected styling.</p>
+   * Updates the displayed filename and applies the selected styling.
    *
    * @param name display name of the chosen file.
    */
@@ -383,14 +385,13 @@ public class StartupPage extends StackPane{
   }
 
   /**
-   * <p>Replaces the rendered leaderboard rows with the given entries.</p>
+   * Replaces the rendered leaderboard rows with the given entries.
    *
-   * <p>The first {@code MAX_ENTRIES} entries are rendered; remaining slots are
-   * padded with placeholder rows so the layout height stays stable regardless
-   * of how many real entries exist.</p>
+   * <p>The first {@code MAX_ENTRIES} entries are rendered; remaining slots are padded with
+   * placeholder rows so the layout height stays stable regardless of how many real entries exist.
    *
-   * @param entries the entries to display, already sorted by score descending.
-   *                Must be non-null but may be empty.
+   * @param entries the entries to display, already sorted by score descending. Must be non-null but
+   *     may be empty.
    */
   public void setLeaderboard(List<LeaderboardEntry> entries) {
     if (leaderboardRows == null) return;
@@ -398,18 +399,19 @@ public class StartupPage extends StackPane{
     for (int i = 0; i < LEADERBOARD_SIZE; i++) {
       if (i < entries.size()) {
         LeaderboardEntry entry = entries.get(i);
-        leaderboardRows.getChildren().add(
-            buildLeaderboardRow(i + 1, entry.name(),
-                String.format("%,d", entry.score()), false));
+        leaderboardRows
+            .getChildren()
+            .add(
+                buildLeaderboardRow(
+                    i + 1, entry.name(), String.format("%,d", entry.score()), false));
       } else {
-        leaderboardRows.getChildren().add(
-            buildLeaderboardRow(i + 1, "—", "—", true));
+        leaderboardRows.getChildren().add(buildLeaderboardRow(i + 1, "—", "—", true));
       }
     }
   }
 
   /**
-   * <p>Displays an error message with a brief fade-in animation.</p>
+   * Displays an error message with a brief fade-in animation.
    *
    * @param message error text to display.
    */
@@ -424,12 +426,9 @@ public class StartupPage extends StackPane{
     fade.play();
   }
 
-  /**
-   * <p>Hides the error message and removes it from layout flow.</p>
-   */
+  /** Hides the error message and removes it from layout flow. */
   public void hideError() {
     errorLabel.setVisible(false);
     errorLabel.setManaged(false);
   }
-
 }

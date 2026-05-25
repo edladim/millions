@@ -258,5 +258,15 @@ class StockTest {
     assertEquals(List.of(BigDecimal.TEN, new BigDecimal("12")), stock.getHistoricalPrices());
   }
 
+  /** Verifies that hashCode is based on the ticker symbol. */
+  @Test
+  void hashCode_sameSymbol_matches() {
+    Stock s1 = new Stock("AAPL", "Apple", BigDecimal.TEN);
+    Stock s2 = new Stock("AAPL", "Apple Inc.", BigDecimal.ONE);
+
+    assertEquals(s1.hashCode(), s2.hashCode());
+  }
+
+ 
 
 }

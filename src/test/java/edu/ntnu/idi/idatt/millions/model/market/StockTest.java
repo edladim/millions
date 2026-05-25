@@ -237,7 +237,7 @@ class StockTest {
   @Test
   void equals_null_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals(null, stock);
+    assertFalse(stock.equals(null));
   }
 
   /**
@@ -246,6 +246,17 @@ class StockTest {
   @Test
   void equals_differentType_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals("not a stock", stock);
+    assertFalse(stock.equals("not a stock"));
   }
+
+  /** Verifies that the price history preserves insertion order. */
+  @Test
+  void getHistoricalPrices_preservesInsertionOrder() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+    stock.addNewSalesPrice(new BigDecimal("12"));
+
+    assertEquals(List.of(BigDecimal.TEN, new BigDecimal("12")), stock.getHistoricalPrices());
+  }
+
+
 }

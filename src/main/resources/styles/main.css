@@ -804,22 +804,22 @@
 
 /* Transaction notification */
 .notification-bar > .pane {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: -primary-bg;
     -fx-background-radius: 12;
     -fx-padding: 14;
     -fx-border-color: #4caf50;
-    -fx-border-width: 1;
+    -fx-border-width: 2;
     -fx-border-radius: 12;
 }
 
 .notification-bar > .pane .title {
-    -fx-text-fill: white;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
 .notification-bar > .pane .content {
-    -fx-text-fill: #cfcfcf;
+    -fx-text-fill: #334155;
     -fx-font-size: 12px;
 }
 

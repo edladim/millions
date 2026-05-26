@@ -130,7 +130,7 @@ class ShareTest {
   void equals_sameInstance_returnsTrue() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
 
-    assertTrue(share.equals(share));
+    assertEquals(share, share);
   }
 
   /** Ensures equals returns false when quantity differs. */

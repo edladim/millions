@@ -39,6 +39,8 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Runnable onRetire;
   private Consumer<Page> onNavigate;
 
+  private int totalWeeks;
+
   /** Constructs the sidebar and builds its initial layout. */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
@@ -214,10 +216,20 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     }
   }
 
-  private static final int TOTAL_WEEKS = 520;
+  /**
+   * Sets the total number of weeks in the game, used to display weeks remaining.
+   *
+   * @param totalWeeks the total number of weeks before the game ends
+   */
+  public void setTotalWeeks(int totalWeeks) {
+    this.totalWeeks = totalWeeks;
+    if (weeksLeftLabel != null) {
+      weeksLeftLabel.setText(weeksLeftText(1));
+    }
+  }
 
-  private static String weeksLeftText(int currentWeek) {
-    int left = TOTAL_WEEKS - currentWeek;
+  private String weeksLeftText(int currentWeek) {
+    int left = totalWeeks - currentWeek;
     return left + " weeks left";
   }
 

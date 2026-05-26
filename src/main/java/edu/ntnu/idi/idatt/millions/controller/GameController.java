@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class GameController {
 
   /** Number of weeks before the game ends and the end-game overlay is shown. */
-  private static final int END_OF_GAME_WEEK = 520;
+  private static final int END_OF_GAME_WEEK = 260;
 
   private final MainView view;
   private final Player player;
@@ -40,6 +40,7 @@ public class GameController {
     this.player = player;
     this.exchange = exchange;
 
+    view.getSidebar().setTotalWeeks(END_OF_GAME_WEEK);
     exchange.addObserver(view.getSidebar());
     view.getSidebar().onExchangeUpdated(exchange);
 

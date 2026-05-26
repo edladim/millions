@@ -1,15 +1,18 @@
 package edu.ntnu.idi.idatt.millions.controller;
 
-import edu.ntnu.idi.idatt.millions.persistence.leaderboard.LeaderboardStore;
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-import edu.ntnu.idi.idatt.millions.persistence.stock.StockLoader;
 import edu.ntnu.idi.idatt.millions.model.market.Exchange;
-import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
-import edu.ntnu.idi.idatt.millions.view.util.FontLoader;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
+import edu.ntnu.idi.idatt.millions.persistence.leaderboard.LeaderboardStore;
+import edu.ntnu.idi.idatt.millions.persistence.stock.StockLoader;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.pages.StartupPage;
+import edu.ntnu.idi.idatt.millions.view.util.FontLoader;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -18,15 +21,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.List;
-
 /**
- * <p>Controller responsible for the startup flow and initial game setup.</p>
- * <p>Shows the startup screen, validates inputs, and launches the main game
- * view. Stock loading and font loading are delegated to
- * {@link StockLoader} and {@link FontLoader} respectively.</p>
+ * Controller responsible for the startup flow and initial game setup.
+ *
+ * <p>Shows the startup screen, validates inputs, and launches the main game view. Stock loading and
+ * font loading are delegated to {@link StockLoader} and {@link FontLoader} respectively.
  */
 public class SetupController {
 
@@ -36,8 +35,8 @@ public class SetupController {
   private File selectedFile = null;
 
   /**
-   * <p>Creates a setup controller bound to the primary stage and caches the
-   * startup scene so it can be reused when the player returns from a game.</p>
+   * Creates a setup controller bound to the primary stage and caches the startup scene so it can be
+   * reused when the player returns from a game.
    *
    * @param primaryStage application window to control.
    */
@@ -60,16 +59,15 @@ public class SetupController {
   }
 
   /**
-   * <p>Displays the startup screen and applies base styles.</p>
+   * Displays the startup screen and applies base styles.
    *
-   * <p>Refreshes the leaderboard each time the screen is shown so scores added
-   * since the previous game appear immediately when the player returns from
-   * the end-game overlay.</p>
+   * <p>Refreshes the leaderboard each time the screen is shown so scores added since the previous
+   * game appear immediately when the player returns from the end-game overlay.
    */
   public void show() {
     FontLoader.loadInter();
     screen.setLeaderboard(LeaderboardStore.loadTop());
-    boolean wasFullScreen = primaryStage.isFullScreen();
+    final boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(startupScene);
     primaryStage.setTitle("Millions");
     primaryStage.setResizable(true);
@@ -83,15 +81,11 @@ public class SetupController {
     primaryStage.show();
   }
 
-  /**
-   * <p>Opens a file chooser for selecting a stock data CSV file.</p>
-   */
+  /** Opens a file chooser for selecting a stock data CSV file. */
   public void handleBrowse() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Select Stock Data File");
-    fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("CSV Files", "*.csv")
-    );
+    fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
     File file = fileChooser.showOpenDialog(primaryStage);
     if (file != null) {
@@ -101,16 +95,18 @@ public class SetupController {
   }
 
   /**
-   * <p>Validates input, loads stock data, and launches the game on success.
-   * On any failure (invalid capital, stock load error) an error message is
-   * shown on the startup screen and the game does not start.</p>
+   * Validates input, loads stock data, and launches the game on success. On any failure (invalid
+   * capital, stock load error) an error message is shown on the startup screen and the game does
+   * not start.
    *
    * @param name player name input.
    * @param capitalText starting capital input.
    */
   private void handleStart(String name, String capitalText) {
     BigDecimal capital = parseCapital(capitalText);
-    if (capital == null) return;
+    if (capital == null) {
+      return;
+    }
     List<Stock> stocks;
     try {
       stocks = StockLoader.load(selectedFile);
@@ -126,8 +122,8 @@ public class SetupController {
   }
 
   /**
-   * <p>Parses the starting-capital input. Shows an error on the startup
-   * screen and returns {@code null} if the value is not a positive number.</p>
+   * Parses the starting-capital input. Shows an error on the startup screen and returns {@code
+   * null} if the value is not a positive number.
    *
    * @param capitalText the user input text
    * @return the parsed capital, or {@code null} on invalid input
@@ -147,8 +143,7 @@ public class SetupController {
   }
 
   /**
-   * <p>Creates the main view, wires the game controller, and switches the
-   * stage to the game UI.</p>
+   * Creates the main view, wires the game controller, and switches the stage to the game UI.
    *
    * @param player initialized player model.
    * @param exchange initialized exchange model.
@@ -160,7 +155,7 @@ public class SetupController {
     mainView.setOnNewGame(this::show);
     mainView.setOnExit(Platform::exit);
 
-    boolean wasFullScreen = primaryStage.isFullScreen();
+    final boolean wasFullScreen = primaryStage.isFullScreen();
     primaryStage.setScene(mainView.createScene());
     primaryStage.setTitle("Millions - " + player.getName());
     primaryStage.setResizable(true);
@@ -174,12 +169,11 @@ public class SetupController {
   }
 
   /**
-   * <p>Sizes the stage to the primary screen's visual bounds synchronously,
-   * then marks it as maximized. Setting width and height explicitly via
-   * {@link Stage#setWidth} and {@link Stage#setHeight} updates JavaFX scene
-   * properties immediately — unlike {@link Stage#setMaximized} which triggers
-   * an asynchronous macOS animation and leaves the scene at the old width
-   * until the animation completes.</p>
+   * Sizes the stage to the primary screen's visual bounds synchronously, then marks it as
+   * maximized. Setting width and height explicitly via {@link Stage#setWidth} and {@link
+   * Stage#setHeight} updates JavaFX scene properties immediately — unlike {@link
+   * Stage#setMaximized} which triggers an asynchronous macOS animation and leaves the scene at the
+   * old width until the animation completes.
    */
   private void expandToScreen() {
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
@@ -189,5 +183,4 @@ public class SetupController {
     primaryStage.setHeight(bounds.getHeight());
     primaryStage.setMaximized(true);
   }
-
 }

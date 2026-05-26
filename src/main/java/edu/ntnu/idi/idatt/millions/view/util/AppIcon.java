@@ -10,13 +10,13 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 /**
- * <p>Utility for applying the application icon to a {@link Stage} and the OS taskbar/dock.</p>
+ * Utility for applying the application icon to a {@link Stage} and the OS taskbar/dock.
  *
  * <p>The icon is clipped to a rounded rectangle that matches the macOS squircle proportions.
- * Taskbar support is checked at runtime — missing support is silently ignored, so
- * this utility is safe to call on all platforms.</p>
+ * Taskbar support is checked at runtime — missing support is silently ignored, so this utility is
+ * safe to call on all platforms.
  *
- * <p>This class cannot be instantiated; use {@link #apply(Stage)} directly.</p>
+ * <p>This class cannot be instantiated; use {@link #apply(Stage)} directly.
  */
 public final class AppIcon {
 
@@ -28,8 +28,8 @@ public final class AppIcon {
   private AppIcon() {}
 
   /**
-   * <p>Loads the bundled icon, clips it to a rounded rectangle, and applies it to both
-   * the given {@link Stage} and the OS taskbar/dock (if supported).</p>
+   * Loads the bundled icon, clips it to a rounded rectangle, and applies it to both the given
+   * {@link Stage} and the OS taskbar/dock (if supported).
    *
    * @param stage the primary stage to set the window icon on
    */
@@ -50,9 +50,14 @@ public final class AppIcon {
       return;
     }
     try {
-      BufferedImage src = ImageIO.read(AppIcon.class.getResource(ICON_PATH));
+      var resource = AppIcon.class.getResource(ICON_PATH);
+      if (resource == null) {
+        return;
+      }
+      BufferedImage src = ImageIO.read(resource);
       taskbar.setIconImage(roundedIcon(src));
-    } catch (Exception ignored) {
+    } catch (Exception ignore) {
+      // Taskbar icon not supported on this platform.
     }
   }
 
@@ -62,7 +67,8 @@ public final class AppIcon {
     BufferedImage out = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = out.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setClip(new RoundRectangle2D.Float(pad, pad, ICON_SIZE - pad * 2, ICON_SIZE - pad * 2, arc, arc));
+    g.setClip(
+        new RoundRectangle2D.Float(pad, pad, ICON_SIZE - pad * 2, ICON_SIZE - pad * 2, arc, arc));
     g.drawImage(src, pad, pad, ICON_SIZE - pad * 2, ICON_SIZE - pad * 2, null);
     g.dispose();
     return out;

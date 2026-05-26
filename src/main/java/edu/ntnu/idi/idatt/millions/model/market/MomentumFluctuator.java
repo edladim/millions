@@ -6,40 +6,44 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * <p>A stateful price model combining momentum, per-stock volatility,
- * fat-tail events, and a market-wide sentiment shock.</p>
+ * A stateful price model combining momentum, per-stock volatility, fat-tail events, and a
+ * market-wide sentiment shock.
  *
  * <h2>Per-stock momentum</h2>
- * <p>Each stock maintains a hidden <em>momentum</em> value that carries over
- * between weeks. Momentum fades toward zero each week (mean-reversion via
- * {@code DECAY}) but is continuously perturbed by random shocks, producing
- * trend phases of roughly 3–6 weeks that are visible in the price history.</p>
+ *
+ * <p>Each stock maintains a hidden <em>momentum</em> value that carries over between weeks.
+ * Momentum fades toward zero each week (mean-reversion via {@code DECAY}) but is continuously
+ * perturbed by random shocks, producing trend phases of roughly 3–6 weeks that are visible in the
+ * price history.
  *
  * <h2>Per-stock volatility</h2>
- * <p>Each stock is assigned a random volatility multiplier on first contact,
- * in the range {@code [VOL_MIN, VOL_MAX]}. High-volatility stocks swing more
- * per week; low-volatility stocks move slowly and steadily.</p>
+ *
+ * <p>Each stock is assigned a random volatility multiplier on first contact, in the range {@code
+ * [VOL_MIN, VOL_MAX]}. High-volatility stocks swing more per week; low-volatility stocks move
+ * slowly and steadily.
  *
  * <h2>Fat-tail events (per stock)</h2>
- * <p>With probability {@code FAT_TAIL_PROB} each week, a stock receives an
- * additional large shock (±{@code FAT_TAIL_AMP}, scaled by volatility),
- * modelling sudden company-specific news that can break or reverse a trend.</p>
+ *
+ * <p>With probability {@code FAT_TAIL_PROB} each week, a stock receives an additional large shock
+ * (±{@code FAT_TAIL_AMP}, scaled by volatility), modelling sudden company-specific news that can
+ * break or reverse a trend.
  *
  * <h2>Market-wide sentiment</h2>
- * <p>Once per week, a market shock is sampled and applied to every stock's
- * momentum update. A small baseline sentiment (±{@code MARKET_BASE_AMP})
- * creates mild weekly correlation between all stocks. With probability
- * {@code MARKET_EVENT_PROB}, a large market event (±{@code MARKET_EVENT_AMP})
- * is added on top, pushing all stocks into a sustained bull or bear phase for
- * several weeks before momentum decays back to zero.</p>
+ *
+ * <p>Once per week, a market shock is sampled and applied to every stock's momentum update. A small
+ * baseline sentiment (±{@code MARKET_BASE_AMP}) creates mild weekly correlation between all stocks.
+ * With probability {@code MARKET_EVENT_PROB}, a large market event (±{@code MARKET_EVENT_AMP}) is
+ * added on top, pushing all stocks into a sustained bull or bear phase for several weeks before
+ * momentum decays back to zero.
  *
  * <h2>Momentum cap</h2>
- * <p>After each momentum update, the value is clamped to
- * {@code [−MOMENTUM_CAP, +MOMENTUM_CAP]} to prevent compounding extreme shocks
- * (especially fat-tail and market events) from producing unrealistic weekly
- * price swings.</p>
+ *
+ * <p>After each momentum update, the value is clamped to {@code [−MOMENTUM_CAP, +MOMENTUM_CAP]} to
+ * prevent compounding extreme shocks (especially fat-tail and market events) from producing
+ * unrealistic weekly price swings.
  *
  * <h2>Formula (per stock per week)</h2>
+ *
  * <pre>
  *   shock      = stockShock(vol) [+ fatTailShock(vol) with prob FAT_TAIL_PROB]
  *                + marketShock (same for all stocks this week)
@@ -73,7 +77,7 @@ public final class MomentumFluctuator implements PriceFluctuator {
 
   private static final BigDecimal FLOOR = BigDecimal.ONE;
 
-  private final Map<String, Double> momentum   = new HashMap<>();
+  private final Map<String, Double> momentum = new HashMap<>();
   private final Map<String, Double> volatility = new HashMap<>();
 
   private double marketShock = 0.0;
@@ -81,10 +85,10 @@ public final class MomentumFluctuator implements PriceFluctuator {
   /**
    * {@inheritDoc}
    *
-   * <p>Samples a market-wide sentiment shock for the coming week.
-   * A small baseline keeps mild correlation between all stocks every week.
-   * With {@code MARKET_EVENT_PROB} probability an additional large shock is
-   * added, creating a sustained bull or bear phase across the whole market.</p>
+   * <p>Samples a market-wide sentiment shock for the coming week. A small baseline keeps mild
+   * correlation between all stocks every week. With {@code MARKET_EVENT_PROB} probability an
+   * additional large shock is added, creating a sustained bull or bear phase across the whole
+   * market.
    */
   @Override
   public void beginWeek(Random random) {
@@ -97,13 +101,13 @@ public final class MomentumFluctuator implements PriceFluctuator {
   /**
    * {@inheritDoc}
    *
-   * <p>The symbol is used to retrieve the per-stock
-   * momentum and volatility state.</p>
+   * <p>The symbol is used to retrieve the per-stock momentum and volatility state.
    */
   @Override
   public BigDecimal nextPrice(String symbol, BigDecimal currentPrice, Random random) {
-    double vol = volatility.computeIfAbsent(
-        symbol, k -> VOL_MIN + random.nextDouble() * (VOL_MAX - VOL_MIN));
+    double vol =
+        volatility.computeIfAbsent(
+            symbol, _ -> VOL_MIN + random.nextDouble() * (VOL_MAX - VOL_MIN));
 
     double m = momentum.getOrDefault(symbol, 0.0);
 
@@ -116,7 +120,7 @@ public final class MomentumFluctuator implements PriceFluctuator {
     m = Math.clamp(m * DECAY + shock, -MOMENTUM_CAP, MOMENTUM_CAP);
     momentum.put(symbol, m);
 
-    double noise  = (random.nextDouble() - 0.5) * 2 * BASE_NOISE * vol;
+    double noise = (random.nextDouble() - 0.5) * 2 * BASE_NOISE * vol;
     double change = m + noise;
 
     BigDecimal newPrice = currentPrice.multiply(BigDecimal.valueOf(1 + change));

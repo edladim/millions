@@ -1,29 +1,28 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
-import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Performs financial calculations for purchase transactions.
  *
- * <p>This calculator determines the financial values associated with
- * purchasing shares, including:</p>
+ * <p>This calculator determines the financial values associated with purchasing shares, including:
  *
  * <ul>
- *   <li>Gross purchase value</li>
- *   <li>Broker commission</li>
- *   <li>Tax (none for purchases)</li>
- *   <li>Total cost of the transaction</li>
+ *   <li>Gross purchase value
+ *   <li>Broker commission
+ *   <li>Tax (none for purchases)
+ *   <li>Total cost of the transaction
  * </ul>
  *
- * <p>The calculations follow these rules:</p>
+ * <p>The calculations follow these rules:
  *
  * <ul>
- *   <li>Gross = purchasePrice × quantity</li>
- *   <li>Commission = 0.5% of gross</li>
- *   <li>Tax = 0</li>
- *   <li>Total = gross + commission</li>
+ *   <li>Gross = purchasePrice × quantity
+ *   <li>Commission = 0.5% of gross
+ *   <li>Tax = 0
+ *   <li>Total = gross + commission
  * </ul>
  */
 public final class PurchaseCalculator implements TransactionCalculator {
@@ -36,8 +35,7 @@ public final class PurchaseCalculator implements TransactionCalculator {
   /**
    * Creates a calculator based on a {@link Share}.
    *
-   * <p>The share provides the purchase price and quantity used
-   * for all calculations.</p>
+   * <p>The share provides the purchase price and quantity used for all calculations.
    *
    * @param share the share being purchased
    * @throws NullPointerException if {@code share} is null
@@ -52,8 +50,7 @@ public final class PurchaseCalculator implements TransactionCalculator {
   /**
    * Calculates the gross value of the purchase.
    *
-   * <p>The gross value represents the total price of the shares
-   * before any fees are applied.</p>
+   * <p>The gross value represents the total price of the shares before any fees are applied.
    *
    * @return purchase price multiplied by quantity
    */
@@ -65,7 +62,7 @@ public final class PurchaseCalculator implements TransactionCalculator {
   /**
    * Calculates the broker commission charged for the purchase.
    *
-   * <p>The commission is 0.5% of the gross transaction value.</p>
+   * <p>The commission is 0.5% of the gross transaction value.
    *
    * @return the commission fee
    */
@@ -77,7 +74,7 @@ public final class PurchaseCalculator implements TransactionCalculator {
   /**
    * Calculates the tax for the purchase transaction.
    *
-   * <p>No tax is applied to purchase transactions.</p>
+   * <p>No tax is applied to purchase transactions.
    *
    * @return zero
    */
@@ -89,15 +86,12 @@ public final class PurchaseCalculator implements TransactionCalculator {
   /**
    * Calculates the total cost of the purchase transaction.
    *
-   * <p>The total represents the amount paid by the investor,
-   * including commission.</p>
+   * <p>The total represents the amount paid by the investor, including commission.
    *
    * @return gross value plus commission
    */
   @Override
   public BigDecimal calculateTotal() {
-    return calculateGross()
-        .add(calculateCommission())
-        .add(calculateTax());
+    return calculateGross().add(calculateCommission()).add(calculateTax());
   }
 }

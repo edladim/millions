@@ -4,9 +4,9 @@ import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import edu.ntnu.idi.idatt.millions.view.components.StockChartComponent;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.components.trading.BuyPanel;
 import edu.ntnu.idi.idatt.millions.view.components.trading.StockListPanel;
-import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Consumer;
@@ -19,43 +19,42 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 /**
- * <p>
- * Trading page view that assembles the stock list, chart preview, and
- * buy/sell panel into a {@link BorderPane} layout.
- * </p>
+ * Trading page view that assembles the stock list, chart preview, and buy/sell panel into a {@link
+ * BorderPane} layout.
  *
- * <p>
- * Layout: the center column holds a {@link StockChartComponent} above a
- * {@link StockListPanel}; the right column holds a {@link BuyPanel}.
- * {@code TradingView} acts as the orchestrator — it wires the internal
- * connection between the panels (stock selection drives both the buy panel
- * and the chart) and exposes a flat public API that the controller calls
- * without needing to know about the sub-panels.
- * </p>
+ * <p>Layout: the center column holds a {@link StockChartComponent} above a {@link StockListPanel};
+ * the right column holds a {@link BuyPanel}. {@code TradingView} acts as the orchestrator — it
+ * wires the internal connection between the panels (stock selection drives both the buy panel and
+ * the chart) and exposes a flat public API that the controller calls without needing to know about
+ * the sub-panels.
  */
 public class TradingView extends BorderPane implements ExchangeObserver {
 
   /** Action mode of the trading panel. */
-  public enum Mode { BUY, SELL }
+  public enum Mode {
+    BUY,
+    SELL
+  }
 
   /** Minimum width kept for the center panel before the buy-panel wrapper starts shrinking. */
   private static final double CENTER_MIN_WIDTH = 420;
+
   /** Natural preferred width of the buy-panel wrapper (BuyPanel pref 300 + right padding 24). */
   private static final double WRAPPER_PREF_WIDTH = 324;
+
   /** Hard floor for the buy-panel wrapper so it never collapses entirely. */
   private static final double WRAPPER_MIN_WIDTH = 200;
 
   private final StockListPanel stockListPanel;
   private final BuyPanel buyPanel;
   private final StockChartComponent stockChart;
-  private VBox buyPanelWrapper;
 
   private Consumer<String> onSelectStock;
   private Runnable onRefresh;
 
   /**
-   * <p>Constructs the trading view, builds its layout, and wires the
-   * internal connection between the stock list and the buy panel.</p>
+   * Constructs the trading view, builds its layout, and wires the internal connection between the
+   * stock list and the buy panel.
    */
   public TradingView() {
     getStyleClass().add("dashboard-view");
@@ -67,13 +66,17 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     stockListPanel = new StockListPanel();
     buyPanel = new BuyPanel();
 
-    stockListPanel.setOnStockActivated(stock -> {
-      buyPanel.updateStockInfo(stock);
-      stockChart.setStockInfo(stock.getSymbol(), stock.getCompany());
-    });
-    stockListPanel.setOnStockSelected(symbol -> {
-      if (onSelectStock != null) onSelectStock.accept(symbol);
-    });
+    stockListPanel.setOnStockActivated(
+        stock -> {
+          buyPanel.updateStockInfo(stock);
+          stockChart.setStockInfo(stock.getSymbol(), stock.getCompany());
+        });
+    stockListPanel.setOnStockSelected(
+        symbol -> {
+          if (onSelectStock != null) {
+            onSelectStock.accept(symbol);
+          }
+        });
 
     buyPanel.setMinWidth(0);
 
@@ -82,12 +85,10 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Returns {@code 0} so the parent {@link javafx.scene.control.ScrollPane}
-   * (with {@code fitToWidth=true}) can shrink this node freely to the viewport
-   * width. The default {@link BorderPane} implementation would return
-   * {@code center.minWidth + right.minWidth}, freezing the view at that
-   * combined minimum and causing the right panel to be clipped instead of
-   * shrinking.</p>
+   * Returns {@code 0} so the parent {@link javafx.scene.control.ScrollPane} (with {@code
+   * fitToWidth=true}) can shrink this node freely to the viewport width. The default {@link
+   * BorderPane} implementation would return {@code center.minWidth + right.minWidth}, freezing the
+   * view at that combined minimum and causing the right panel to be clipped instead of shrinking.
    */
   @Override
   protected double computeMinWidth(double height) {
@@ -95,24 +96,22 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Controls the exact pixel split between the center panel and the
-   * buy-panel wrapper in one layout pass, bypassing the standard
-   * {@link BorderPane} algorithm which reads {@code prefWidth} one frame
-   * too late on window resize.</p>
+   * Controls the exact pixel split between the center panel and the buy-panel wrapper in one layout
+   * pass, bypassing the standard {@link BorderPane} algorithm which reads {@code prefWidth} one
+   * frame too late on window resize.
    *
-   * <p>The right wrapper holds at {@value #WRAPPER_PREF_WIDTH} px and only
-   * starts shrinking once the center reaches {@value #CENTER_MIN_WIDTH} px.
-   * It floors at {@value #WRAPPER_MIN_WIDTH} px.</p>
+   * <p>The right wrapper holds at {@value #WRAPPER_PREF_WIDTH} px and only starts shrinking once
+   * the center reaches {@value #CENTER_MIN_WIDTH} px. It floors at {@value #WRAPPER_MIN_WIDTH} px.
    */
   @Override
   protected void layoutChildren() {
     Insets ins = getInsets();
     double x = ins.getLeft();
     double y = ins.getTop();
-    double w = getWidth()  - ins.getLeft() - ins.getRight();
-    double h = getHeight() - ins.getTop()  - ins.getBottom();
+    double w = getWidth() - ins.getLeft() - ins.getRight();
+    double h = getHeight() - ins.getTop() - ins.getBottom();
 
-    double rightW  = Math.clamp(w - CENTER_MIN_WIDTH, WRAPPER_MIN_WIDTH, WRAPPER_PREF_WIDTH);
+    double rightW = Math.clamp(w - CENTER_MIN_WIDTH, WRAPPER_MIN_WIDTH, WRAPPER_PREF_WIDTH);
     double centerW = w - rightW;
 
     if (getCenter() != null) {
@@ -134,7 +133,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   private VBox buildBuyPanelWrapper() {
-    buyPanelWrapper = new VBox(buyPanel);
+    VBox buyPanelWrapper = new VBox(buyPanel);
     buyPanelWrapper.getStyleClass().add("buy-panel-wrapper");
     buyPanelWrapper.setPadding(new Insets(24, 24, 24, 0));
     buyPanelWrapper.setMinWidth(WRAPPER_MIN_WIDTH);
@@ -145,13 +144,15 @@ public class TradingView extends BorderPane implements ExchangeObserver {
 
   @Override
   public void onExchangeUpdated(ReadOnlyExchange exchange) {
-    if (onRefresh != null) onRefresh.run();
+    if (onRefresh != null) {
+      onRefresh.run();
+    }
   }
 
   // Public API — delegates to sub-panels
 
   /**
-   * <p>Replaces the stock list and re-applies the pending highlight.</p>
+   * Replaces the stock list and re-applies the pending highlight.
    *
    * @param stocks the stocks to display
    */
@@ -160,8 +161,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Programmatically selects the given stock without spuriously firing
-   * the controller's {@code onSelectStock} callback from the listener.</p>
+   * Programmatically selects the given stock without spuriously firing the controller's {@code
+   * onSelectStock} callback from the listener.
    *
    * @param stock the stock to select
    */
@@ -170,8 +171,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Marks the given symbol as highlighted without firing the controller
-   * callback. Remembered if the stock is not yet in the items list.</p>
+   * Marks the given symbol as highlighted without firing the controller callback. Remembered if the
+   * stock is not yet in the items list.
    *
    * @param symbol the symbol to highlight, or {@code null} to clear
    */
@@ -180,7 +181,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Returns the search field used for stock filtering.</p>
+   * Returns the search field used for stock filtering.
    *
    * @return the search text field
    */
@@ -189,7 +190,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Returns the chart component so the controller can push price data.</p>
+   * Returns the chart component so the controller can push price data.
    *
    * @return the stock chart component
    */
@@ -197,71 +198,92 @@ public class TradingView extends BorderPane implements ExchangeObserver {
     return stockChart;
   }
 
-  /** @see BuyPanel#setMode(Mode) */
-  public void setMode(Mode mode) { buyPanel.setMode(mode); }
+  /** Delegates to {@link BuyPanel#setMode(Mode)}. */
+  public void setMode(Mode mode) {
+    buyPanel.setMode(mode);
+  }
 
-  /** @see BuyPanel#getMode() */
-  public Mode getMode() { return buyPanel.getMode(); }
+  /** Delegates to {@link BuyPanel#getMode()}. */
+  public Mode getMode() {
+    return buyPanel.getMode();
+  }
 
-  /** @see BuyPanel#getInputValue() */
-  public BigDecimal getInputValue() { return buyPanel.getInputValue(); }
+  /** Delegates to {@link BuyPanel#getInputValue()}. */
+  public BigDecimal getInputValue() {
+    return buyPanel.getInputValue();
+  }
 
-  /** @see BuyPanel#isAmountMode() */
-  public boolean isAmountMode() { return buyPanel.isAmountMode(); }
+  /** Delegates to {@link BuyPanel#isAmountMode()}. */
+  public boolean isAmountMode() {
+    return buyPanel.isAmountMode();
+  }
 
-  /** @see BuyPanel#setCostPreview(String, String, String) */
+  /** Delegates to {@link BuyPanel#setCostPreview(String, String, String)}. */
   public void setCostPreview(String gross, String commission, String total) {
     buyPanel.setCostPreview(gross, commission, total);
   }
 
-  /** @see BuyPanel#setDerivedLabel(String) */
-  public void setDerivedLabel(String text) { buyPanel.setDerivedLabel(text); }
+  /** Delegates to {@link BuyPanel#setDerivedLabel(String)}. */
+  public void setDerivedLabel(String text) {
+    buyPanel.setDerivedLabel(text);
+  }
 
-  /** @see BuyPanel#setActionEnabled(boolean) */
-  public void setActionEnabled(boolean enabled) { buyPanel.setActionEnabled(enabled); }
+  /** Delegates to {@link BuyPanel#setActionEnabled(boolean)}. */
+  public void setActionEnabled(boolean enabled) {
+    buyPanel.setActionEnabled(enabled);
+  }
 
-  /** @see BuyPanel#clearInput() */
-  public void clearInput() { buyPanel.clearInput(); }
+  /** Delegates to {@link BuyPanel#setCurrentPrice(BigDecimal)}. */
+  public void setCurrentPrice(BigDecimal price) {
+    buyPanel.setCurrentPrice(price);
+  }
 
-  /** @see BuyPanel#setCurrentPrice(BigDecimal) */
-  public void setCurrentPrice(BigDecimal price) { buyPanel.setCurrentPrice(price); }
-
-  /** @see BuyPanel#setInputAmount(BigDecimal, boolean) */
+  /** Delegates to {@link BuyPanel#setInputAmount(BigDecimal, boolean)}. */
   public void setInputAmount(BigDecimal value, boolean asAmount) {
     buyPanel.setInputAmount(value, asAmount);
   }
 
-  /** @see BuyPanel#setOwnedQuantity(BigDecimal) */
-  public void setOwnedQuantity(BigDecimal qty) { buyPanel.setOwnedQuantity(qty); }
+  /** Delegates to {@link BuyPanel#setOwnedQuantity(BigDecimal)}. */
+  public void setOwnedQuantity(BigDecimal qty) {
+    buyPanel.setOwnedQuantity(qty);
+  }
 
-  /** @see BuyPanel#setCashBalance(BigDecimal) */
-  public void setCashBalance(BigDecimal cash) { buyPanel.setCashBalance(cash); }
+  /** Delegates to {@link BuyPanel#setCashBalance(BigDecimal)}. */
+  public void setCashBalance(BigDecimal cash) {
+    buyPanel.setCashBalance(cash);
+  }
 
   // Callback registration
 
   /**
-   * <p>Registers a handler that runs when the user confirms a trade.</p>
+   * Registers a handler that runs when the user confirms a trade.
    *
    * @param handler the action handler
    */
-  public void setOnAction(Consumer<Mode> handler) { buyPanel.setOnAction(handler); }
+  public void setOnAction(Consumer<Mode> handler) {
+    buyPanel.setOnAction(handler);
+  }
 
   /**
-   * <p>Registers a handler that runs when the input field changes.</p>
+   * Registers a handler that runs when the input field changes.
    *
    * @param handler the handler to run on change
    */
-  public void setOnInputChanged(Runnable handler) { buyPanel.setOnInputChanged(handler); }
+  public void setOnInputChanged(Runnable handler) {
+    buyPanel.setOnInputChanged(handler);
+  }
 
   /**
-   * <p>Registers a handler that runs when the user toggles Buy/Sell mode.</p>
+   * Registers a handler that runs when the user toggles Buy/Sell mode.
    *
    * @param handler the handler accepting the new mode
    */
-  public void setOnModeChanged(Consumer<Mode> handler) { buyPanel.setOnModeChanged(handler); }
+  public void setOnModeChanged(Consumer<Mode> handler) {
+    buyPanel.setOnModeChanged(handler);
+  }
 
   /**
-   * <p>Registers a handler that runs when a percentage button is clicked.</p>
+   * Registers a handler that runs when a percentage button is clicked.
    *
    * @param handler the consumer that receives the selected percentage as a decimal
    */
@@ -270,8 +292,7 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when a stock is selected by the user,
-   * receiving its symbol.</p>
+   * Registers a handler that runs when a stock is selected by the user, receiving its symbol.
    *
    * @param handler the handler accepting the selected symbol
    */
@@ -280,8 +301,8 @@ public class TradingView extends BorderPane implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when the exchange updates, so the
-   * controller can rebuild the stock list.</p>
+   * Registers a handler that runs when the exchange updates, so the controller can rebuild the
+   * stock list.
    *
    * @param handler the handler to run on exchange update
    */

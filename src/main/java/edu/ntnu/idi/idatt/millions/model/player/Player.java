@@ -1,7 +1,6 @@
 package edu.ntnu.idi.idatt.millions.model.player;
 
 import edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio;
-
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
@@ -13,17 +12,16 @@ import java.util.Objects;
 /**
  * Represents a player in the trading game.
  *
- * <p>A player has a name, a starting amount of money and a current
- * balance that changes as transactions are performed.</p>
+ * <p>A player has a name, a starting amount of money and a current balance that changes as
+ * transactions are performed.
  *
- * <p>The player also owns a {@link Portfolio} containing shares
- * and a {@link TransactionArchive} storing completed transactions.</p>
+ * <p>The player also owns a {@link Portfolio} containing shares and a {@link TransactionArchive}
+ * storing completed transactions.
  */
 public final class Player implements ReadOnlyPlayer {
 
   private static final BigDecimal WORST_REQIREMENT = new BigDecimal("-0.50");
   private static final BigDecimal BAD_REQIREMEMENT = new BigDecimal("-0.20");
-  private static final BigDecimal AVRAGE_INVESTOR = BigDecimal.ZERO;
   private static final BigDecimal ALRIGHT_REQUIREMENT = new BigDecimal("0.20");
   private static final BigDecimal GOOD_REQUIREMENT = new BigDecimal("1.00");
   private static final BigDecimal EXCELLENT_REQUIREMENT = new BigDecimal("2.00");
@@ -39,12 +37,11 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Creates a new player.
    *
-   * <p>The player starts with a given amount of money which becomes both
-   * the starting capital and the initial balance.</p>
+   * <p>The player starts with a given amount of money which becomes both the starting capital and
+   * the initial balance.
    *
    * @param name the player's name
    * @param startingMoney the initial capital
-   *
    * @throws NullPointerException if name or startingMoney is null
    * @throws IllegalArgumentException if name is blank or startingMoney is negative
    */
@@ -79,12 +76,11 @@ public final class Player implements ReadOnlyPlayer {
    * Adds money to the player's balance.
    *
    * @param amount the amount to add
-   *
    * @throws NullPointerException if amount is null
    * @throws IllegalArgumentException if amount is negative
    */
   public void addMoney(BigDecimal amount) {
-    amount = validateAmount(amount);
+    validateAmount(amount);
     money = money.add(amount);
     notifyObservers();
   }
@@ -93,13 +89,12 @@ public final class Player implements ReadOnlyPlayer {
    * Withdraws money from the player's balance.
    *
    * @param amount the amount to withdraw
-   *
    * @throws NullPointerException if amount is null
    * @throws IllegalArgumentException if amount is negative
    * @throws IllegalStateException if the player has insufficient funds
    */
   public void withdrawMoney(BigDecimal amount) {
-    amount = validateAmount(amount);
+    validateAmount(amount);
     if (money.compareTo(amount) < 0) {
       throw new IllegalStateException("Insufficient funds");
     }
@@ -138,8 +133,8 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Calculates the player's total net worth.
    *
-   * <p>The net worth is the sum of the portfolio net worth
-   * (amount received after selling all shares) and current cash balance.</p>
+   * <p>The net worth is the sum of the portfolio net worth (amount received after selling all
+   * shares) and current cash balance.
    *
    * @return the total net worth, never null
    */
@@ -149,8 +144,9 @@ public final class Player implements ReadOnlyPlayer {
 
   /**
    * Appends the player's current net worth to the historical series.
-   * <p>The recorded value reflects the latest snapshot of {@link #getNetWorth()}
-   * at the time of the call.</p>
+   *
+   * <p>The recorded value reflects the latest snapshot of {@link #getNetWorth()} at the time of the
+   * call.
    */
   public void updateHistoricalNetWorth() {
     historicalNetWorth.add(getNetWorth());
@@ -159,6 +155,7 @@ public final class Player implements ReadOnlyPlayer {
 
   /**
    * Returns the recorded net worth history for the player.
+   *
    * @return a list of net worth snapshots in chronological order
    */
   public List<BigDecimal> getHistoricalNetWorth() {
@@ -168,8 +165,8 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Calculates the player's profit relative to the starting capital.
    *
-   * <p>A positive value means the player has increased net worth,
-   * while a negative value means the player has lost value overall.</p>
+   * <p>A positive value means the player has increased net worth, while a negative value means the
+   * player has lost value overall.
    *
    * @return the profit compared to starting capital, never null
    */
@@ -180,8 +177,8 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Calculates the player's growth rate relative to the starting capital.
    *
-   * <p>The growth rate is expressed as a decimal value where
-   * {@code 0.20} means 20% growth and {@code 1.00} means 100% growth.</p>
+   * <p>The growth rate is expressed as a decimal value where {@code 0.20} means 20% growth and
+   * {@code 1.00} means 100% growth.
    *
    * @return the growth rate, never null
    */
@@ -196,8 +193,7 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Returns the number of distinct weeks in which the player has traded.
    *
-   * <p>A week is counted if the player has completed at least one
-   * transaction during that week.</p>
+   * <p>A week is counted if the player has completed at least one transaction during that week.
    *
    * @return the number of active trading weeks
    */
@@ -208,17 +204,16 @@ public final class Player implements ReadOnlyPlayer {
   /**
    * Returns the player's current progression status.
    *
-   * <p>Status is determined by comparing the player's current net worth
-   * with the starting capital, together with the number of weeks in which
-   * the player has been active in the market.</p>
+   * <p>Status is determined by comparing the player's current net worth with the starting capital,
+   * together with the number of weeks in which the player has been active in the market.
    *
    * <ul>
-   *   <li>{@link PlayerStatus#BERNARD_MADOFF} requires at least 200% growth</li>
-   *   <li>{@link PlayerStatus#RAY_DALIO} requires at least 100% growth</li>
-   *   <li>{@link PlayerStatus#INVESTOR} requires at least 20% growth</li>
-   *   <li>{@link PlayerStatus#AVERAGE_JOE} requires at least -20% growth</li>
-   *   <li>{@link PlayerStatus#MAX_MINUS} requires at least -50% growth</li>
-   *   <li>{@link PlayerStatus#BUY_HIGH_BJORN} is below -50% growth</li>
+   *   <li>{@link PlayerStatus#BERNARD_MADOFF} requires at least 200% growth
+   *   <li>{@link PlayerStatus#RAY_DALIO} requires at least 100% growth
+   *   <li>{@link PlayerStatus#INVESTOR} requires at least 20% growth
+   *   <li>{@link PlayerStatus#AVERAGE_JOE} requires at least -20% growth
+   *   <li>{@link PlayerStatus#MAX_MINUS} requires at least -50% growth
+   *   <li>{@link PlayerStatus#BUY_HIGH_BJORN} is below -50% growth
    * </ul>
    *
    * @return the player's current status, never null

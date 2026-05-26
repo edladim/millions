@@ -2,7 +2,6 @@ package edu.ntnu.idi.idatt.millions.model.portfolio;
 
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleCalculator;
 import edu.ntnu.idi.idatt.millions.observer.PortfolioObserver;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -13,13 +12,14 @@ import java.util.Objects;
 /**
  * Represents a portfolio containing a collection of {@link Share} objects.
  *
- * <p>A portfolio manages shares owned by an investor and provides operations
- * for adding, removing, retrieving, and querying shares.</p>
+ * <p>A portfolio manages shares owned by an investor and provides operations for adding, removing,
+ * retrieving, and querying shares.
  *
- * <p>The class guarantees that:</p>
+ * <p>The class guarantees that:
+ *
  * <ul>
- *   <li>No {@code null} shares can be added</li>
- *   <li>The internal collection cannot be modified externally</li>
+ *   <li>No {@code null} shares can be added
+ *   <li>The internal collection cannot be modified externally
  * </ul>
  */
 public final class Portfolio implements ReadOnlyPortfolio {
@@ -27,17 +27,14 @@ public final class Portfolio implements ReadOnlyPortfolio {
   private final List<PortfolioObserver> observers = new ArrayList<>();
   private final List<Share> shares = new ArrayList<>();
 
-  /**
-   * Constructs an empty portfolio.
-   */
-  public Portfolio() {
-  }
+  /** Constructs an empty portfolio. */
+  public Portfolio() {}
 
   /**
    * Constructs a portfolio initialized with a list of shares.
    *
-   * <p>Each share is validated and added using {@link #addShare(Share)}
-   * to ensure consistent validation rules.</p>
+   * <p>Each share is validated and added using {@link #addShare(Share)} to ensure consistent
+   * validation rules.
    *
    * @param shares the initial shares to include in the portfolio
    * @throws NullPointerException if {@code shares} or any share in the list is null
@@ -66,8 +63,7 @@ public final class Portfolio implements ReadOnlyPortfolio {
    * Removes a share from the portfolio.
    *
    * @param share the share to remove, cannot be null
-   * @return {@code true} if the share existed and was removed,
-   *         {@code false} otherwise
+   * @return {@code true} if the share existed and was removed, {@code false} otherwise
    * @throws NullPointerException if {@code share} is null
    */
   public boolean removeShare(Share share) {
@@ -82,29 +78,13 @@ public final class Portfolio implements ReadOnlyPortfolio {
   /**
    * Returns all shares currently stored in the portfolio.
    *
-   * <p>The returned list is an unmodifiable copy to prevent
-   * external modification of the internal state.</p>
+   * <p>The returned list is an unmodifiable copy to prevent external modification of the internal
+   * state.
    *
    * @return an unmodifiable list of shares, never null
    */
   public List<Share> getShares() {
     return List.copyOf(shares);
-  }
-
-  /**
-   * Returns one {@link Holding} per unique stock symbol, aggregating all share
-   * lots that reference the same stock. Order follows first occurrence in the
-   * underlying share list.
-   *
-   * @return the aggregated holdings, never null
-   */
-  @Override
-  public List<Holding> getHoldings() {
-    Map<String, List<Share>> grouped = new LinkedHashMap<>();
-    for (Share s : shares) {
-      grouped.computeIfAbsent(s.getStock().getSymbol(), k -> new ArrayList<>()).add(s);
-    }
-    return grouped.values().stream().map(Holding::aggregate).toList();
   }
 
   /**
@@ -121,6 +101,21 @@ public final class Portfolio implements ReadOnlyPortfolio {
     return shares.stream()
         .filter(share -> share.getStock().getSymbol().equals(validatedSymbol))
         .toList();
+  }
+
+  /**
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share lots that reference
+   * the same stock. Order follows first occurrence in the underlying share list.
+   *
+   * @return the aggregated holdings, never null
+   */
+  @Override
+  public List<Holding> getHoldings() {
+    Map<String, List<Share>> grouped = new LinkedHashMap<>();
+    for (Share s : shares) {
+      grouped.computeIfAbsent(s.getStock().getSymbol(), _ -> new ArrayList<>()).add(s);
+    }
+    return grouped.values().stream().map(Holding::aggregate).toList();
   }
 
   /**
@@ -145,31 +140,26 @@ public final class Portfolio implements ReadOnlyPortfolio {
   }
 
   /**
-   * <p>Returns the number of distinct stock symbols held in the portfolio.
-   * Two {@link Share} lots referencing the same stock count as one.</p>
+   * Returns the number of distinct stock symbols held in the portfolio. Two {@link Share} lots
+   * referencing the same stock count as one.
    *
    * @return the number of unique stocks owned
    */
   @Override
   public long getDistinctStockCount() {
-    return shares.stream()
-        .map(s -> s.getStock().getSymbol())
-        .distinct()
-        .count();
+    return shares.stream().map(s -> s.getStock().getSymbol()).distinct().count();
   }
 
   /**
    * Calculates the current total market value of the portfolio.
    *
-   * <p>The value is calculated as the sum of the current value of each
-   * {@link Share} in the portfolio.</p>
+   * <p>The value is calculated as the sum of the current value of each {@link Share} in the
+   * portfolio.
    *
    * @return the total market value of the portfolio, never null
    */
   public BigDecimal getTotalValue() {
-    return shares.stream()
-        .map(Share::getCurrentValue)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return shares.stream().map(Share::getCurrentValue).reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   /**
@@ -178,16 +168,13 @@ public final class Portfolio implements ReadOnlyPortfolio {
    * @return the total invested capital, never null
    */
   public BigDecimal getTotalInvestment() {
-    return shares.stream()
-        .map(Share::getTotalInvestment)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    return shares.stream().map(Share::getTotalInvestment).reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   /**
    * Calculates the total unrealized gain or loss of the portfolio.
    *
-   * <p>This is the difference between the current market value and the
-   * original invested capital.</p>
+   * <p>This is the difference between the current market value and the original invested capital.
    *
    * @return the total gain or loss, never null
    */
@@ -216,17 +203,16 @@ public final class Portfolio implements ReadOnlyPortfolio {
   /**
    * Calculates the net worth from selling all shares in the portfolio.
    *
-   * <p>The net worth is calculated by determining what amount would be
-   * received after selling each share, accounting for broker commissions
-   * and taxes on profit.</p>
+   * <p>The net worth is calculated by determining what amount would be received after selling each
+   * share, accounting for broker commissions and taxes on profit.
    *
    * @return the total net worth after all deductions, never null
    */
   public BigDecimal getNetWorth() {
     return shares.stream()
-            .map(SaleCalculator::new)
-            .map(SaleCalculator::calculateTotal)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        .map(SaleCalculator::new)
+        .map(SaleCalculator::calculateTotal)
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 
   /**
@@ -247,5 +233,4 @@ public final class Portfolio implements ReadOnlyPortfolio {
       observer.onPortfolioUpdated(this);
     }
   }
-
 }

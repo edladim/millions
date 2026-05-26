@@ -1,25 +1,25 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Sale}.
  *
- * <p>The tests verify that sale transactions correctly:</p>
+ * <p>The tests verify that sale transactions correctly:
+ *
  * <ul>
- *   <li>Expose transaction information</li>
- *   <li>Transfer money to the player</li>
- *   <li>Remove shares from the portfolio</li>
- *   <li>Store the transaction in the archive</li>
- *   <li>Reject invalid commit scenarios</li>
+ *   <li>Expose transaction information
+ *   <li>Transfer money to the player
+ *   <li>Remove shares from the portfolio
+ *   <li>Store the transaction in the archive
+ *   <li>Reject invalid commit scenarios
  * </ul>
  */
 class SaleTest {
@@ -28,9 +28,7 @@ class SaleTest {
   private Player player;
   private Sale sale;
 
-  /**
-   * Creates a share owned by the player before each test.
-   */
+  /** Creates a share owned by the player before each test. */
   @BeforeEach
   void setUp() {
     Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("150"));
@@ -83,9 +81,7 @@ class SaleTest {
   @Test
   void commit_addsTransactionToArchive() {
     sale.commit(player);
-    assertTrue(player.getTransactionArchive()
-        .getSales(5)
-        .contains(sale));
+    assertTrue(player.getTransactionArchive().getSales(5).contains(sale));
   }
 
   /** Verifies that the committed flag is set. */
@@ -99,23 +95,20 @@ class SaleTest {
   @Test
   void commit_shareNotOwned_throwsException() {
     player.getPortfolio().removeShare(share);
-    assertThrows(IllegalStateException.class,
-        () -> sale.commit(player));
+    assertThrows(IllegalStateException.class, () -> sale.commit(player));
   }
 
   /** Verifies that committing twice is not allowed. */
   @Test
   void commit_twice_throwsException() {
     sale.commit(player);
-    assertThrows(IllegalStateException.class,
-        () -> sale.commit(player));
+    assertThrows(IllegalStateException.class, () -> sale.commit(player));
   }
 
   /** Verifies that null player input is rejected. */
   @Test
   void commit_nullPlayer_throwsException() {
 
-    assertThrows(NullPointerException.class,
-        () -> sale.commit(null));
+    assertThrows(NullPointerException.class, () -> sale.commit(null));
   }
 }

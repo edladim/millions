@@ -12,18 +12,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
- * <p>
  * Overlay component shown when the game ends.
- * </p>
  *
- * <p>
- * Renders a dimmed full-screen backdrop with a centered card. The card is
- * sized to its content and floats centered in the overlay with equal space
- * above and below. Stat cards are built with {@link ViewWidgets#summaryCard}
- * using compact padding and spacing so everything fits within the minimum
- * window height. The Profit and Return Rate stats (indices 1 and 2) are
- * placed side by side.
- * </p>
+ * <p>Renders a dimmed full-screen backdrop with a centered card. The card is sized to its content
+ * and floats centered in the overlay with equal space above and below. Stat cards are built with
+ * {@link ViewWidgets#summaryCard} using compact padding and spacing so everything fits within the
+ * minimum window height. The Profit and Return Rate stats (indices 1 and 2) are placed side by
+ * side.
  */
 public class EndGameOverlay extends StackPane {
 
@@ -35,15 +30,11 @@ public class EndGameOverlay extends StackPane {
    */
   public record StatRow(String label, String value) {}
 
-  private final VBox card;
-  private final Label title;
   private final VBox statsBox;
   private final Button newGameBtn;
   private final Button exitBtn;
 
-  /**
-   * <p>Constructs the end-game overlay and builds its UI.</p>
-   */
+  /** Constructs the end-game overlay and builds its UI. */
   public EndGameOverlay() {
     getStyleClass().add("endgame-overlay");
     setVisible(false);
@@ -51,12 +42,12 @@ public class EndGameOverlay extends StackPane {
     setPickOnBounds(true);
     setPadding(new Insets(20, 0, 20, 0));
 
-    card = new VBox(0);
+    VBox card = new VBox(0);
     card.getStyleClass().add("startup-card");
     card.setMaxWidth(550);
     card.setMinWidth(550);
 
-    title = new Label("Game Over");
+    Label title = new Label("Game Over");
     title.getStyleClass().add("endgame-title");
     Label subtitle = new Label("Your final results");
     subtitle.getStyleClass().add("startup-subtitle");
@@ -92,11 +83,8 @@ public class EndGameOverlay extends StackPane {
   }
 
   /**
-   * <p>
-   * Builds a compact stat card via {@link ViewWidgets#summaryCard} with reduced
-   * padding and tighter internal spacing so the overlay fits within the minimum
-   * window height.
-   * </p>
+   * Builds a compact stat card via {@link ViewWidgets#summaryCard} with reduced padding and tighter
+   * internal spacing so the overlay fits within the minimum window height.
    *
    * @param label the stat's display label
    * @param value the formatted stat value
@@ -110,11 +98,9 @@ public class EndGameOverlay extends StackPane {
   }
 
   /**
-   * <p>
-   * Displays the overlay and renders stat cards for each entry in {@code stats}.
-   * Stats at index&nbsp;1 and&nbsp;2 (Profit and Return Rate) are placed side
-   * by side; all other stats get their own full-width row.
-   * </p>
+   * Displays the overlay and renders stat cards for each entry in {@code stats}. Stats at
+   * index&nbsp;1 and&nbsp;2 (Profit and Return Rate) are placed side by side; all other stats get
+   * their own full-width row.
    *
    * @param stats the list of label/value pairs to display
    */
@@ -123,9 +109,9 @@ public class EndGameOverlay extends StackPane {
 
     for (int i = 0; i < stats.size(); i++) {
       if (i == 1 && i + 1 < stats.size()) {
-        VBox left  = buildStatCard(stats.get(i).label(),     stats.get(i).value());
+        VBox left = buildStatCard(stats.get(i).label(), stats.get(i).value());
         VBox right = buildStatCard(stats.get(i + 1).label(), stats.get(i + 1).value());
-        HBox.setHgrow(left,  Priority.ALWAYS);
+        HBox.setHgrow(left, Priority.ALWAYS);
         HBox.setHgrow(right, Priority.ALWAYS);
 
         HBox row = new HBox(4, left, right);
@@ -141,28 +127,20 @@ public class EndGameOverlay extends StackPane {
   }
 
   /**
-   * <p>Hides the overlay and releases it from layout.</p>
-   */
-  public void hide() {
-    setVisible(false);
-    setManaged(false);
-  }
-
-  /**
-   * <p>Registers a handler for the "New Game" action.</p>
+   * Registers a handler for the "New Game" action.
    *
    * @param onNewGame the action to run
    */
   public void setOnNewGame(Runnable onNewGame) {
-    newGameBtn.setOnAction(e -> onNewGame.run());
+    newGameBtn.setOnAction(_ -> onNewGame.run());
   }
 
   /**
-   * <p>Registers a handler for the "Exit" action.</p>
+   * Registers a handler for the "Exit" action.
    *
    * @param onExit the action to run
    */
   public void setOnExit(Runnable onExit) {
-    exitBtn.setOnAction(e -> onExit.run());
+    exitBtn.setOnAction(_ -> onExit.run());
   }
 }

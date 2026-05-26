@@ -3,16 +3,11 @@ package edu.ntnu.idi.idatt.millions.model.market;
 import java.util.List;
 
 /**
- * <p>
- * Read-only view of an {@link Exchange} intended for use by observer classes
- * such as views.
- * </p>
+ * Read-only view of an {@link Exchange} intended for use by observer classes such as views.
  *
- * <p>
- * Exposing only getter methods ensures that observers can display exchange data
- * without being able to execute trades or advance the week. The full mutable
- * {@link Exchange} is only accessible to controllers.
- * </p>
+ * <p>Exposing only getter methods ensures that observers can display exchange data without being
+ * able to execute trades or advance the week. The full mutable {@link Exchange} is only accessible
+ * to controllers.
  */
 public interface ReadOnlyExchange {
 
@@ -54,9 +49,9 @@ public interface ReadOnlyExchange {
   List<? extends ReadOnlyStock> getLosers(int limit);
 
   /**
-   * <p>Returns the top-performing stocks this week, sorted by percentage
-   * change descending. Unlike {@link #getGainers}, all stocks are eligible
-   * regardless of whether their change is positive or negative.</p>
+   * Returns the top-performing stocks this week, sorted by percentage change descending. Unlike
+   * {@link #getGainers}, all stocks are eligible regardless of whether their change is positive or
+   * negative.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of top performers, never null
@@ -65,9 +60,9 @@ public interface ReadOnlyExchange {
   List<? extends ReadOnlyStock> getTopPerformers(int limit);
 
   /**
-   * <p>Returns the worst-performing stocks this week, sorted by percentage
-   * change ascending. Unlike {@link #getLosers}, all stocks are eligible
-   * regardless of whether their change is positive or negative.</p>
+   * Returns the worst-performing stocks this week, sorted by percentage change ascending. Unlike
+   * {@link #getLosers}, all stocks are eligible regardless of whether their change is positive or
+   * negative.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of worst performers, never null

@@ -1,25 +1,25 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.model.player.Player;
 import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
-import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Purchase}.
  *
- * <p>The tests verify that purchase transactions correctly:</p>
+ * <p>The tests verify that purchase transactions correctly:
+ *
  * <ul>
- *   <li>Expose transaction information</li>
- *   <li>Execute the commit operation</li>
- *   <li>Change the player's money and portfolio</li>
- *   <li>Store the transaction in the archive</li>
- *   <li>Reject invalid commit scenarios</li>
+ *   <li>Expose transaction information
+ *   <li>Execute the commit operation
+ *   <li>Change the player's money and portfolio
+ *   <li>Store the transaction in the archive
+ *   <li>Reject invalid commit scenarios
  * </ul>
  */
 class PurchaseTest {
@@ -28,9 +28,7 @@ class PurchaseTest {
   private Player player;
   private Purchase purchase;
 
-  /**
-   * Creates a fresh purchase transaction before each test.
-   */
+  /** Creates a fresh purchase transaction before each test. */
   @BeforeEach
   void setUp() {
 
@@ -83,9 +81,7 @@ class PurchaseTest {
   @Test
   void commit_addsTransactionToArchive() {
     purchase.commit(player);
-    assertTrue(player.getTransactionArchive()
-        .getTransactions(5)
-        .contains(purchase));
+    assertTrue(player.getTransactionArchive().getTransactions(5).contains(purchase));
   }
 
   /** Verifies that the committed flag is set after commit. */
@@ -99,22 +95,19 @@ class PurchaseTest {
   @Test
   void commit_twice_throwsException() {
     purchase.commit(player);
-    assertThrows(IllegalStateException.class,
-        () -> purchase.commit(player));
+    assertThrows(IllegalStateException.class, () -> purchase.commit(player));
   }
 
   /** Verifies that committing with insufficient funds fails. */
   @Test
   void commit_insufficientFunds_throwsException() {
     player.withdrawMoney(new BigDecimal("9999"));
-    assertThrows(IllegalStateException.class,
-        () -> purchase.commit(player));
+    assertThrows(IllegalStateException.class, () -> purchase.commit(player));
   }
 
   /** Verifies that null player input is rejected. */
   @Test
   void commit_nullPlayer_throwsException() {
-    assertThrows(NullPointerException.class,
-        () -> purchase.commit(null));
+    assertThrows(NullPointerException.class, () -> purchase.commit(null));
   }
 }

@@ -1,43 +1,39 @@
 package edu.ntnu.idi.idatt.millions.persistence.leaderboard;
 
-import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.*;
 
+import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Unit tests for {@link CsvLeaderboardWriter}.
  *
- * <p>Tests focus on correct serialisation of entries, overwrite semantics,
- * and edge-case inputs. A temporary directory is used to avoid coupling
- * tests to any real file on the developer's machine.</p>
+ * <p>Tests focus on correct serialisation of entries, overwrite semantics, and edge-case inputs. A
+ * temporary directory is used to avoid coupling tests to any real file on the developer's machine.
  *
- * <p>Verifies the following behaviours:</p>
+ * <p>Verifies the following behaviours:
+ *
  * <ul>
- *   <li>Entries are written in {@code name,score} format, one per line</li>
- *   <li>An existing file is fully replaced on each write</li>
- *   <li>Missing parent directories are created automatically</li>
- *   <li>A name containing a comma has its comma replaced with a space</li>
- *   <li>Writing an empty list produces an empty file</li>
- *   <li>A round-trip (write then read) returns the original entries</li>
- *   <li>A null path or null entries list is rejected immediately</li>
+ *   <li>Entries are written in {@code name,score} format, one per line
+ *   <li>An existing file is fully replaced on each write
+ *   <li>Missing parent directories are created automatically
+ *   <li>A name containing a comma has its comma replaced with a space
+ *   <li>Writing an empty list produces an empty file
+ *   <li>A round-trip (write then read) returns the original entries
+ *   <li>A null path or null entries list is rejected immediately
  * </ul>
  */
 class CsvLeaderboardWriterTest {
 
-  @TempDir
-  Path tempDir;
+  @TempDir Path tempDir;
 
   // Construction
 
-  /**
-   * Verifies that a null path is rejected at construction time.
-   */
+  /** Verifies that a null path is rejected at construction time. */
   @Test
   void constructor_nullPath_throwsNullPointerException() {
     assertThrows(NullPointerException.class, () -> new CsvLeaderboardWriter(null));
@@ -45,9 +41,7 @@ class CsvLeaderboardWriterTest {
 
   // Null-guard on write
 
-  /**
-   * Verifies that passing null as the entries list is rejected.
-   */
+  /** Verifies that passing null as the entries list is rejected. */
   @Test
   void writeLeaderboard_nullEntries_throwsNullPointerException() {
     CsvLeaderboardWriter writer = new CsvLeaderboardWriter(tempDir.resolve("lb.csv"));
@@ -56,36 +50,29 @@ class CsvLeaderboardWriterTest {
 
   // Format correctness
 
-  /**
-   * Verifies that each entry is written as {@code name,score} on its own line.
-   */
+  /** Verifies that each entry is written as {@code name,score} on its own line. */
   @Test
   void writeLeaderboard_validEntries_writesNameCommaScore() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
-    new CsvLeaderboardWriter(csv).writeLeaderboard(
-        List.of(new LeaderboardEntry("Alice", 1500L)));
+    new CsvLeaderboardWriter(csv).writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1500L)));
 
     String content = Files.readString(csv);
     assertTrue(content.contains("Alice,1500"), "Expected 'Alice,1500' in output");
   }
 
-  /**
-   * Verifies that multiple entries each appear on a separate line.
-   */
+  /** Verifies that multiple entries each appear on a separate line. */
   @Test
   void writeLeaderboard_multipleEntries_eachOnOwnLine() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
-    new CsvLeaderboardWriter(csv).writeLeaderboard(List.of(
-        new LeaderboardEntry("Alice", 1500L),
-        new LeaderboardEntry("Bob",   800L)));
+    new CsvLeaderboardWriter(csv)
+        .writeLeaderboard(
+            List.of(new LeaderboardEntry("Alice", 1500L), new LeaderboardEntry("Bob", 800L)));
 
     List<String> lines = Files.readAllLines(csv);
     assertEquals(2, lines.size());
   }
 
-  /**
-   * Verifies that writing an empty list produces a file with no content.
-   */
+  /** Verifies that writing an empty list produces a file with no content. */
   @Test
   void writeLeaderboard_emptyList_producesEmptyFile() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
@@ -96,64 +83,56 @@ class CsvLeaderboardWriterTest {
 
   // Overwrite semantics
 
-  /**
-   * Verifies that a second write fully replaces the first write.
-   */
+  /** Verifies that a second write fully replaces the first write. */
   @Test
   void writeLeaderboard_secondWrite_truncatesExistingContent() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
     CsvLeaderboardWriter writer = new CsvLeaderboardWriter(csv);
 
     writer.writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1500L)));
-    writer.writeLeaderboard(List.of(new LeaderboardEntry("Bob",   800L)));
+    writer.writeLeaderboard(List.of(new LeaderboardEntry("Bob", 800L)));
 
     String content = Files.readString(csv);
     assertFalse(content.contains("Alice"), "Old entry should have been removed");
-    assertTrue(content.contains("Bob"),    "New entry should be present");
+    assertTrue(content.contains("Bob"), "New entry should be present");
   }
 
   // Parent directory creation
 
-  /**
-   * Verifies that missing parent directories are created automatically.
-   */
+  /** Verifies that missing parent directories are created automatically. */
   @Test
   void writeLeaderboard_missingParentDirs_createsThemAutomatically() throws Exception {
     Path csv = tempDir.resolve("a/b/c/leaderboard.csv");
-    new CsvLeaderboardWriter(csv).writeLeaderboard(
-        List.of(new LeaderboardEntry("Alice", 100L)));
+    new CsvLeaderboardWriter(csv).writeLeaderboard(List.of(new LeaderboardEntry("Alice", 100L)));
 
     assertTrue(Files.exists(csv), "File should have been created including missing parents");
   }
 
   // Comma-sanitisation
 
-  /**
-   * Verifies that a comma in a name is replaced with a space to keep the CSV valid.
-   */
+  /** Verifies that a comma in a name is replaced with a space to keep the CSV valid. */
   @Test
   void writeLeaderboard_nameWithComma_replacesCommaWithSpace() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
-    new CsvLeaderboardWriter(csv).writeLeaderboard(
-        List.of(new LeaderboardEntry("Smith, John", 500L)));
+    new CsvLeaderboardWriter(csv)
+        .writeLeaderboard(List.of(new LeaderboardEntry("Smith, John", 500L)));
 
     String content = Files.readString(csv);
-    assertTrue(content.contains("Smith  John"),
-        "Comma in name should have been replaced with a space");
+    assertTrue(
+        content.contains("Smith  John"), "Comma in name should have been replaced with a space");
   }
 
   // Round-trip
 
-  /**
-   * Verifies that entries written by the writer can be read back exactly by the reader.
-   */
+  /** Verifies that entries written by the writer can be read back exactly by the reader. */
   @Test
   void writeLeaderboard_roundTrip_readBackProducesIdenticalEntries() throws Exception {
     Path csv = tempDir.resolve("leaderboard.csv");
-    List<LeaderboardEntry> original = List.of(
-        new LeaderboardEntry("Alice", 1500L),
-        new LeaderboardEntry("Bob",   800L),
-        new LeaderboardEntry("Carol", 300L));
+    List<LeaderboardEntry> original =
+        List.of(
+            new LeaderboardEntry("Alice", 1500L),
+            new LeaderboardEntry("Bob", 800L),
+            new LeaderboardEntry("Carol", 300L));
 
     new CsvLeaderboardWriter(csv).writeLeaderboard(original);
     List<LeaderboardEntry> readBack = new CsvLeaderboardReader(csv).readLeaderboard();

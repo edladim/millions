@@ -6,14 +6,14 @@ import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
  * Observer interface for receiving notifications when an exchange changes state.
  *
  * <p>Observers register themselves on an {@link edu.ntnu.idi.idatt.millions.model.market.Exchange}
- * and are notified whenever the exchange advances to the next trading week
- * (i.e. stock prices are updated).</p>
+ * and are notified whenever the exchange advances to the next trading week (i.e. stock prices are
+ * updated).
  *
- * <p>The callback receives a {@link ReadOnlyExchange} to prevent observers from
- * executing trades or advancing the week.</p>
+ * <p>The callback receives a {@link ReadOnlyExchange} to prevent observers from executing trades or
+ * advancing the week.
  *
- * <p>Typical implementors are GUI views that display stock prices or the current week,
- * such as a trading view or a sidebar showing the week counter.</p>
+ * <p>Typical implementors are GUI views that display stock prices or the current week, such as a
+ * trading view or a sidebar showing the week counter.
  *
  * @see ReadOnlyExchange
  * @see PortfolioObserver
@@ -24,8 +24,8 @@ public interface ExchangeObserver {
   /**
    * Called when the exchange has advanced to a new trading week.
    *
-   * <p>Implementations should refresh any displayed stock prices or
-   * week-dependent information using the data available on {@code exchange}.</p>
+   * <p>Implementations should refresh any displayed stock prices or week-dependent information
+   * using the data available on {@code exchange}.
    *
    * @param exchange a read-only view of the exchange that changed, never null
    */

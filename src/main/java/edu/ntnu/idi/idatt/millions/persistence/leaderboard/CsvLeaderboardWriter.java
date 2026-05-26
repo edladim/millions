@@ -1,8 +1,7 @@
 package edu.ntnu.idi.idatt.millions.persistence.leaderboard;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,24 +14,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * <p>Writes leaderboard entries to a CSV file as a single snapshot.</p>
+ * Writes leaderboard entries to a CSV file as a single snapshot.
  *
- * <p>Each call to {@link #writeLeaderboard(List)} truncates the target file
- * and writes the full list, so the file always reflects the current top-N
- * leaderboard rather than a historical log.</p>
+ * <p>Each call to {@link #writeLeaderboard(List)} truncates the target file and writes the full
+ * list, so the file always reflects the current top-N leaderboard rather than a historical log.
  *
- * <p>The format written is: {@code name,score} (one entry per line).</p>
+ * <p>The format written is: {@code name,score} (one entry per line).
  *
- * <p>Names containing a comma are sanitized by replacing the comma with a
- * space — this writer does not support CSV escaping. Application code is
- * expected to keep names free of commas at the input layer.</p>
+ * <p>Names containing a comma are sanitized by replacing the comma with a space — this writer does
+ * not support CSV escaping. Application code is expected to keep names free of commas at the input
+ * layer.
  *
- * <p>The target file (and any missing parent directories) is created on first
- * write.</p>
+ * <p>The target file (and any missing parent directories) is created on first write.
  *
- * <p>Example usage:</p>
+ * <p>Example usage:
+ *
  * <pre>{@code
- * LeaderboardWriter writer = new CsvLeaderboardWriter(Path.of("/home/user/.millions/leaderboard.csv"));
+ * LeaderboardWriter writer =
+ *     new CsvLeaderboardWriter(Path.of("/home/user/.millions/leaderboard.csv"));
  * writer.writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1234L)));
  * }</pre>
  *
@@ -46,10 +45,9 @@ public class CsvLeaderboardWriter implements LeaderboardWriter {
   private final Path path;
 
   /**
-   * <p>Creates a writer targeting the given file path.</p>
+   * Creates a writer targeting the given file path.
    *
-   * <p>The file and any missing parent directories are created automatically
-   * on first write.</p>
+   * <p>The file and any missing parent directories are created automatically on first write.
    *
    * @param path the destination file path, cannot be null
    * @throws NullPointerException if {@code path} is null
@@ -59,10 +57,10 @@ public class CsvLeaderboardWriter implements LeaderboardWriter {
   }
 
   /**
-   * <p>Writes the given entries to the CSV file, replacing any existing content.</p>
+   * Writes the given entries to the CSV file, replacing any existing content.
    *
    * @param entries the entries to persist, cannot be null
-   * @throws PersistenceException   if an I/O error occurs while writing
+   * @throws PersistenceException if an I/O error occurs while writing
    * @throws NullPointerException if {@code entries} is null
    */
   @Override
@@ -79,9 +77,12 @@ public class CsvLeaderboardWriter implements LeaderboardWriter {
       throw new PersistenceException("Failed to create parent directory for '" + path + "'", e);
     }
 
-    try (BufferedWriter writer = Files.newBufferedWriter(
-        path, StandardCharsets.UTF_8,
-        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+    try (BufferedWriter writer =
+        Files.newBufferedWriter(
+            path,
+            StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING)) {
       for (LeaderboardEntry entry : entries) {
         String safeName = entry.name().replace(',', ' ');
         writer.write(safeName + "," + entry.score());

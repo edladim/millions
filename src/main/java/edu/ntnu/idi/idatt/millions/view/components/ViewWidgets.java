@@ -13,38 +13,33 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 
 /**
- * <p>
- * Static factory methods for layout fragments that appear repeatedly across
- * the page views (Dashboard, Portfolio, Trading).
- * </p>
+ * Static factory methods for layout fragments that appear repeatedly across the page views
+ * (Dashboard, Portfolio, Trading).
  *
- * <p>
- * Centralising these patterns keeps the views slim and ensures consistent
- * spacing, style classes, and overall look. Each factory returns a fully
- * configured node; callers may further tweak the result (e.g. override
- * padding) as needed.
- * </p>
+ * <p>Centralising these patterns keeps the views slim and ensures consistent spacing, style
+ * classes, and overall look. Each factory returns a fully configured node; callers may further
+ * tweak the result (e.g. override padding) as needed.
  *
- * <p>This class cannot be instantiated.</p>
+ * <p>This class cannot be instantiated.
  */
 public final class ViewWidgets {
 
   private ViewWidgets() {}
 
   /**
-   * <p>Pair returned by {@link #summaryCard(String, String, String)} giving
-   * callers typed access to both the outer card and its value label without
-   * having to cast {@code card.getChildren().get(1)}.</p>
+   * Pair returned by {@link #summaryCard(String, String, String)} giving callers typed access to
+   * both the outer card and its value label without having to cast {@code
+   * card.getChildren().get(1)}.
    *
-   * @param card       the card container
+   * @param card the card container
    * @param valueLabel the label inside the card that displays the dynamic value
    */
   public record SummaryCard(VBox card, Label valueLabel) {}
 
   /**
-   * <p>Builds a page header with a large title and a muted subtitle.</p>
+   * Builds a page header with a large title and a muted subtitle.
    *
-   * @param title    the page title text
+   * @param title the page title text
    * @param subtitle the page subtitle text
    * @return a {@link VBox} containing the title above the subtitle
    */
@@ -59,12 +54,12 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Builds a small summary card: muted title above a bold value, used in
-   * dashboards and portfolio overviews. The card stretches to fill horizontal
-   * space when placed in an {@link HBox} with {@code HBox.setHgrow(card, ALWAYS)}.</p>
+   * Builds a small summary card: muted title above a bold value, used in dashboards and portfolio
+   * overviews. The card stretches to fill horizontal space when placed in an {@link HBox} with
+   * {@code HBox.setHgrow(card, ALWAYS)}.
    *
-   * @param title           the card's heading
-   * @param initialValue    the initial value text (often {@code "$0.00"})
+   * @param title the card's heading
+   * @param initialValue the initial value text (often {@code "$0.00"})
    * @param valueStyleClass the CSS class to apply to the value label
    * @return both the card container and its value label
    */
@@ -83,13 +78,11 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Builds a section-sized card: a {@code .stat-card}-styled container with
-   * 24&nbsp;px padding on all sides, used to wrap larger content groups such
-   * as movers, holdings, and transaction tables.</p>
+   * Builds a section-sized card: a {@code .stat-card}-styled container with 24&nbsp;px padding on
+   * all sides, used to wrap larger content groups such as movers, holdings, and transaction tables.
    *
-   * <p>Callers that need asymmetric padding (e.g. {@code Insets(24, 14, 24, 24)}
-   * to compensate for a TableView scrollbar gutter) can call
-   * {@link VBox#setPadding(Insets)} on the returned card.</p>
+   * <p>Callers that need asymmetric padding (e.g. {@code Insets(24, 14, 24, 24)} to compensate for
+   * a TableView scrollbar gutter) can call {@link VBox#setPadding(Insets)} on the returned card.
    *
    * @param children the child nodes to add, in order
    * @return a {@link VBox} configured as a section card
@@ -102,14 +95,13 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Builds a stock identity block with a coloured circle (containing the
-   * symbol's first letter), the stock ticker symbol in bold, and the company
-   * name in muted text below it.</p>
+   * Builds a stock identity block with a coloured circle (containing the symbol's first letter),
+   * the stock ticker symbol in bold, and the company name in muted text below it.
    *
-   * <p>This is the variant used in the Trading and Portfolio tables, where
-   * the ticker symbol is the primary identifier.</p>
+   * <p>This is the variant used in the Trading and Portfolio tables, where the ticker symbol is the
+   * primary identifier.
    *
-   * @param symbol  the ticker symbol; its first character is shown in the icon
+   * @param symbol the ticker symbol; its first character is shown in the icon
    * @param company the full company name, shown in muted text below the symbol
    * @return an {@link HBox} containing the icon and the two-line label group
    */
@@ -118,12 +110,11 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Stock identity block variant with the <em>company name</em> shown bold
-   * and the ticker symbol underneath in muted text. Used in the Dashboard
-   * top-gainers / top-losers panels where the human-readable company name is
-   * the primary identifier.</p>
+   * Stock identity block variant with the <em>company name</em> shown bold and the ticker symbol
+   * underneath in muted text. Used in the Dashboard top-gainers / top-losers panels where the
+   * human-readable company name is the primary identifier.
    *
-   * @param symbol  the ticker symbol; its first character is shown in the icon
+   * @param symbol the ticker symbol; its first character is shown in the icon
    * @param company the full company name, shown bold as the primary label
    * @return an {@link HBox} containing the icon and the two-line label group
    */
@@ -132,14 +123,13 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Internal builder shared by {@link #stockIconBlock(String, String)} and
-   * {@link #stockIconBlockCompanyFirst(String, String)}. The icon always
-   * displays the first character of the ticker symbol regardless of which
-   * label is rendered as primary.</p>
+   * Internal builder shared by {@link #stockIconBlock(String, String)} and {@link
+   * #stockIconBlockCompanyFirst(String, String)}. The icon always displays the first character of
+   * the ticker symbol regardless of which label is rendered as primary.
    *
-   * @param symbol  the ticker symbol; used only to pick the icon letter
+   * @param symbol the ticker symbol; used only to pick the icon letter
    * @param primary the bold (top) label text
-   * @param muted   the muted (bottom) label text
+   * @param muted the muted (bottom) label text
    * @return the configured row
    */
   private static HBox buildIconBlock(String symbol, String primary, String muted) {
@@ -147,7 +137,7 @@ public final class ViewWidgets {
     circle.getStyleClass().add("stock-icon");
     Label letter = new Label(String.valueOf(symbol.charAt(0)));
     letter.getStyleClass().add("mover-icon-letter");
-    StackPane iconPane = new StackPane(circle, letter);
+    final StackPane iconPane = new StackPane(circle, letter);
 
     Label primaryLabel = new Label(primary);
     primaryLabel.getStyleClass().add("mover-name");
@@ -166,8 +156,8 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Creates a section-heading label (large, bold) used to introduce a
-   * group of content within a card.</p>
+   * Creates a section-heading label (large, bold) used to introduce a group of content within a
+   * card.
    *
    * @param text the heading text
    * @return the configured label
@@ -179,8 +169,8 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Creates a smaller, uppercase sub-heading label used to label
-   * sub-sections inside a card (e.g. "Top Performers").</p>
+   * Creates a smaller, uppercase sub-heading label used to label sub-sections inside a card (e.g.
+   * "Top Performers").
    *
    * @param text the sub-heading text
    * @return the configured label
@@ -192,23 +182,8 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Creates a centred placeholder label shown when a list or section has
-   * no data (e.g. "You don't own any shares yet.").</p>
-   *
-   * @param text the placeholder text
-   * @return the configured label
-   */
-  public static Label emptyLabel(String text) {
-    Label label = new Label(text);
-    label.getStyleClass().add("empty-label");
-    label.setMaxWidth(Double.MAX_VALUE);
-    label.setAlignment(Pos.CENTER);
-    return label;
-  }
-
-  /**
-   * <p>Creates an invisible vertical spacer of the given height. Use for
-   * adding fixed vertical gaps in a {@link VBox} without relying on spacing.</p>
+   * Creates an invisible vertical spacer of the given height. Use for adding fixed vertical gaps in
+   * a {@link VBox} without relying on spacing.
    *
    * @param height the spacer height in pixels
    * @return the spacer region
@@ -220,8 +195,7 @@ public final class ViewWidgets {
   }
 
   /**
-   * <p>Creates a 1&nbsp;px-tall horizontal divider line styled via the
-   * {@code .divider} CSS class.</p>
+   * Creates a 1&nbsp;px-tall horizontal divider line styled via the {@code .divider} CSS class.
    *
    * @return the divider region
    */

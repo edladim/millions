@@ -1,21 +1,19 @@
 package edu.ntnu.idi.idatt.millions.persistence.stock;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 
 /**
- * <p>Service that loads stock data either from a user-selected file or from
- * the bundled default classpath resource.</p>
+ * Service that loads stock data either from a user-selected file or from the bundled default
+ * classpath resource.
  *
- * <p>This class isolates the "where do my stocks come from" decision from the
- * UI layer. On any failure it throws a {@link PersistenceException} with a
- * user-friendly message that callers can show directly.</p>
+ * <p>This class isolates the "where do my stocks come from" decision from the UI layer. On any
+ * failure it throws a {@link PersistenceException} with a user-friendly message that callers can
+ * show directly.
  *
- * <p>This class cannot be instantiated; use the static method directly.</p>
+ * <p>This class cannot be instantiated; use the static method directly.
  */
 public final class StockLoader {
 
@@ -25,14 +23,13 @@ public final class StockLoader {
   private StockLoader() {}
 
   /**
-   * <p>Loads stock data from {@code file} if provided, falling back to the
-   * bundled classpath resource if {@code file} is {@code null}.</p>
+   * Loads stock data from {@code file} if provided, falling back to the bundled classpath resource
+   * if {@code file} is {@code null}.
    *
    * @param file the user-selected file, or {@code null} to use the bundled default
    * @return a non-empty list of stocks parsed from the source
-   * @throws PersistenceException if the source cannot be read or contains no
-   *                            valid stock entries; the message is suitable
-   *                            for display to the end user
+   * @throws PersistenceException if the source cannot be read or contains no valid stock entries;
+   *     the message is suitable for display to the end user
    */
   public static List<Stock> load(File file) throws PersistenceException {
     if (file != null) {
@@ -43,8 +40,7 @@ public final class StockLoader {
       }
     }
 
-    InputStream stream = StockLoader.class.getResourceAsStream(DEFAULT_STOCK_FILE);
-    if (stream == null) {
+    if (StockLoader.class.getResource(DEFAULT_STOCK_FILE) == null) {
       throw new PersistenceException(
           "Default StockData.csv not found. Please select a file manually.");
     }

@@ -4,16 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * <p>
- * Read-only view of a {@link Portfolio} intended for use by observer classes
- * such as views.
- * </p>
+ * Read-only view of a {@link Portfolio} intended for use by observer classes such as views.
  *
- * <p>
- * Exposing only getter methods ensures that observers can display portfolio
- * data without being able to add or remove shares. The full mutable
- * {@link Portfolio} is only accessible to controllers.
- * </p>
+ * <p>Exposing only getter methods ensures that observers can display portfolio data without being
+ * able to add or remove shares. The full mutable {@link Portfolio} is only accessible to
+ * controllers.
  */
 public interface ReadOnlyPortfolio {
 
@@ -25,8 +20,8 @@ public interface ReadOnlyPortfolio {
   List<Share> getShares();
 
   /**
-   * Returns one {@link Holding} per unique stock symbol, aggregating all share
-   * lots that reference the same stock.
+   * Returns one {@link Holding} per unique stock symbol, aggregating all share lots that reference
+   * the same stock.
    *
    * @return the aggregated holdings, never null
    */
@@ -68,8 +63,8 @@ public interface ReadOnlyPortfolio {
   int size();
 
   /**
-   * <p>Returns the number of distinct stock symbols held in the portfolio.
-   * Two {@link Share} lots referencing the same stock count as one.</p>
+   * Returns the number of distinct stock symbols held in the portfolio. Two {@link Share} lots
+   * referencing the same stock count as one.
    *
    * @return the number of unique stocks owned
    */

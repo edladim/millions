@@ -1,11 +1,9 @@
 package edu.ntnu.idi.idatt.millions.model.market;
 
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
 
 public class ReadOnlyStockTest {
   @Test

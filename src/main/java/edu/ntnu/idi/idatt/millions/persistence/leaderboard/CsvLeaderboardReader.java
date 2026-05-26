@@ -1,8 +1,7 @@
 package edu.ntnu.idi.idatt.millions.persistence.leaderboard;
 
-import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
-
 import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,22 +16,25 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * <p>Reads leaderboard entries from a CSV file.</p>
+ * Reads leaderboard entries from a CSV file.
  *
- * <p>The CSV format expected by this reader:</p>
+ * <p>The CSV format expected by this reader:
+ *
  * <ul>
- *   <li>Lines starting with {@code #} are treated as comments and ignored.</li>
- *   <li>Blank lines are ignored.</li>
- *   <li>Data lines must follow the format: {@code name,score}</li>
- *   <li>{@code score} must be a non-negative integer.</li>
+ *   <li>Lines starting with {@code #} are treated as comments and ignored.
+ *   <li>Blank lines are ignored.
+ *   <li>Data lines must follow the format: {@code name,score}
+ *   <li>{@code score} must be a non-negative integer.
  * </ul>
  *
- * <p>Malformed lines are skipped with a warning so a single bad line does not
- * abort the entire read. A missing file is treated as an empty leaderboard.</p>
+ * <p>Malformed lines are skipped with a warning so a single bad line does not abort the entire
+ * read. A missing file is treated as an empty leaderboard.
  *
- * <p>Example usage:</p>
+ * <p>Example usage:
+ *
  * <pre>{@code
- * LeaderboardReader reader = new CsvLeaderboardReader(Path.of("/home/user/.millions/leaderboard.csv"));
+ * LeaderboardReader reader =
+ *     new CsvLeaderboardReader(Path.of("/home/user/.millions/leaderboard.csv"));
  * List<LeaderboardEntry> entries = reader.readLeaderboard();
  * }</pre>
  *
@@ -47,10 +49,10 @@ public class CsvLeaderboardReader implements LeaderboardReader {
   private final Path path;
 
   /**
-   * <p>Creates a reader for a CSV leaderboard file at the given path.</p>
+   * Creates a reader for a CSV leaderboard file at the given path.
    *
-   * <p>The file does not need to exist when this reader is constructed; a
-   * missing file is handled gracefully by {@link #readLeaderboard()}.</p>
+   * <p>The file does not need to exist when this reader is constructed; a missing file is handled
+   * gracefully by {@link #readLeaderboard()}.
    *
    * @param path the path to the leaderboard CSV file, cannot be null
    * @throws NullPointerException if {@code path} is null
@@ -60,11 +62,11 @@ public class CsvLeaderboardReader implements LeaderboardReader {
   }
 
   /**
-   * <p>Reads and returns all valid leaderboard entries from the CSV source.</p>
+   * Reads and returns all valid leaderboard entries from the CSV source.
    *
-   * <p>If the file does not exist, an empty list is returned. Malformed lines
-   * are skipped and logged as warnings. An exception is only thrown if an
-   * unexpected I/O error occurs while reading an existing file.</p>
+   * <p>If the file does not exist, an empty list is returned. Malformed lines are skipped and
+   * logged as warnings. An exception is only thrown if an unexpected I/O error occurs while reading
+   * an existing file.
    *
    * @return a non-null list of {@link LeaderboardEntry} objects (possibly empty)
    * @throws PersistenceException if an I/O error occurs while reading the file
@@ -93,10 +95,10 @@ public class CsvLeaderboardReader implements LeaderboardReader {
   }
 
   /**
-   * <p>Attempts to parse a single CSV line into a {@link LeaderboardEntry}.</p>
+   * Attempts to parse a single CSV line into a {@link LeaderboardEntry}.
    *
-   * <p>Returns an empty {@link Optional} and logs a warning if the line is
-   * malformed, so a single bad line does not abort the entire file read.</p>
+   * <p>Returns an empty {@link Optional} and logs a warning if the line is malformed, so a single
+   * bad line does not abort the entire file read.
    *
    * @param line the raw CSV line
    * @param lineNumber the 1-based line number, used in warning messages
@@ -105,8 +107,13 @@ public class CsvLeaderboardReader implements LeaderboardReader {
   private Optional<LeaderboardEntry> parseLine(String line, int lineNumber) {
     String[] fields = line.split(",");
     if (fields.length != EXPECTED_FIELD_COUNT) {
-      LOGGER.warn("Skipping leaderboard line {} in '{}': expected {} fields but found {} — \"{}\"",
-          lineNumber, path, EXPECTED_FIELD_COUNT, fields.length, line);
+      LOGGER.warn(
+          "Skipping leaderboard line {} in '{}': expected {} fields but found {} — \"{}\"",
+          lineNumber,
+          path,
+          EXPECTED_FIELD_COUNT,
+          fields.length,
+          line);
       return Optional.empty();
     }
 
@@ -122,14 +129,17 @@ public class CsvLeaderboardReader implements LeaderboardReader {
     try {
       score = Long.parseLong(scoreRaw);
     } catch (NumberFormatException e) {
-      LOGGER.warn("Skipping leaderboard line {} in '{}': invalid score '{}'",
-          lineNumber, path, scoreRaw);
+      LOGGER.warn(
+          "Skipping leaderboard line {} in '{}': invalid score '{}'", lineNumber, path, scoreRaw);
       return Optional.empty();
     }
 
     if (score < 0) {
-      LOGGER.warn("Skipping leaderboard line {} in '{}': score must be non-negative, got {}",
-          lineNumber, path, score);
+      LOGGER.warn(
+          "Skipping leaderboard line {} in '{}': score must be non-negative, got {}",
+          lineNumber,
+          path,
+          score);
       return Optional.empty();
     }
 

@@ -1,13 +1,8 @@
 package edu.ntnu.idi.idatt.millions.model.market;
 
-import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
-
-import edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio;
-
 import edu.ntnu.idi.idatt.millions.model.player.Player;
-
-import edu.ntnu.idi.idatt.millions.model.market.MomentumFluctuator;
-import edu.ntnu.idi.idatt.millions.model.market.PriceFluctuator;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import edu.ntnu.idi.idatt.millions.model.transaction.PurchaseFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.SaleFactory;
 import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
@@ -15,17 +10,22 @@ import edu.ntnu.idi.idatt.millions.model.transaction.TransactionFactory;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Represents a stock exchange where players can buy and sell stocks.
  *
- * <p>The exchange maintains a collection of stocks that can be traded.
- * Stocks are stored internally in a map using their ticker symbol as
- * the key.</p>
+ * <p>The exchange maintains a collection of stocks that can be traded. Stocks are stored internally
+ * in a map using their ticker symbol as the key.
  *
- * <p>The exchange also tracks the current trading week and updates stock
- * prices when advancing to the next week.</p>
+ * <p>The exchange also tracks the current trading week and updates stock prices when advancing to
+ * the next week.
  */
 public final class Exchange implements ReadOnlyExchange {
 
@@ -43,7 +43,6 @@ public final class Exchange implements ReadOnlyExchange {
    *
    * @param name the exchange name
    * @param stocks the list of stocks traded on the exchange
-   *
    * @throws NullPointerException if name or stocks is null
    * @throws IllegalArgumentException if name is blank or stock list is empty
    */
@@ -94,9 +93,7 @@ public final class Exchange implements ReadOnlyExchange {
    * Checks whether a stock with the given symbol exists.
    *
    * @param symbol the stock symbol
-   *
    * @return true if the stock exists
-   *
    * @throws NullPointerException if symbol is null
    * @throws IllegalArgumentException if symbol is blank
    */
@@ -109,9 +106,7 @@ public final class Exchange implements ReadOnlyExchange {
    * Returns the stock associated with the given symbol.
    *
    * @param symbol the stock symbol
-   *
    * @return the stock
-   *
    * @throws IllegalArgumentException if the symbol does not exist
    */
   public Stock getStock(String symbol) {
@@ -126,8 +121,8 @@ public final class Exchange implements ReadOnlyExchange {
   /**
    * Retrieves a list of all stocks currently registered in the exchange.
    *
-   * @return an unmodifiable list of stocks present in the exchange,
-   *         never null but could be empty if no stocks are registered
+   * @return an unmodifiable list of stocks present in the exchange, never null but could be empty
+   *     if no stocks are registered
    */
   public List<Stock> getStocks() {
     return List.copyOf(stockMap.values());
@@ -136,8 +131,8 @@ public final class Exchange implements ReadOnlyExchange {
   /**
    * Returns the top gaining stocks since last week, sorted by price change descending.
    *
-   * <p>Only stocks with a positive latest price change are included.
-   * The result is limited to at most {@code limit} entries.</p>
+   * <p>Only stocks with a positive latest price change are included. The result is limited to at
+   * most {@code limit} entries.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of top gainers, never null, may be empty
@@ -158,8 +153,8 @@ public final class Exchange implements ReadOnlyExchange {
   /**
    * Returns the worst performing stocks since last week, sorted by price change ascending.
    *
-   * <p>Only stocks with a negative latest price change are included.
-   * The result is limited to at most {@code limit} entries.</p>
+   * <p>Only stocks with a negative latest price change are included. The result is limited to at
+   * most {@code limit} entries.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of top losers, never null, may be empty
@@ -178,9 +173,8 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
-   * <p>Returns the top-performing stocks this week, sorted by percentage
-   * change descending. All stocks are eligible regardless of the sign of
-   * their change.</p>
+   * Returns the top-performing stocks this week, sorted by percentage change descending. All stocks
+   * are eligible regardless of the sign of their change.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of top performers, never null, may be empty
@@ -197,9 +191,8 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
-   * <p>Returns the worst-performing stocks this week, sorted by percentage
-   * change ascending. All stocks are eligible regardless of the sign of
-   * their change.</p>
+   * Returns the worst-performing stocks this week, sorted by percentage change ascending. All
+   * stocks are eligible regardless of the sign of their change.
    *
    * @param limit the maximum number of stocks to return
    * @return an unmodifiable list of worst performers, never null, may be empty
@@ -218,22 +211,20 @@ public final class Exchange implements ReadOnlyExchange {
   /**
    * Finds all stocks matching a search term.
    *
-   * <p>The search checks both the symbol and company name and is
-   * case-insensitive.</p>
+   * <p>The search checks both the symbol and company name and is case-insensitive.
    *
    * @param searchTerm the search term
-   *
    * @return a list of matching stocks
-   *
    * @throws NullPointerException if searchTerm is null
    */
   public List<Stock> findStocks(String searchTerm) {
     Objects.requireNonNull(searchTerm, "Search term cannot be null");
     String query = searchTerm.toLowerCase().trim();
     return stockMap.values().stream()
-        .filter(stock ->
-            stock.getSymbol().toLowerCase().contains(query)
-                || stock.getCompany().toLowerCase().contains(query))
+        .filter(
+            stock ->
+                stock.getSymbol().toLowerCase().contains(query)
+                    || stock.getCompany().toLowerCase().contains(query))
         .toList();
   }
 
@@ -243,7 +234,6 @@ public final class Exchange implements ReadOnlyExchange {
    * @param symbol the stock symbol
    * @param quantity number of shares
    * @param player the player performing the purchase
-   *
    * @return the created transaction
    */
   public Transaction buy(String symbol, BigDecimal quantity, Player player) {
@@ -264,7 +254,6 @@ public final class Exchange implements ReadOnlyExchange {
    *
    * @param share the share to sell
    * @param player the player performing the sale
-   *
    * @return the created transaction
    */
   public Transaction sell(Share share, Player player) {
@@ -276,20 +265,18 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
-   * Sells a specified quantity of a stock, drawing from the player's existing
-   * share lots in the order they were acquired.
+   * Sells a specified quantity of a stock, drawing from the player's existing share lots in the
+   * order they were acquired.
    *
-   * <p>If a lot is fully consumed, it is sold whole. If the requested quantity
-   * lands inside a lot, that lot is split: the remaining portion is kept in
-   * the portfolio at its original purchase price, and the sold portion is
-   * committed as a sale transaction.</p>
+   * <p>If a lot is fully consumed, it is sold whole. If the requested quantity lands inside a lot,
+   * that lot is split: the remaining portion is kept in the portfolio at its original purchase
+   * price, and the sold portion is committed as a sale transaction.
    *
    * @param symbol the stock symbol to sell
-   * @param quantity the quantity to sell, must be positive and not exceed the
-   *                 total quantity owned of {@code symbol}
+   * @param quantity the quantity to sell, must be positive and not exceed the total quantity owned
+   *     of {@code symbol}
    * @param player the player performing the sale
    * @return the transaction created for the final sale lot
-   *
    * @throws NullPointerException if any argument is null
    * @throws IllegalArgumentException if {@code quantity} is not positive
    * @throws IllegalStateException if the player does not own enough of the stock
@@ -304,20 +291,20 @@ public final class Exchange implements ReadOnlyExchange {
 
     Portfolio portfolio = player.getPortfolio();
     List<Share> matching = portfolio.getShares(symbol);
-    BigDecimal totalOwned = matching.stream()
-        .map(Share::getQuantity)
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal totalOwned =
+        matching.stream().map(Share::getQuantity).reduce(BigDecimal.ZERO, BigDecimal::add);
 
     if (quantity.compareTo(totalOwned) > 0) {
-      throw new IllegalStateException(
-          "Cannot sell more than owned (owned: " + totalOwned + ")");
+      throw new IllegalStateException("Cannot sell more than owned (owned: " + totalOwned + ")");
     }
 
     Stock stock = getStock(symbol);
     BigDecimal remaining = quantity;
     Transaction lastTx = null;
     for (Share share : matching) {
-      if (remaining.signum() <= 0) break;
+      if (remaining.signum() <= 0) {
+        break;
+      }
 
       if (share.getQuantity().compareTo(remaining) <= 0) {
         lastTx = sell(share, player);
@@ -352,16 +339,15 @@ public final class Exchange implements ReadOnlyExchange {
   /**
    * Advances the exchange to the next trading week.
    *
-   * <p>This increments the week number, updates stock prices randomly,
-   * and notifies all registered {@link ExchangeObserver}s.</p>
+   * <p>This increments the week number, updates stock prices randomly, and notifies all registered
+   * {@link ExchangeObserver}s.
    */
   public void advance() {
     week++;
     fluctuator.beginWeek(random);
 
     for (Stock stock : stockMap.values()) {
-      BigDecimal newPrice = fluctuator.nextPrice(
-          stock.getSymbol(), stock.getSalesPrice(), random);
+      BigDecimal newPrice = fluctuator.nextPrice(stock.getSymbol(), stock.getSalesPrice(), random);
       stock.addNewSalesPrice(newPrice);
     }
 
@@ -371,23 +357,25 @@ public final class Exchange implements ReadOnlyExchange {
   }
 
   /**
-   * Returns the percentage price change for a stock as a {@code double}, used
-   * for sorting gainers and losers by relative move rather than absolute dollar change.
+   * Returns the percentage price change for a stock as a {@code double}, used for sorting gainers
+   * and losers by relative move rather than absolute dollar change.
    *
    * @param stock the stock to evaluate
    * @return percentage change, or {@code 0.0} if the previous price was zero
    */
   private static double percentChange(Stock stock) {
     BigDecimal change = stock.getLatestPriceChange();
-    BigDecimal prev   = stock.getSalesPrice().subtract(change);
-    if (prev.signum() == 0) return 0.0;
+    BigDecimal prev = stock.getSalesPrice().subtract(change);
+    if (prev.signum() == 0) {
+      return 0.0;
+    }
     return change.divide(prev, 8, RoundingMode.HALF_UP).doubleValue();
   }
 
   /**
-   * Pre-generates price history for all stocks without incrementing the week
-   * counter or notifying observers. Called once during construction so charts
-   * have historical data from the very first frame.
+   * Pre-generates price history for all stocks without incrementing the week counter or notifying
+   * observers. Called once during construction so charts have historical data from the very first
+   * frame.
    *
    * @param weeks the number of historical weeks to simulate
    */
@@ -395,8 +383,8 @@ public final class Exchange implements ReadOnlyExchange {
     for (int i = 0; i < weeks; i++) {
       fluctuator.beginWeek(random);
       for (Stock stock : stockMap.values()) {
-        BigDecimal newPrice = fluctuator.nextPrice(
-            stock.getSymbol(), stock.getSalesPrice(), random);
+        BigDecimal newPrice =
+            fluctuator.nextPrice(stock.getSymbol(), stock.getSalesPrice(), random);
         stock.addNewSalesPrice(newPrice);
       }
     }

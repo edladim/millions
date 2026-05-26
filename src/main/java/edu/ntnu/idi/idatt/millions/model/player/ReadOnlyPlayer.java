@@ -34,11 +34,10 @@ public interface ReadOnlyPlayer {
    */
   BigDecimal getNetWorth();
 
-
   /**
    * Returns the player's historical net worth values, ordered from oldest to most recent.
    *
-   * <p>The returned list is an unmodifiable snapshot and cannot be modified by callers.</p>
+   * <p>The returned list is an unmodifiable snapshot and cannot be modified by callers.
    *
    * @return an unmodifiable list of net worth values
    */

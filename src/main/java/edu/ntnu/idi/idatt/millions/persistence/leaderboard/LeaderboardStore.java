@@ -30,8 +30,13 @@ public final class LeaderboardStore {
   /** Maximum number of entries kept in the leaderboard. */
   public static final int MAX_ENTRIES = 5;
 
-  /** Canonical location of the leaderboard file on disk. */
-  private static final Path DEFAULT_PATH =
+  /**
+   * Canonical location of the leaderboard file on disk.
+   *
+   * <p>Not declared {@code final} so tests can redirect it to a temporary location via reflection;
+   * in production this value is never reassigned.
+   */
+  private static Path DEFAULT_PATH =
       Paths.get(System.getProperty("user.home"), ".millions", "leaderboard.csv");
 
   private LeaderboardStore() {

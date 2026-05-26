@@ -111,4 +111,58 @@ public class TransactionArchiveTest {
   void distinctWeeksShouldBeZeroWhenArchiveIsEmpty() {
     assertEquals(0, archive.countDistinctWeeks());
   }
+
+  /** Verifies that {@code getAll} returns all transactions in insertion order. */
+  @Test
+  void getAllShouldReturnAllTransactionsInOrder() {
+    Purchase purchase = new Purchase(share, 1);
+    Sale sale = new Sale(share, 2);
+    archive.add(purchase);
+    archive.add(sale);
+
+    List<Transaction> all = archive.getAll();
+
+    assertEquals(2, all.size());
+    assertEquals(purchase, all.get(0));
+    assertEquals(sale, all.get(1));
+  }
+
+  /** Verifies that {@code getAll} returns an empty list when the archive is empty. */
+  @Test
+  void getAllShouldReturnEmptyListWhenArchiveIsEmpty() {
+    assertTrue(archive.getAll().isEmpty());
+  }
+
+  /** Verifies that adding {@code null} throws {@link NullPointerException}. */
+  @Test
+  void addNullShouldThrowNullPointerException() {
+    assertThrows(NullPointerException.class, () -> archive.add(null));
+  }
+
+  /**
+   * Verifies that a negative week number in {@code getTransactions} throws {@link
+   * IllegalArgumentException}.
+   */
+  @Test
+  void getTransactionsWithNegativeWeekShouldThrow() {
+    assertThrows(IllegalArgumentException.class, () -> archive.getTransactions(-1));
+  }
+
+  /**
+   * Verifies that a negative week number in {@code getPurchases} throws {@link
+   * IllegalArgumentException}.
+   */
+  @Test
+  void getPurchasesWithNegativeWeekShouldThrow() {
+    assertThrows(IllegalArgumentException.class, () -> archive.getPurchases(-1));
+  }
+
+  /**
+   * Verifies that a negative week number in {@code getSales} throws {@link
+   * IllegalArgumentException}.
+   */
+  @Test
+  void getSalesWithNegativeWeekShouldThrow() {
+    assertThrows(IllegalArgumentException.class, () -> archive.getSales(-1));
+  }
 }

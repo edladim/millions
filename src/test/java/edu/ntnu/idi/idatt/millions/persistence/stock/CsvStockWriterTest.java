@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.persistence.stock;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -75,5 +76,14 @@ class CsvStockWriterTest {
   @Test
   void constructor_nullPath_throwsNullPointerException() {
     assertThrows(NullPointerException.class, () -> new CsvStockWriter(null));
+  }
+
+  @Test
+  void writeStockData_unwritablePath_throwsPersistenceException() {
+    Path invalid = tempDir.resolve("missing_dir").resolve("output.csv");
+    CsvStockWriter writer = new CsvStockWriter(invalid);
+    Stock stock = new Stock("AAPL", "Apple Inc.", new BigDecimal("150.00"));
+
+    assertThrows(PersistenceException.class, () -> writer.writeStockData(stock));
   }
 }

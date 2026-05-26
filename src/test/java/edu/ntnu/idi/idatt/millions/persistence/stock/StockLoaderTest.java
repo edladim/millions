@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -110,5 +111,17 @@ class StockLoaderTest {
   @Test
   void defaultStockFile_constant_hasExpectedValue() {
     assertEquals("/data/StockData.csv", StockLoader.DEFAULT_STOCK_FILE);
+  }
+
+  /**
+   * Invokes the private constructor via reflection to cover it for JaCoCo. The class is a static
+   * utility holder and the constructor must never be used in production code.
+   */
+  @Test
+  void privateConstructor_isInvocable_viaReflection() throws Exception {
+    Constructor<StockLoader> constructor = StockLoader.class.getDeclaredConstructor();
+    constructor.setAccessible(true);
+
+    assertNotNull(constructor.newInstance());
   }
 }

@@ -139,6 +139,32 @@ public class TransactionArchiveTest {
     assertThrows(NullPointerException.class, () -> archive.add(null));
   }
 
+  /** Verifies that {@code getPurchases} only returns purchases from the requested week. */
+  @Test
+  void getPurchasesShouldFilterOutOtherWeeks() {
+    archive.add(new Purchase(share, 1));
+    archive.add(new Purchase(share, 2));
+    archive.add(new Sale(share, 2));
+
+    List<Purchase> purchases = archive.getPurchases(2);
+
+    assertEquals(1, purchases.size());
+    assertEquals(2, purchases.getFirst().getWeek());
+  }
+
+  /** Verifies that {@code getSales} only returns sales from the requested week. */
+  @Test
+  void getSalesShouldFilterOutOtherWeeks() {
+    archive.add(new Sale(share, 1));
+    archive.add(new Sale(share, 2));
+    archive.add(new Purchase(share, 2));
+
+    List<Sale> sales = archive.getSales(2);
+
+    assertEquals(1, sales.size());
+    assertEquals(2, sales.getFirst().getWeek());
+  }
+
   /**
    * Verifies that a negative week number in {@code getTransactions} throws {@link
    * IllegalArgumentException}.

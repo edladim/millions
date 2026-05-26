@@ -17,7 +17,7 @@ import java.util.Objects;
  * <p>This class serves as a base class for concrete transaction types such as {@link Purchase} and
  * {@link Sale}.
  */
-public abstract class Transaction {
+public abstract class Transaction implements ReadOnlyTransaction {
 
   private final Share share;
   private final int week;
@@ -83,6 +83,14 @@ public abstract class Transaction {
   public boolean isCommitted() {
     return committed;
   }
+
+  /**
+   * Returns {@code true} if this transaction is a purchase, {@code false} if it is a sale.
+   *
+   * @return {@code true} for {@link Purchase}, {@code false} for {@link Sale}
+   */
+  @Override
+  public abstract boolean isBuy();
 
   /**
    * Commits the transaction.

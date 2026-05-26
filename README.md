@@ -61,7 +61,7 @@ src/
 │   │   │   ├── market/            # Exchange, Stock, price fluctuation
 │   │   │   ├── player/            # Player, status, score, leaderboard entry
 │   │   │   ├── portfolio/         # Portfolio, holdings, shares
-│   │   │   └── transaction/       # Transaction types, calculators and factories
+│   │   │   └── transaction/       # Transaction types, calculators, factories and read-only views
 │   │   ├── observer/              # Observer interfaces (Exchange, Player, Portfolio)
 │   │   ├── persistence/
 │   │   │   ├── leaderboard/       # Leaderboard reader/writer interfaces + CSV impl

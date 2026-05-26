@@ -31,6 +31,12 @@ public final class Purchase extends Transaction {
     super(share, week, new PurchaseCalculator(share));
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isBuy() {
+    return true;
+  }
+
   /**
    * Commits the purchase transaction.
    *

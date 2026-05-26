@@ -1,6 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.dialogs;
 
-import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.ReadOnlyTransaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionCalculator;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public final class TransactionDialog {
    * @param tx the committed purchase transaction
    * @param cashLeft the player's remaining cash balance after the purchase
    */
-  public static void showPurchaseConfirmation(Transaction tx, BigDecimal cashLeft) {
+  public static void showPurchaseConfirmation(ReadOnlyTransaction tx, BigDecimal cashLeft) {
     TransactionCalculator calc = tx.getCalculator();
     String symbol = tx.getShare().getStock().getSymbol();
     String quantity = ViewFormatter.quantity(tx.getShare().getQuantity());
@@ -59,7 +59,7 @@ public final class TransactionDialog {
    * @param tx the committed sale transaction
    * @param cashBalance the player's cash balance after the sale
    */
-  public static void showSaleConfirmation(Transaction tx, BigDecimal cashBalance) {
+  public static void showSaleConfirmation(ReadOnlyTransaction tx, BigDecimal cashBalance) {
     TransactionCalculator calc = tx.getCalculator();
     String symbol = tx.getShare().getStock().getSymbol();
     String quantity = ViewFormatter.quantity(tx.getShare().getQuantity());

@@ -155,14 +155,14 @@ class ShareTest {
   @Test
   void equals_null_returnsFalse() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertNotEquals(null, share);
+    assertFalse(share.equals(null));
   }
 
   /** Ensures equals returns false for unrelated types. */
   @Test
   void equals_differentType_returnsFalse() {
     Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
-    assertNotEquals("not share", share);
+    assertFalse(share.equals("not share"));
   }
 
   /** Verifies hashCode is consistent with value equality. */
@@ -186,5 +186,29 @@ class ShareTest {
     Share s2 = new Share(other, BigDecimal.ONE, BigDecimal.ONE);
 
     assertNotEquals(s1, s2);
+  }
+
+  /** Verifies that a zero purchase price is accepted (non-negative boundary). */
+  @Test
+  void constructor_zeroPurchasePrice_createsShare() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, share.getPurchasePrice());
+  }
+
+  /** Verifies that total investment is zero when purchase price is zero. */
+  @Test
+  void getTotalInvestment_zeroPurchasePrice_returnsZero() {
+    Share share = new Share(stock, new BigDecimal("5"), BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, share.getTotalInvestment());
+  }
+
+  /** Verifies that gain or loss equals current value when purchase price is zero. */
+  @Test
+  void getGainOrLoss_zeroPurchasePrice_equalsCurrentValue() {
+    Share share = new Share(stock, new BigDecimal("5"), BigDecimal.ZERO);
+
+    assertEquals(share.getCurrentValue(), share.getGainOrLoss());
   }
 }

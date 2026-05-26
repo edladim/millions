@@ -17,7 +17,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -47,7 +46,8 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 
-    getChildren().addAll(setLogo(), buildSpacer(24), buildNavSection(), buildBottomSection());
+    getChildren()
+        .addAll(setLogo(), ViewWidgets.spacer(24), buildNavSection(), buildBottomSection());
   }
 
   /**
@@ -212,18 +212,6 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       case TRADING -> tradingBtn.getStyleClass().add("nav-btn-active");
       default -> throw new AssertionError("Unhandled page: " + page);
     }
-  }
-
-  /**
-   * Creates a spacer region with a fixed height.
-   *
-   * @param height the spacer height in pixels
-   * @return the spacer region
-   */
-  private Region buildSpacer(double height) {
-    Region r = new Region();
-    r.setPrefHeight(height);
-    return r;
   }
 
   private static final int TOTAL_WEEKS = 520;

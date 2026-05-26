@@ -281,10 +281,7 @@ public class BuyPanel extends VBox {
     estimatedCostLabel = makeCostRow("Estimated Cost", "$0.00");
     commissionLabel = makeCostRow("Commission (0.5%)", "$0.00");
 
-    Region divider = new Region();
-    divider.getStyleClass().add("divider");
-    divider.setPrefHeight(1);
-    divider.setMaxWidth(Double.MAX_VALUE);
+    Region divider = ViewWidgets.divider();
 
     totalCostLabel = makeCostRow("Total", "$0.00");
     totalCostLabel.getStyleClass().add("cost-row-total");

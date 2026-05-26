@@ -1,7 +1,7 @@
 package edu.ntnu.idi.idatt.millions.model.player;
 
 import edu.ntnu.idi.idatt.millions.model.portfolio.ReadOnlyPortfolio;
-import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.ReadOnlyTransaction;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -76,5 +76,5 @@ public interface ReadOnlyPlayer {
    *
    * @return an unmodifiable list of all transactions
    */
-  List<Transaction> getTransactions();
+  List<ReadOnlyTransaction> getTransactions();
 }

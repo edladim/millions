@@ -1,11 +1,12 @@
 package edu.ntnu.idi.idatt.millions.model.player;
 
 import edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio;
-import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.ReadOnlyTransaction;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
 import edu.ntnu.idi.idatt.millions.observer.PlayerObserver;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,8 +21,8 @@ import java.util.Objects;
  */
 public final class Player implements ReadOnlyPlayer {
 
-  private static final BigDecimal WORST_REQIREMENT = new BigDecimal("-0.50");
-  private static final BigDecimal BAD_REQIREMEMENT = new BigDecimal("-0.20");
+  private static final BigDecimal WORST_REQUIREMENT = new BigDecimal("-0.50");
+  private static final BigDecimal BAD_REQUIREMENT = new BigDecimal("-0.20");
   private static final BigDecimal ALRIGHT_REQUIREMENT = new BigDecimal("0.20");
   private static final BigDecimal GOOD_REQUIREMENT = new BigDecimal("1.00");
   private static final BigDecimal EXCELLENT_REQUIREMENT = new BigDecimal("2.00");
@@ -50,6 +51,7 @@ public final class Player implements ReadOnlyPlayer {
     this.startingMoney = validateAmount(startingMoney);
     this.money = startingMoney;
     this.portfolio = new Portfolio();
+    this.portfolio.addObserver(_ -> notifyObservers());
     this.transactionArchive = new TransactionArchive();
     this.historicalNetWorth = new ArrayList<>();
   }
@@ -126,8 +128,8 @@ public final class Player implements ReadOnlyPlayer {
    * @return an unmodifiable list of all transactions
    */
   @Override
-  public List<Transaction> getTransactions() {
-    return transactionArchive.getAll();
+  public List<ReadOnlyTransaction> getTransactions() {
+    return Collections.unmodifiableList(new ArrayList<>(transactionArchive.getAll()));
   }
 
   /**
@@ -233,11 +235,11 @@ public final class Player implements ReadOnlyPlayer {
       return PlayerStatus.INVESTOR;
     }
 
-    if (r.compareTo(BAD_REQIREMEMENT) >= 0) {
+    if (r.compareTo(BAD_REQUIREMENT) >= 0) {
       return PlayerStatus.AVERAGE_JOE;
     }
 
-    if (r.compareTo(WORST_REQIREMENT) >= 0) {
+    if (r.compareTo(WORST_REQUIREMENT) >= 0) {
       return PlayerStatus.MAX_MINUS;
     }
 

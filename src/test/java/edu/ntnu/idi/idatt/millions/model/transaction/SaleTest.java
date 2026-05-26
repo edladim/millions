@@ -111,4 +111,10 @@ class SaleTest {
 
     assertThrows(NullPointerException.class, () -> sale.commit(null));
   }
+
+  /** Verifies that {@code isBuy()} returns {@code false} for a sale. */
+  @Test
+  void isBuy_returnsFalse() {
+    assertFalse(sale.isBuy());
+  }
 }

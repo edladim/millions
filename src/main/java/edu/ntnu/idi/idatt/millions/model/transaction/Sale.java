@@ -31,6 +31,12 @@ public final class Sale extends Transaction {
     super(share, week, new SaleCalculator(share));
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isBuy() {
+    return false;
+  }
+
   /**
    * Commits the sale transaction.
    *
@@ -57,10 +63,9 @@ public final class Sale extends Transaction {
 
     BigDecimal totalValue = getCalculator().calculateTotal();
 
-    player.getTransactionArchive().add(this);
-    player.getPortfolio().removeShare(getShare());
-    player.addMoney(totalValue);
-
     committed = true;
+    player.addMoney(totalValue);
+    player.getPortfolio().removeShare(getShare());
+    player.getTransactionArchive().add(this);
   }
 }

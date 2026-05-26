@@ -6,6 +6,11 @@ import java.util.Random;
 /**
  * Strategy interface for computing the next sales price of a stock.
  *
+ * <p>This interface is the <em>Strategy</em> in the <strong>Strategy design pattern</strong>: the
+ * {@link Exchange} holds a reference to a {@code PriceFluctuator} and delegates all price-movement
+ * decisions to it, making the algorithm interchangeable at construction time without modifying the
+ * exchange itself.
+ *
  * <p>Implementations define the price-movement model used by the exchange when advancing to the
  * next trading week. A new price is computed for each stock individually, allowing stateful models
  * to track per-symbol history.

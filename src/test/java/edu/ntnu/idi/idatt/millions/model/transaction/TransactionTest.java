@@ -41,6 +41,11 @@ class TransactionTest {
     public void commit(Player player) {
       committed = true;
     }
+
+    @Override
+    public boolean isBuy() {
+      return false;
+    }
   }
 
   /** Creates a reusable transaction before each test. */
@@ -105,5 +110,11 @@ class TransactionTest {
   void constructor_zeroWeek_throwsException() {
 
     assertThrows(IllegalArgumentException.class, () -> new TestTransaction(share, 0, calculator));
+  }
+
+  /** Verifies that {@code isBuy()} returns the value defined by the concrete subclass. */
+  @Test
+  void isBuy_returnsSubclassValue() {
+    assertFalse(transaction.isBuy());
   }
 }

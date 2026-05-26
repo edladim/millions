@@ -110,4 +110,10 @@ class PurchaseTest {
   void commit_nullPlayer_throwsException() {
     assertThrows(NullPointerException.class, () -> purchase.commit(null));
   }
+
+  /** Verifies that {@code isBuy()} returns {@code true} for a purchase. */
+  @Test
+  void isBuy_returnsTrue() {
+    assertTrue(purchase.isBuy());
+  }
 }

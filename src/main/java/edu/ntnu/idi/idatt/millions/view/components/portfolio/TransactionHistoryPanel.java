@@ -1,7 +1,6 @@
 package edu.ntnu.idi.idatt.millions.view.components.portfolio;
 
-import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
-import edu.ntnu.idi.idatt.millions.model.transaction.Transaction;
+import edu.ntnu.idi.idatt.millions.model.transaction.ReadOnlyTransaction;
 import edu.ntnu.idi.idatt.millions.view.components.PaginatedTable;
 import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.util.TableStyleUtils;
@@ -31,7 +30,7 @@ public class TransactionHistoryPanel extends VBox {
 
   private static final int PAGE_SIZE = 5;
 
-  private final PaginatedTable<Transaction> transactions;
+  private final PaginatedTable<ReadOnlyTransaction> transactions;
 
   /** Constructs the transaction history panel and builds its layout as a section card. */
   public TransactionHistoryPanel() {
@@ -51,8 +50,8 @@ public class TransactionHistoryPanel extends VBox {
   // Table builders
 
   @SuppressWarnings({"deprecation", "unchecked"})
-  private TableView<Transaction> buildTransactionTable() {
-    TableView<Transaction> table = new TableView<>(FXCollections.observableArrayList());
+  private TableView<ReadOnlyTransaction> buildTransactionTable() {
+    TableView<ReadOnlyTransaction> table = new TableView<>(FXCollections.observableArrayList());
     table.getStyleClass().add("stock-table");
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     table.setPlaceholder(new Label("No transactions yet. Buy or sell stocks to see your history."));
@@ -61,25 +60,25 @@ public class TransactionHistoryPanel extends VBox {
         _ ->
             new TableRow<>() {
               @Override
-              protected void updateItem(Transaction tx, boolean empty) {
+              protected void updateItem(ReadOnlyTransaction tx, boolean empty) {
                 super.updateItem(tx, empty);
                 getStyleClass().removeAll("tx-row-buy", "tx-row-sell");
                 if (!empty && tx != null) {
-                  getStyleClass().add(tx instanceof Purchase ? "tx-row-buy" : "tx-row-sell");
+                  getStyleClass().add(tx.isBuy() ? "tx-row-buy" : "tx-row-sell");
                 }
               }
             });
 
-    TableColumn<Transaction, Transaction> stockCol =
+    TableColumn<ReadOnlyTransaction, ReadOnlyTransaction> stockCol =
         TableStyleUtils.stockIconColumn(
             tx -> tx.getShare().getStock().getSymbol(),
             tx -> tx.getShare().getStock().getCompany());
-    TableColumn<Transaction, BigDecimal> qtyCol =
+    TableColumn<ReadOnlyTransaction, BigDecimal> qtyCol =
         buildTxBigDecimalCol(
             "Quantity", tx -> tx.getShare().getQuantity(), ViewFormatter::quantity);
-    TableColumn<Transaction, BigDecimal> priceCol =
+    TableColumn<ReadOnlyTransaction, BigDecimal> priceCol =
         buildTxBigDecimalCol("Price", tx -> tx.getShare().getPurchasePrice(), ViewFormatter::price);
-    TableColumn<Transaction, BigDecimal> valueCol =
+    TableColumn<ReadOnlyTransaction, BigDecimal> valueCol =
         buildTxBigDecimalCol(
             "Value", tx -> tx.getCalculator().calculateGross(), ViewFormatter::price);
 
@@ -87,8 +86,8 @@ public class TransactionHistoryPanel extends VBox {
       col.setMinWidth(70);
     }
 
-    TableColumn<Transaction, Transaction> typeCol = buildTxTypeColumn();
-    TableColumn<Transaction, Integer> weekCol = buildTxWeekColumn();
+    TableColumn<ReadOnlyTransaction, ReadOnlyTransaction> typeCol = buildTxTypeColumn();
+    TableColumn<ReadOnlyTransaction, Integer> weekCol = buildTxWeekColumn();
 
     table.getColumns().addAll(stockCol, qtyCol, priceCol, valueCol, typeCol, weekCol);
 
@@ -110,11 +109,11 @@ public class TransactionHistoryPanel extends VBox {
    * @param formatter function mapping the value to its display string
    * @return the configured column
    */
-  private TableColumn<Transaction, BigDecimal> buildTxBigDecimalCol(
+  private TableColumn<ReadOnlyTransaction, BigDecimal> buildTxBigDecimalCol(
       String title,
-      Function<Transaction, BigDecimal> extractor,
+      Function<ReadOnlyTransaction, BigDecimal> extractor,
       Function<BigDecimal, String> formatter) {
-    TableColumn<Transaction, BigDecimal> col = new TableColumn<>(title);
+    TableColumn<ReadOnlyTransaction, BigDecimal> col = new TableColumn<>(title);
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(extractor.apply(d.getValue())));
     col.setCellFactory(
         _ ->
@@ -134,20 +133,20 @@ public class TransactionHistoryPanel extends VBox {
    *
    * @return the configured type column
    */
-  private TableColumn<Transaction, Transaction> buildTxTypeColumn() {
-    TableColumn<Transaction, Transaction> col = new TableColumn<>("Type");
+  private TableColumn<ReadOnlyTransaction, ReadOnlyTransaction> buildTxTypeColumn() {
+    TableColumn<ReadOnlyTransaction, ReadOnlyTransaction> col = new TableColumn<>("Type");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue()));
     col.setCellFactory(
         _ ->
             new TableCell<>() {
               @Override
-              protected void updateItem(Transaction item, boolean empty) {
+              protected void updateItem(ReadOnlyTransaction item, boolean empty) {
                 super.updateItem(item, empty);
                 getStyleClass().removeAll("tx-type-buy", "tx-type-sell");
                 if (empty || item == null) {
                   setText(null);
                 } else {
-                  boolean isBuy = item instanceof Purchase;
+                  boolean isBuy = item.isBuy();
                   setText(isBuy ? "Buy" : "Sell");
                   getStyleClass().add(isBuy ? "tx-type-buy" : "tx-type-sell");
                 }
@@ -163,8 +162,8 @@ public class TransactionHistoryPanel extends VBox {
    *
    * @return the configured week column
    */
-  private TableColumn<Transaction, Integer> buildTxWeekColumn() {
-    TableColumn<Transaction, Integer> col = new TableColumn<>("Week");
+  private TableColumn<ReadOnlyTransaction, Integer> buildTxWeekColumn() {
+    TableColumn<ReadOnlyTransaction, Integer> col = new TableColumn<>("Week");
     col.setCellValueFactory(d -> new ReadOnlyObjectWrapper<>(d.getValue().getWeek()));
     col.setCellFactory(
         _ ->
@@ -186,7 +185,7 @@ public class TransactionHistoryPanel extends VBox {
    *
    * @param items the transactions to display
    */
-  public void setItems(List<Transaction> items) {
+  public void setItems(List<ReadOnlyTransaction> items) {
     transactions.setItems(items);
   }
 }

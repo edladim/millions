@@ -51,6 +51,10 @@ import java.util.Random;
  *   change     = momentum' + noise(vol)
  *   newPrice   = currentPrice × (1 + change)  [floor: $1.00]
  * </pre>
+ *
+ * <p>This class is a concrete <em>Strategy</em> in the <strong>Strategy design pattern</strong>,
+ * implementing {@link PriceFluctuator} so it can be injected into {@link Exchange} and swapped for
+ * a simpler model (e.g. a random-walk or fixed-growth strategy) without modifying any other code.
  */
 public final class MomentumFluctuator implements PriceFluctuator {
 

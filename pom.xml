@@ -86,6 +86,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/view/**</exclude>
+                        <exclude>**/controller/**</exclude>
                         <exclude>**/Main.class</exclude>
                         <exclude>**/persistence/stock/StockLoader.class</exclude>
                     </excludes>

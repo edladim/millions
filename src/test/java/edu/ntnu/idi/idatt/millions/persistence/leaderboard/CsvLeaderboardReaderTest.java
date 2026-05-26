@@ -190,4 +190,16 @@ class CsvLeaderboardReaderTest {
     assertEquals(1, entries.size());
     assertEquals("Bob", entries.getFirst().name());
   }
+
+  /**
+   * Verifies that an I/O failure during read is converted to a {@link PersistenceException}.
+   * Triggered by pointing the reader at a directory, which exists but cannot be opened as a file.
+   */
+  @Test
+  void readLeaderboard_pathIsDirectory_throwsPersistenceException() throws Exception {
+    Path dir = tempDir.resolve("not_a_file");
+    Files.createDirectory(dir);
+
+    assertThrows(PersistenceException.class, () -> new CsvLeaderboardReader(dir).readLeaderboard());
+  }
 }

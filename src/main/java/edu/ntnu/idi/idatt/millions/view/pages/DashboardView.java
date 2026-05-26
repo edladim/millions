@@ -305,25 +305,38 @@ public class DashboardView extends VBox
     moversPositiveContainer.getChildren().clear();
     moversNegativeContainer.getChildren().clear();
 
-    List<? extends ReadOnlyStock> topPerformers =
-        currentExchange.getTopPerformers(gainersDisplayCount + 1);
-    int toShowG = Math.min(gainersDisplayCount, topPerformers.size());
-    for (int i = 0; i < toShowG; i++) {
-      moversPositiveContainer.getChildren().add(buildMoverRow(i + 1, topPerformers.get(i)));
-    }
-    setLoadMoreVisible(
-        loadMoreGainersLabel,
-        topPerformers.size() > gainersDisplayCount && gainersDisplayCount < MAX_MOVERS);
+    renderMoversList(
+        currentExchange.getTopPerformers(gainersDisplayCount + 1),
+        gainersDisplayCount,
+        moversPositiveContainer,
+        loadMoreGainersLabel);
 
-    List<? extends ReadOnlyStock> bottomPerformers =
-        currentExchange.getBottomPerformers(losersDisplayCount + 1);
-    int toShowL = Math.min(losersDisplayCount, bottomPerformers.size());
-    for (int i = 0; i < toShowL; i++) {
-      moversNegativeContainer.getChildren().add(buildMoverRow(i + 1, bottomPerformers.get(i)));
+    renderMoversList(
+        currentExchange.getBottomPerformers(losersDisplayCount + 1),
+        losersDisplayCount,
+        moversNegativeContainer,
+        loadMoreLosersLabel);
+  }
+
+  /**
+   * Renders a single movers list into the given container and toggles the "Load more" label.
+   *
+   * @param performers the full candidate list (fetched with one extra entry to detect overflow)
+   * @param displayCount the maximum number of rows to render
+   * @param container the {@link VBox} to populate
+   * @param loadMoreLabel the label to show or hide depending on whether more entries are available
+   */
+  private void renderMoversList(
+      List<? extends ReadOnlyStock> performers,
+      int displayCount,
+      VBox container,
+      Label loadMoreLabel) {
+    int toShow = Math.min(displayCount, performers.size());
+    for (int i = 0; i < toShow; i++) {
+      container.getChildren().add(buildMoverRow(i + 1, performers.get(i)));
     }
     setLoadMoreVisible(
-        loadMoreLosersLabel,
-        bottomPerformers.size() > losersDisplayCount && losersDisplayCount < MAX_MOVERS);
+        loadMoreLabel, performers.size() > displayCount && displayCount < MAX_MOVERS);
   }
 
   /**

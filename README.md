@@ -12,6 +12,21 @@ Millions is a stock trading simulation game built in Java with JavaFX. The playe
 
 ---
 
+## Download & install
+
+Pre-built native installers are available as artifacts from the latest GitHub Actions run, no Java installation required.
+
+1. Go to the [Actions tab](https://github.com/edladim/millions/actions) and open the latest **Package native installers** run.
+2. Scroll to **Artifacts** and download the one matching your OS.
+
+| OS | Artifact | How to install |
+|----|----------|----------------|
+| **macOS** | `Millions-macOS.zip` → `Millions-1.1.1.dmg` | Open the `.dmg`, drag **Millions.app** to Applications. First launch: right-click → Open to bypass Gatekeeper. |
+| **Windows** | `Millions-Windows.zip` → `Millions-1.1.1.msi` | Run the `.msi` installer and follow the wizard. |
+| **Linux** | `Millions-Linux.zip` → `millions_1.1.1_amd64.deb` | `sudo dpkg -i millions_1.1.1_amd64.deb` |
+
+---
+
 ## Requirements
 
 - Java 25 or newer
@@ -44,7 +59,7 @@ mvn clean package
 After building the project, run:
 
 ```bash
-java -jar target/millions-1.1.0-jar-with-dependencies.jar
+java -jar target/millions-1.1.1-jar-with-dependencies.jar
 ```
 ---
 

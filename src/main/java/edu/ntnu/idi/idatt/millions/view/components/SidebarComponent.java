@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -34,6 +35,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Button tradingBtn;
   private Label weekLabel;
   private Label weeksLeftLabel;
+  private ProgressBar weekProgressBar;
 
   private Runnable onAdvanceWeek;
   private Runnable onRetire;
@@ -181,14 +183,19 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
 
     weekLabel = new Label(ViewFormatter.week(1));
     weekLabel.getStyleClass().add("week-box-value");
+    weekLabel.setMinWidth(Label.USE_PREF_SIZE);
 
     weeksLeftLabel = new Label(weeksLeftText(1));
     weeksLeftLabel.getStyleClass().add("week-box-subtitle");
 
+    weekProgressBar = new ProgressBar(0);
+    weekProgressBar.getStyleClass().add("week-progress");
+    weekProgressBar.setMaxWidth(Double.MAX_VALUE);
+
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
     weekIcon.getStyleClass().add("week-box-icon");
 
-    VBox textBox = new VBox(2, currentWeekLabel, weekLabel, weeksLeftLabel);
+    VBox textBox = new VBox(2, currentWeekLabel, weekLabel, weeksLeftLabel, weekProgressBar);
 
     HBox weekBox = new HBox(10, weekIcon, textBox);
     weekBox.setAlignment(Pos.CENTER_LEFT);
@@ -226,6 +233,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     if (weeksLeftLabel != null) {
       weeksLeftLabel.setText(weeksLeftText(1));
     }
+    updateProgress(1);
   }
 
   private String weeksLeftText(int currentWeek) {
@@ -241,6 +249,16 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private void setWeek(int week) {
     weekLabel.setText(ViewFormatter.week(week));
     weeksLeftLabel.setText(weeksLeftText(week));
+    updateProgress(week);
+  }
+
+  private void updateProgress(int week) {
+    if (weekProgressBar == null || totalWeeks <= 0) {
+      return;
+    }
+    double raw = (double) week / totalWeeks;
+    double progress = Math.clamp(raw, 0.05, 1.0);
+    weekProgressBar.setProgress(progress);
   }
 
   /**

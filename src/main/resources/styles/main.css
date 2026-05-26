@@ -107,7 +107,7 @@
 }
 
 .week-box-value {
-    -fx-font-size: 18px;
+    -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-text-fill: -primary;
 }
@@ -119,6 +119,26 @@
 
 .week-box-icon {
     -fx-font-size: 18px;
+}
+
+.week-progress {
+    -fx-pref-height: 14px;
+    -fx-min-height: 14px;
+    -fx-max-height: 14px;
+    -fx-padding: 6 0 0 0;
+}
+
+.week-progress > .track {
+    -fx-background-color: -border;
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+}
+
+.week-progress > .bar {
+    -fx-background-color: -primary;
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+    -fx-padding: 7;
 }
 
 /* Page elements (shared) */

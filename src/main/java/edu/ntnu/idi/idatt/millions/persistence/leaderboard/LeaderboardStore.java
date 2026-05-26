@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.OptionalInt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -66,19 +65,19 @@ public final class LeaderboardStore {
    *
    * <p>The submitted entry is inserted into the existing list, the list is sorted by score
    * descending, trimmed to {@value #MAX_ENTRIES}, and written back to disk. If the submitted entry
-   * survives the trim, its 1-based rank (1–{@value #MAX_ENTRIES}) is returned; otherwise an empty
-   * {@link OptionalInt} is returned.
+   * survives the trim, its 1-based rank (1–{@value #MAX_ENTRIES}) is returned; otherwise {@code
+   * null} is returned.
    *
    * <p>If writing fails the error is logged but the rank is still returned — UI code should not be
    * blocked from displaying the result of the game just because persistence failed.
    *
    * @param name the player's name; must be non-null and non-blank
    * @param score the player's final score; must be {@code >= 0}
-   * @return the player's 1-based rank if they made the top {@value #MAX_ENTRIES}, else empty
+   * @return the player's 1-based rank if they made the top {@value #MAX_ENTRIES}, else {@code null}
    * @throws NullPointerException if {@code name} is null
    * @throws IllegalArgumentException if {@code name} is blank or {@code score} is negative
    */
-  public static OptionalInt submit(String name, long score) {
+  public static Integer submit(String name, long score) {
     Objects.requireNonNull(name, "name cannot be null");
     LeaderboardEntry submitted = new LeaderboardEntry(name, score);
 
@@ -103,6 +102,6 @@ public final class LeaderboardStore {
     }
 
     int index = entries.indexOf(submitted);
-    return index >= 0 ? OptionalInt.of(index + 1) : OptionalInt.empty();
+    return index >= 0 ? index + 1 : null;
   }
 }

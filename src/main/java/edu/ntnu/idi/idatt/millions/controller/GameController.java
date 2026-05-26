@@ -8,7 +8,6 @@ import edu.ntnu.idi.idatt.millions.persistence.leaderboard.LeaderboardStore;
 import edu.ntnu.idi.idatt.millions.view.MainView;
 import edu.ntnu.idi.idatt.millions.view.pages.Page;
 import java.util.ArrayList;
-import java.util.OptionalInt;
 
 /**
  * Top-level controller for an active game.
@@ -110,7 +109,7 @@ public class GameController {
   /** Computes the final score and asks the view to render the end-game overlay. */
   private void endGame() {
     long score = ScoreCalculator.compute(player.getReturnRate(), exchange.getWeek());
-    OptionalInt rank = LeaderboardStore.submit(player.getName(), score);
+    Integer rank = LeaderboardStore.submit(player.getName(), score);
     view.showEndGame(
         player.getNetWorth(),
         player.getProfit(),

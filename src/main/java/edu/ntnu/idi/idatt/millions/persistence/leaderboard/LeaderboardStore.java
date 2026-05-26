@@ -36,6 +36,7 @@ public final class LeaderboardStore {
    * <p>Not declared {@code final} so tests can redirect it to a temporary location via reflection;
    * in production this value is never reassigned.
    */
+  @SuppressWarnings("FieldMayBeFinal")
   private static Path DEFAULT_PATH =
       Paths.get(System.getProperty("user.home"), ".millions", "leaderboard.csv");
 

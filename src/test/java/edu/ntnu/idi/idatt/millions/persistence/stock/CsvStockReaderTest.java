@@ -159,7 +159,7 @@ class CsvStockReaderTest {
 
   @Test
   void constructor_nullPath_throwsNullPointerException() {
-    assertThrows(NullPointerException.class, () -> new CsvStockReader((Path) null));
+    assertThrows(NullPointerException.class, () -> new CsvStockReader(null));
   }
 
   // Classpath factory

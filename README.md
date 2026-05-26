@@ -36,11 +36,16 @@ mvn test
 mvn compile
 ```
 
-### Build a packaged JAR
+### Build and run a packaged JAR with dependencies
 ```bash
-mvn package
+mvn clean package
 ```
 
+After building the project, run:
+
+```bash
+java -jar target/millions-1.1.0-jar-with-dependencies.jar
+```
 ---
 
 ## Project structure

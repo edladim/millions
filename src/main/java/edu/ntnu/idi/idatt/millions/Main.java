@@ -31,7 +31,7 @@ public class Main extends Application {
    *
    * @param args command-line arguments (unused)
    */
-  static void main(String[] args) {
+  public static void main(String[] args) {
     launch(args);
   }
 }

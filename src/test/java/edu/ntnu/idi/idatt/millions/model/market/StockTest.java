@@ -203,14 +203,14 @@ class StockTest {
   @Test
   void equals_null_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals(null, stock);
+    assertFalse(stock.equals(null));
   }
 
   /** Ensures equals returns false for unrelated types. */
   @Test
   void equals_differentType_returnsFalse() {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
-    assertNotEquals("not a stock", stock);
+    assertFalse(stock.equals("not a stock"));
   }
 
   /** Verifies that the price history preserves insertion order. */
@@ -249,5 +249,24 @@ class StockTest {
     Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
 
     assertEquals(stock, stock);
+  }
+
+  /** Verifies that a zero initial price is accepted (non-negative boundary). */
+  @Test
+  void constructor_zeroPrice_createsStock() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, stock.getSalesPrice());
+  }
+
+  /** Verifies that a zero sales price is accepted by {@code addNewSalesPrice}. */
+  @Test
+  void addNewSalesPrice_zero_accepted() {
+    Stock stock = new Stock("AAPL", "Apple", BigDecimal.TEN);
+
+    stock.addNewSalesPrice(BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, stock.getSalesPrice());
+    assertEquals(2, stock.getHistoricalPrices().size());
   }
 }

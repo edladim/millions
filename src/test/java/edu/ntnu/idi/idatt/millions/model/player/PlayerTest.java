@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import edu.ntnu.idi.idatt.millions.model.market.Stock;
 import edu.ntnu.idi.idatt.millions.model.portfolio.Portfolio;
 import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
+import edu.ntnu.idi.idatt.millions.model.transaction.Purchase;
+import edu.ntnu.idi.idatt.millions.model.transaction.Sale;
 import edu.ntnu.idi.idatt.millions.model.transaction.TransactionArchive;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
@@ -235,6 +237,49 @@ class PlayerTest {
     assertEquals(2, player.getHistoricalNetWorth().size());
     assertEquals(0, new BigDecimal("10000").compareTo(player.getHistoricalNetWorth().get(0)));
     assertEquals(0, new BigDecimal("11000").compareTo(player.getHistoricalNetWorth().get(1)));
+  }
+
+  /**
+   * Verifies that {@code getTransactions} delegates to the archive and returns all transactions.
+   */
+  @Test
+  void getTransactions_returnsAllTransactionsFromArchive() {
+    Stock stock = new Stock("AAPL", "Apple", new BigDecimal("100"));
+    Share share = new Share(stock, new BigDecimal("5"), new BigDecimal("90"));
+
+    player.getTransactionArchive().add(new Purchase(share, 1));
+    player.getTransactionArchive().add(new Sale(share, 2));
+
+    assertEquals(2, player.getTransactions().size());
+  }
+
+  /** Verifies that {@code getTransactions} returns an empty list when the archive is empty. */
+  @Test
+  void getTransactions_emptyArchive_returnsEmptyList() {
+    assertTrue(player.getTransactions().isEmpty());
+  }
+
+  /** Verifies that adding zero does not change the balance. */
+  @Test
+  void addMoney_zero_balanceUnchanged() {
+    player.addMoney(BigDecimal.ZERO);
+    assertEquals(0, startingMoney.compareTo(player.getMoney()));
+  }
+
+  /** Verifies that withdrawing zero does not change the balance. */
+  @Test
+  void withdrawMoney_zero_balanceUnchanged() {
+    player.withdrawMoney(BigDecimal.ZERO);
+    assertEquals(0, startingMoney.compareTo(player.getMoney()));
+  }
+
+  /** Verifies that observers are notified when {@code updateHistoricalNetWorth} is called. */
+  @Test
+  void updateHistoricalNetWorth_notifiesObservers() {
+    int[] callCount = {0};
+    player.addObserver(_ -> callCount[0]++);
+    player.updateHistoricalNetWorth();
+    assertEquals(1, callCount[0]);
   }
 
   /** Verifies that addObserver rejects null. */

@@ -3,6 +3,7 @@ package edu.ntnu.idi.idatt.millions.persistence.leaderboard;
 import static org.junit.jupiter.api.Assertions.*;
 
 import edu.ntnu.idi.idatt.millions.model.player.LeaderboardEntry;
+import edu.ntnu.idi.idatt.millions.persistence.PersistenceException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -123,6 +124,54 @@ class CsvLeaderboardWriterTest {
   }
 
   // Round-trip
+
+  /**
+   * Verifies that a path with no parent component (a bare filename) is handled without an NPE,
+   * exercising the {@code parent != null} branch.
+   */
+  @Test
+  void writeLeaderboard_pathWithoutParent_writesSuccessfully() throws Exception {
+    Path bare = Path.of("test_leaderboard_no_parent.csv");
+    try {
+      new CsvLeaderboardWriter(bare).writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1L)));
+      assertTrue(Files.exists(bare));
+    } finally {
+      Files.deleteIfExists(bare);
+    }
+  }
+
+  /**
+   * Verifies that an I/O failure while creating parent directories is surfaced as a {@link
+   * PersistenceException}. Triggered by making the parent path point at an existing regular file.
+   */
+  @Test
+  void writeLeaderboard_parentIsExistingFile_throwsPersistenceException() throws Exception {
+    Path blocker = tempDir.resolve("blocker");
+    Files.createFile(blocker);
+    Path nested = blocker.resolve("leaderboard.csv");
+
+    CsvLeaderboardWriter writer = new CsvLeaderboardWriter(nested);
+
+    assertThrows(
+        PersistenceException.class,
+        () -> writer.writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1L))));
+  }
+
+  /**
+   * Verifies that an I/O failure while opening the target file for writing is surfaced as a {@link
+   * PersistenceException}. Triggered by pointing the writer at an existing directory.
+   */
+  @Test
+  void writeLeaderboard_pathIsDirectory_throwsPersistenceException() throws Exception {
+    Path dir = tempDir.resolve("blocking_dir");
+    Files.createDirectory(dir);
+
+    CsvLeaderboardWriter writer = new CsvLeaderboardWriter(dir);
+
+    assertThrows(
+        PersistenceException.class,
+        () -> writer.writeLeaderboard(List.of(new LeaderboardEntry("Alice", 1L))));
+  }
 
   /** Verifies that entries written by the writer can be read back exactly by the reader. */
   @Test

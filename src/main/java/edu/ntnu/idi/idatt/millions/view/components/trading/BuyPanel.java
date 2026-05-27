@@ -1,9 +1,9 @@
 package edu.ntnu.idi.idatt.millions.view.components.trading;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyStock;
-import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
-import edu.ntnu.idi.idatt.millions.view.widgets.ViewWidgets;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyStock;
+import edu.ntnu.idi.idatt.millions.view.components.ViewWidgets;
 import edu.ntnu.idi.idatt.millions.view.pages.TradingView.Mode;
+import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.function.Consumer;
@@ -21,19 +21,14 @@ import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
- * <p>
- * Buy/sell panel that lets the player enter a quantity or dollar amount
- * and submit a trade for the currently selected stock. Contains the
- * mode toggle (Buy / Sell), selected stock info, cash/owned summary,
- * input field with quantity↔amount toggle, quick-percentage buttons,
- * and an order-summary cost card.
- * </p>
+ * Buy/sell panel that lets the player enter a quantity or dollar amount and submit a trade for the
+ * currently selected stock. Contains the mode toggle (Buy / Sell), selected stock info, cash/owned
+ * summary, input field with quantity↔amount toggle, quick-percentage buttons, and an order-summary
+ * cost card.
  *
- * <p>
- * All interaction callbacks ({@link #setOnAction}, {@link #setOnInputChanged},
- * {@link #setOnModeChanged}, {@link #setOnPercentSelected}) are registered
- * by the controller via {@link edu.ntnu.idi.idatt.millions.view.pages.TradingView}.
- * </p>
+ * <p>All interaction callbacks ({@link #setOnAction}, {@link #setOnInputChanged}, {@link
+ * #setOnModeChanged}, {@link #setOnPercentSelected}) are registered by the controller via {@link
+ * edu.ntnu.idi.idatt.millions.view.pages.TradingView}.
  */
 public class BuyPanel extends VBox {
 
@@ -45,18 +40,18 @@ public class BuyPanel extends VBox {
   private Label buyChangeLabel;
   private Button buyTab;
   private Button sellTab;
-  private Label panelTitle;
+  private final Label panelTitle;
   private Label cashBalanceLabel;
   private Label ownedValueLabel;
   private Label inputLabel;
 
-  private Spinner<Double> inputSpinner;
-  private Label derivedLabel;
+  private final Spinner<Double> inputSpinner;
+  private final Label derivedLabel;
   private BigDecimal currentPrice;
   private Label estimatedCostLabel;
   private Label commissionLabel;
   private Label totalCostLabel;
-  private Button actionButton;
+  private final Button actionButton;
 
   private Mode currentMode = Mode.BUY;
   private boolean amountMode = false;
@@ -66,9 +61,7 @@ public class BuyPanel extends VBox {
   private Consumer<Mode> onModeChanged;
   private Consumer<BigDecimal> onPercentSelected;
 
-  /**
-   * <p>Constructs the buy panel and builds its initial layout.</p>
-   */
+  /** Constructs the buy panel and builds its initial layout. */
   public BuyPanel() {
     super(16);
     getStyleClass().add("buy-panel");
@@ -77,14 +70,14 @@ public class BuyPanel extends VBox {
     setMaxWidth(300);
     setPadding(new Insets(24, 20, 24, 20));
 
-    HBox modeToggle = buildModeToggle();
+    final HBox modeToggle = buildModeToggle();
 
     panelTitle = new Label("Buy Stock");
     panelTitle.getStyleClass().add("section-heading");
 
-    VBox stockInfoCard = buildSelectedStockInfo();
-    HBox playerInfoCard = buildPlayerInfoCard();
-    HBox inputHeader = buildInputHeader();
+    final VBox stockInfoCard = buildSelectedStockInfo();
+    final HBox playerInfoCard = buildPlayerInfoCard();
+    final HBox inputHeader = buildInputHeader();
 
     inputSpinner = buildInputSpinner();
 
@@ -94,31 +87,34 @@ public class BuyPanel extends VBox {
     derivedLabel.setMinWidth(0);
     derivedLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
 
-    VBox costCard = buildCostCard();
+    final VBox costCard = buildCostCard();
 
     actionButton = new Button("Buy now");
     actionButton.getStyleClass().add("buy-btn");
     actionButton.setMaxWidth(Double.MAX_VALUE);
     actionButton.setDisable(true);
-    actionButton.setOnAction(e -> {
-      if (onAction != null) onAction.accept(currentMode);
-    });
+    actionButton.setOnAction(
+        _ -> {
+          if (onAction != null) {
+            onAction.accept(currentMode);
+          }
+        });
 
     HBox percentageCard = buildPercentageCard();
 
-    getChildren().addAll(
-        modeToggle,
-        panelTitle,
-        stockInfoCard,
-        playerInfoCard,
-        inputHeader,
-        inputSpinner,
-        percentageCard,
-        derivedLabel,
-        costCard,
-        ViewWidgets.spacer(4),
-        actionButton
-    );
+    getChildren()
+        .addAll(
+            modeToggle,
+            panelTitle,
+            stockInfoCard,
+            playerInfoCard,
+            inputHeader,
+            inputSpinner,
+            percentageCard,
+            derivedLabel,
+            costCard,
+            ViewWidgets.spacer(4),
+            actionButton);
 
     VBox.setVgrow(costCard, Priority.NEVER);
   }
@@ -129,12 +125,12 @@ public class BuyPanel extends VBox {
     buyTab = new Button("Buy");
     buyTab.getStyleClass().addAll("mode-tab", "mode-tab-active");
     buyTab.setMaxWidth(Double.MAX_VALUE);
-    buyTab.setOnAction(e -> setMode(Mode.BUY));
+    buyTab.setOnAction(_ -> setMode(Mode.BUY));
 
     sellTab = new Button("Sell");
     sellTab.getStyleClass().add("mode-tab");
     sellTab.setMaxWidth(Double.MAX_VALUE);
-    sellTab.setOnAction(e -> setMode(Mode.SELL));
+    sellTab.setOnAction(_ -> setMode(Mode.SELL));
 
     HBox.setHgrow(buyTab, Priority.ALWAYS);
     HBox.setHgrow(sellTab, Priority.ALWAYS);
@@ -203,7 +199,7 @@ public class BuyPanel extends VBox {
     Button swapBtn = new Button();
     swapBtn.setGraphic(swapIcon);
     swapBtn.getStyleClass().add("swap-btn");
-    swapBtn.setOnAction(e -> toggleInputMode());
+    swapBtn.setOnAction(_ -> toggleInputMode());
 
     HBox header = new HBox(inputLabel, spacer, swapBtn);
     header.setAlignment(Pos.CENTER_LEFT);
@@ -214,31 +210,51 @@ public class BuyPanel extends VBox {
     Spinner<Double> spinner = new Spinner<>();
     SpinnerValueFactory.DoubleSpinnerValueFactory factory =
         new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1_000_000_000.0, 1.0, 1.0);
-    factory.setConverter(new javafx.util.StringConverter<>() {
-      @Override public String toString(Double v) {
-        if (v == null || v == 0.0) return "";
-        return (v == Math.floor(v) && !Double.isInfinite(v))
-            ? String.valueOf(v.longValue()) : String.valueOf(v);
-      }
-      @Override public Double fromString(String s) {
-        if (s == null || s.isBlank()) return 0.0;
-        try { return Double.parseDouble(s.trim().replace(",", ".")); }
-        catch (NumberFormatException e) { return 0.0; }
-      }
-    });
+    factory.setConverter(
+        new javafx.util.StringConverter<>() {
+          @Override
+          public String toString(Double v) {
+            if (v == null || v == 0.0) {
+              return "";
+            }
+            return (v == Math.floor(v) && !Double.isInfinite(v))
+                ? String.valueOf(v.longValue())
+                : String.valueOf(v);
+          }
+
+          @Override
+          public Double fromString(String s) {
+            if (s == null || s.isBlank()) {
+              return 0.0;
+            }
+            try {
+              return Double.parseDouble(s.trim().replace(",", "."));
+            } catch (NumberFormatException e) {
+              return 0.0;
+            }
+          }
+        });
     spinner.setValueFactory(factory);
     spinner.setEditable(true);
     spinner.getStyleClass().add("search-field");
     spinner.setMaxWidth(Double.MAX_VALUE);
-    spinner.getEditor().textProperty().addListener((_, _, _) -> {
-      if (onInputChanged != null) onInputChanged.run();
-    });
+    spinner
+        .getEditor()
+        .textProperty()
+        .addListener(
+            (_, _, _) -> {
+              if (onInputChanged != null) {
+                onInputChanged.run();
+              }
+            });
     return spinner;
   }
 
   private HBox buildPercentageCard() {
-    String[]     labels   = {"25%", "50%", "100%"};
-    BigDecimal[] percents = {new BigDecimal("0.25"), new BigDecimal("0.50"), new BigDecimal("1.00")};
+    final String[] labels = {"25%", "50%", "100%"};
+    BigDecimal[] percents = {
+      new BigDecimal("0.25"), new BigDecimal("0.50"), new BigDecimal("1.00")
+    };
 
     HBox card = new HBox(5);
     card.setAlignment(Pos.CENTER);
@@ -250,7 +266,7 @@ public class BuyPanel extends VBox {
       Button btn = new Button(labels[i]);
       btn.getStyleClass().add("mode-tab");
       btn.setMaxWidth(Double.MAX_VALUE);
-      btn.setOnAction(e -> firePercent(pct));
+      btn.setOnAction(_ -> firePercent(pct));
       HBox.setHgrow(btn, Priority.ALWAYS);
       card.getChildren().add(btn);
     }
@@ -265,10 +281,7 @@ public class BuyPanel extends VBox {
     estimatedCostLabel = makeCostRow("Estimated Cost", "$0.00");
     commissionLabel = makeCostRow("Commission (0.5%)", "$0.00");
 
-    Region divider = new Region();
-    divider.getStyleClass().add("divider");
-    divider.setPrefHeight(1);
-    divider.setMaxWidth(Double.MAX_VALUE);
+    Region divider = ViewWidgets.divider();
 
     totalCostLabel = makeCostRow("Total", "$0.00");
     totalCostLabel.getStyleClass().add("cost-row-total");
@@ -297,15 +310,18 @@ public class BuyPanel extends VBox {
     inputLabel.setText(amountMode ? "Amount ($)" : "Quantity");
 
     if (current.signum() > 0 && currentPrice != null && currentPrice.signum() > 0) {
-      BigDecimal converted = wasAmount
-          ? current.divide(currentPrice, 4, RoundingMode.HALF_UP)
-          : current.multiply(currentPrice).setScale(2, RoundingMode.HALF_UP);
+      BigDecimal converted =
+          wasAmount
+              ? current.divide(currentPrice, 4, RoundingMode.HALF_UP)
+              : current.multiply(currentPrice).setScale(2, RoundingMode.HALF_UP);
       setSpinnerValue(converted);
     } else {
       setSpinnerValue(BigDecimal.ZERO);
     }
 
-    if (onInputChanged != null) onInputChanged.run();
+    if (onInputChanged != null) {
+      onInputChanged.run();
+    }
   }
 
   private void setSpinnerValue(BigDecimal value) {
@@ -313,45 +329,53 @@ public class BuyPanel extends VBox {
         (SpinnerValueFactory.DoubleSpinnerValueFactory) inputSpinner.getValueFactory();
     factory.setValue(value.doubleValue());
     String stripped = value.stripTrailingZeros().toPlainString();
-    if (stripped.startsWith(".")) stripped = "0" + stripped;
+    if (stripped.startsWith(".")) {
+      stripped = "0" + stripped;
+    }
     inputSpinner.getEditor().setText(stripped);
   }
 
   private void firePercent(BigDecimal percent) {
-    if (onPercentSelected != null) onPercentSelected.accept(percent);
+    if (onPercentSelected != null) {
+      onPercentSelected.accept(percent);
+    }
   }
 
   // Public API
 
   /**
-   * <p>Updates the stock info card (symbol, company, price, change, high, low)
-   * and enables the action button for the given stock.</p>
+   * Updates the stock info card (symbol, company, price, change, high, low) and enables the action
+   * button for the given stock.
    *
    * @param stock the stock currently selected in the list
    */
   public void updateStockInfo(ReadOnlyStock stock) {
     BigDecimal change = stock.getLatestPriceChange();
-    boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
+    final boolean isPositive = change.compareTo(BigDecimal.ZERO) >= 0;
 
     buySymbolLabel.setText(stock.getSymbol());
     buyCompanyLabel.setText(stock.getCompany());
     buyPriceLabel.setText(ViewFormatter.price(stock.getSalesPrice()));
     buyChangeLabel.setText(ViewFormatter.changeArrowPercent(change, stock.getSalesPrice()));
     buyChangeLabel.getStyleClass().removeAll("mover-change-positive", "mover-change-negative");
-    buyChangeLabel.getStyleClass().add(isPositive ? "mover-change-positive" : "mover-change-negative");
+    buyChangeLabel
+        .getStyleClass()
+        .add(isPositive ? "mover-change-positive" : "mover-change-negative");
     buyHighLabel.setText("H: " + ViewFormatter.price(stock.getHighestPrice()));
     buyLowLabel.setText("L: " + ViewFormatter.price(stock.getLowestPrice()));
     actionButton.setDisable(false);
   }
 
   /**
-   * <p>Switches the panel between Buy and Sell mode, updating tab styling,
-   * panel title, action button text, and notifying the registered mode handler.</p>
+   * Switches the panel between Buy and Sell mode, updating tab styling, panel title, action button
+   * text, and notifying the registered mode handler.
    *
    * @param mode the new mode
    */
   public void setMode(Mode mode) {
-    if (currentMode == mode) return;
+    if (currentMode == mode) {
+      return;
+    }
     currentMode = mode;
 
     buyTab.getStyleClass().removeAll("mode-tab-active");
@@ -361,17 +385,21 @@ public class BuyPanel extends VBox {
     panelTitle.setText(mode == Mode.BUY ? "Buy Stock" : "Sell Stock");
     actionButton.setText(mode == Mode.BUY ? "Buy now" : "Sell now");
     actionButton.getStyleClass().removeAll("action-btn-sell");
-    if (mode == Mode.SELL) actionButton.getStyleClass().add("action-btn-sell");
+    if (mode == Mode.SELL) {
+      actionButton.getStyleClass().add("action-btn-sell");
+    }
 
-    if (onModeChanged != null) onModeChanged.accept(mode);
+    if (onModeChanged != null) {
+      onModeChanged.accept(mode);
+    }
   }
 
   /**
-   * <p>Updates the displayed order cost preview values.</p>
+   * Updates the displayed order cost preview values.
    *
-   * @param gross      the estimated cost string
+   * @param gross the estimated cost string
    * @param commission the commission string
-   * @param total      the total cost string
+   * @param total the total cost string
    */
   public void setCostPreview(String gross, String commission, String total) {
     estimatedCostLabel.setText("Estimated Cost:   " + gross);
@@ -380,14 +408,16 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Returns the current input value as entered by the user. Returns
-   * {@link BigDecimal#ZERO} if the field is empty or unparseable.</p>
+   * Returns the current input value as entered by the user. Returns {@link BigDecimal#ZERO} if the
+   * field is empty or unparseable.
    *
    * @return the parsed input value, never {@code null}
    */
   public BigDecimal getInputValue() {
     String text = inputSpinner.getEditor().getText();
-    if (text == null || text.isBlank()) return BigDecimal.ZERO;
+    if (text == null || text.isBlank()) {
+      return BigDecimal.ZERO;
+    }
     try {
       return new BigDecimal(text.trim().replace(",", "."));
     } catch (NumberFormatException e) {
@@ -396,7 +426,7 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Returns whether the input field is in dollar-amount mode.</p>
+   * Returns whether the input field is in dollar-amount mode.
    *
    * @return {@code true} if the user is entering a dollar amount
    */
@@ -405,7 +435,7 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Returns the current panel mode.</p>
+   * Returns the current panel mode.
    *
    * @return {@link Mode#BUY} or {@link Mode#SELL}
    */
@@ -414,18 +444,17 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Updates the "Stocks Owned" value in the player info card.
-   * Pass {@code null} or a non-positive value to show the empty placeholder.</p>
+   * Updates the "Stocks Owned" value in the player info card. Pass {@code null} or a non-positive
+   * value to show the empty placeholder.
    *
    * @param qty the owned quantity, or {@code null} to clear
    */
   public void setOwnedQuantity(BigDecimal qty) {
-    ownedValueLabel.setText(
-        (qty == null || qty.signum() <= 0) ? "–" : ViewFormatter.quantity(qty));
+    ownedValueLabel.setText((qty == null || qty.signum() <= 0) ? "–" : ViewFormatter.quantity(qty));
   }
 
   /**
-   * <p>Updates the cash balance shown in the player info card.</p>
+   * Updates the cash balance shown in the player info card.
    *
    * @param cash the player's current cash balance
    */
@@ -434,8 +463,8 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Sets the small derived-value hint shown below the input field
-   * (e.g. {@code "≈ 2.78 shares"} when in amount mode).</p>
+   * Sets the small derived-value hint shown below the input field (e.g. {@code "≈ 2.78 shares"}
+   * when in amount mode).
    *
    * @param text the hint text, or empty string to clear
    */
@@ -444,7 +473,7 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Enables or disables the action (Buy/Sell) button.</p>
+   * Enables or disables the action (Buy/Sell) button.
    *
    * @param enabled {@code true} to enable
    */
@@ -453,18 +482,8 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Clears the input field without triggering side effects beyond the
-   * input-change listener.</p>
-   */
-  public void clearInput() {
-    setSpinnerValue(BigDecimal.ZERO);
-    inputSpinner.getEditor().clear();
-    derivedLabel.setText("");
-  }
-
-  /**
-   * <p>Sets the current sales price of the selected stock so the panel can
-   * convert between quantity- and amount-input when the user toggles the mode.</p>
+   * Sets the current sales price of the selected stock so the panel can convert between quantity-
+   * and amount-input when the user toggles the mode.
    *
    * @param price the current stock price, may be {@code null} when no stock is selected
    */
@@ -473,20 +492,21 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Fills the input with the given value, toggling input mode if needed
-   * to match {@code asAmount}.</p>
+   * Fills the input with the given value, toggling input mode if needed to match {@code asAmount}.
    *
-   * @param value    the value to set
+   * @param value the value to set
    * @param asAmount {@code true} to interpret as a dollar amount, {@code false} for quantity
    */
   public void setInputAmount(BigDecimal value, boolean asAmount) {
-    if (asAmount != amountMode) toggleInputMode();
+    if (asAmount != amountMode) {
+      toggleInputMode();
+    }
     setSpinnerValue(value);
   }
 
   /**
-   * <p>Registers a handler that runs when the user confirms a trade via the
-   * action button. The handler receives the current panel mode.</p>
+   * Registers a handler that runs when the user confirms a trade via the action button. The handler
+   * receives the current panel mode.
    *
    * @param handler the action handler
    */
@@ -495,8 +515,8 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Registers a handler that runs whenever the input field text or
-   * input mode (quantity/amount) changes.</p>
+   * Registers a handler that runs whenever the input field text or input mode (quantity/amount)
+   * changes.
    *
    * @param handler the handler to run on change
    */
@@ -505,8 +525,7 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Registers a handler that runs when the user toggles between Buy and
-   * Sell mode.</p>
+   * Registers a handler that runs when the user toggles between Buy and Sell mode.
    *
    * @param handler the handler accepting the new mode
    */
@@ -515,8 +534,8 @@ public class BuyPanel extends VBox {
   }
 
   /**
-   * <p>Registers a handler that runs when a percentage button (25/50/100%)
-   * is clicked. The handler receives the selected percentage as a decimal.</p>
+   * Registers a handler that runs when a percentage button (25/50/100%) is clicked. The handler
+   * receives the selected percentage as a decimal.
    *
    * @param handler the consumer that receives the selected percentage
    */

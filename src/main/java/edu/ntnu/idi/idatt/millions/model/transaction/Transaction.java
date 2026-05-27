@@ -1,34 +1,29 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Share;
-
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import java.util.Objects;
 
 /**
  * Represents a financial transaction involving a {@link Share}.
  *
- * <p>A transaction represents either the purchase or sale of shares
- * performed in a specific week. Each transaction uses a
- * {@link TransactionCalculator} to compute financial values such as
- * gross value, commission, tax and total value.</p>
+ * <p>A transaction represents either the purchase or sale of shares performed in a specific week.
+ * Each transaction uses a {@link TransactionCalculator} to compute financial values such as gross
+ * value, commission, tax and total value.
  *
- * <p>A transaction can only be committed once. After a transaction has
- * been committed, further attempts to commit it again should result in
- * an exception.</p>
+ * <p>A transaction can only be committed once. After a transaction has been committed, further
+ * attempts to commit it again should result in an exception.
  *
- * <p>This class serves as a base class for concrete transaction types
- * such as {@link Purchase} and {@link Sale}.</p>
+ * <p>This class serves as a base class for concrete transaction types such as {@link Purchase} and
+ * {@link Sale}.
  */
-public abstract class Transaction {
+public abstract class Transaction implements ReadOnlyTransaction {
 
   private final Share share;
   private final int week;
   private final TransactionCalculator calculator;
 
-  /**
-   * Indicates whether the transaction has already been committed.
-   */
+  /** Indicates whether the transaction has already been committed. */
   protected boolean committed;
 
   /**
@@ -37,7 +32,6 @@ public abstract class Transaction {
    * @param share the share involved in the transaction
    * @param week the week in which the transaction occurs
    * @param calculator the calculator used for financial calculations
-   *
    * @throws NullPointerException if share or calculator is null
    * @throws IllegalArgumentException if week is not positive
    */
@@ -91,13 +85,19 @@ public abstract class Transaction {
   }
 
   /**
+   * Returns {@code true} if this transaction is a purchase, {@code false} if it is a sale.
+   *
+   * @return {@code true} for {@link Purchase}, {@code false} for {@link Sale}
+   */
+  @Override
+  public abstract boolean isBuy();
+
+  /**
    * Commits the transaction.
    *
-   * <p>The implementation is provided by subclasses such as
-   * {@link Purchase} and {@link Sale}.</p>
+   * <p>The implementation is provided by subclasses such as {@link Purchase} and {@link Sale}.
    *
    * @param player the player performing the transaction
-   *
    * @throws NullPointerException if player is null
    * @throws IllegalStateException if the transaction has already been committed
    */

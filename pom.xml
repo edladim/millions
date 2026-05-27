@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.ntni.idi.idatt.millions</groupId>
+    <groupId>edu.ntnu.idi.idatt.millions</groupId>
     <artifactId>millions</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1.1</version>
 
     <properties>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <log4j.version>2.26.0</log4j.version>
     </properties>
     <dependencies>
         <dependency>
@@ -28,12 +28,12 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.25.3</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-jcl</artifactId>
-            <version>2.24.3</version>
+            <version>${log4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
@@ -83,6 +83,14 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.14</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/view/**</exclude>
+                        <exclude>**/controller/**</exclude>
+                        <exclude>**/Main.class</exclude>
+                        <exclude>**/persistence/stock/StockLoader.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -106,14 +114,36 @@
 
                 <configuration>
                     <configLocation>google_checks.xml</configLocation>
+                    <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
-                   <!--
-                   Add if build shoud fail on checkstyle warning:
-                   <violationSeverity>warning</violationSeverity>
-                   test 2-->
+                    <violationSeverity>warning</violationSeverity>
                 </configuration>
 
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Spotless auto-formatter (Google Java Format) -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.27.0</version>
+                        </googleJavaFormat>
+                        <removeUnusedImports/>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -128,6 +158,11 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.7.1</version>
                 <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>edu.ntnu.idi.idatt.millions.Launcher</mainClass>
+                        </manifest>
+                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -144,4 +179,111 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Builds a native installer/bundle via jpackage. Run with: mvn clean package -Pmac (or -Pwindows / -Plinux) -->
+        <profile>
+            <id>mac</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-mac</id>
+                                <phase>package</phase>
+                                <goals><goal>exec</goal></goals>
+                                <configuration>
+                                    <executable>jpackage</executable>
+                                    <arguments>
+                                        <argument>--type</argument><argument>dmg</argument>
+                                        <argument>--name</argument><argument>Millions</argument>
+                                        <argument>--app-version</argument><argument>${project.version}</argument>
+                                        <argument>--vendor</argument><argument>NTNU IDATx2003</argument>
+                                        <argument>--input</argument><argument>${project.build.directory}</argument>
+                                        <argument>--main-jar</argument><argument>${project.artifactId}-${project.version}-jar-with-dependencies.jar</argument>
+                                        <argument>--main-class</argument><argument>edu.ntnu.idi.idatt.millions.Launcher</argument>
+                                        <argument>--icon</argument><argument>${project.basedir}/packaging/icons/icon.icns</argument>
+                                        <argument>--dest</argument><argument>${project.build.directory}/dist</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>windows</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-windows</id>
+                                <phase>package</phase>
+                                <goals><goal>exec</goal></goals>
+                                <configuration>
+                                    <executable>jpackage</executable>
+                                    <arguments>
+                                        <argument>--type</argument><argument>msi</argument>
+                                        <argument>--name</argument><argument>Millions</argument>
+                                        <argument>--app-version</argument><argument>${project.version}</argument>
+                                        <argument>--vendor</argument><argument>NTNU IDATx2003</argument>
+                                        <argument>--input</argument><argument>${project.build.directory}</argument>
+                                        <argument>--main-jar</argument><argument>${project.artifactId}-${project.version}-jar-with-dependencies.jar</argument>
+                                        <argument>--main-class</argument><argument>edu.ntnu.idi.idatt.millions.Launcher</argument>
+                                        <argument>--icon</argument><argument>${project.basedir}/packaging/icons/icon.ico</argument>
+                                        <argument>--win-shortcut</argument>
+                                        <argument>--win-menu</argument>
+                                        <argument>--dest</argument><argument>${project.build.directory}/dist</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>linux</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>jpackage-linux</id>
+                                <phase>package</phase>
+                                <goals><goal>exec</goal></goals>
+                                <configuration>
+                                    <executable>jpackage</executable>
+                                    <arguments>
+                                        <argument>--type</argument><argument>deb</argument>
+                                        <argument>--name</argument><argument>millions</argument>
+                                        <argument>--app-version</argument><argument>${project.version}</argument>
+                                        <argument>--vendor</argument><argument>NTNU IDATx2003</argument>
+                                        <argument>--input</argument><argument>${project.build.directory}</argument>
+                                        <argument>--main-jar</argument><argument>${project.artifactId}-${project.version}-jar-with-dependencies.jar</argument>
+                                        <argument>--main-class</argument><argument>edu.ntnu.idi.idatt.millions.Launcher</argument>
+                                        <argument>--icon</argument><argument>${project.basedir}/packaging/icons/icon.png</argument>
+                                        <argument>--dest</argument><argument>${project.build.directory}/dist</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

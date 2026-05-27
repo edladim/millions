@@ -1,0 +1,62 @@
+name: Package native installers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            profile: mac
+            artifact-name: Millions-macOS
+            artifact-path: target/dist/*.dmg
+          - os: windows-latest
+            profile: windows
+            artifact-name: Millions-Windows
+            artifact-path: target/dist/*.msi
+          - os: ubuntu-latest
+            profile: linux
+            artifact-name: Millions-Linux
+            artifact-path: target/dist/*.deb
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      # Genererer icon.ico fra icon.png på Windows-runneren (vi committer ikke .ico)
+      - name: Generate Windows icon (.ico)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.Drawing
+          $src = "packaging/icons/icon.png"
+          $dst = "packaging/icons/icon.ico"
+          $bmp = [System.Drawing.Bitmap]::FromFile((Resolve-Path $src))
+          $icon = [System.Drawing.Icon]::FromHandle($bmp.GetHicon())
+          $fs = [System.IO.File]::Create($dst)
+          $icon.Save($fs)
+          $fs.Close()
+          $bmp.Dispose()
+
+      - name: Build with Maven (${{ matrix.profile }})
+        run: mvn -B -DskipTests -Dcheckstyle.skip -Dspotless.check.skip clean package -P${{ matrix.profile }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact-name }}
+          path: ${{ matrix.artifact-path }}
+          if-no-files-found: error

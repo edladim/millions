@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionList Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+  <!-- Indentation is enforced by Spotless / Google Java Format -->
+  <suppress checks="Indentation" files=".*\.java"/>
+  <!-- _ is the Java 22+ unnamed variable/parameter syntax (JEP 456); google_checks.xml
+       predates this feature and does not allow single-character names starting with _ -->
+  <suppress checks="LambdaParameterName" message=".*'_'.*"/>
+</suppressions>

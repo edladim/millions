@@ -1,24 +1,23 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Share;
-
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Represents a purchase transaction.
  *
- * <p>A purchase transaction buys a {@link Share} for a player. When the
- * transaction is committed, the following actions occur:</p>
+ * <p>A purchase transaction buys a {@link Share} for a player. When the transaction is committed,
+ * the following actions occur:
  *
  * <ol>
- *   <li>The total purchase cost is withdrawn from the player's money</li>
- *   <li>The share is added to the player's portfolio</li>
- *   <li>The transaction is stored in the player's transaction archive</li>
+ *   <li>The total purchase cost is withdrawn from the player's money
+ *   <li>The share is added to the player's portfolio
+ *   <li>The transaction is stored in the player's transaction archive
  * </ol>
  *
- * <p>A purchase can only be committed once.</p>
+ * <p>A purchase can only be committed once.
  */
 public final class Purchase extends Transaction {
 
@@ -32,15 +31,19 @@ public final class Purchase extends Transaction {
     super(share, week, new PurchaseCalculator(share));
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isBuy() {
+    return true;
+  }
+
   /**
    * Commits the purchase transaction.
    *
-   * <p>The purchase is completed by withdrawing the total transaction
-   * cost from the player, adding the share to the portfolio, and
-   * storing the transaction in the archive.</p>
+   * <p>The purchase is completed by withdrawing the total transaction cost from the player, adding
+   * the share to the portfolio, and storing the transaction in the archive.
    *
    * @param player the player performing the purchase
-   *
    * @throws NullPointerException if {@code player} is null
    * @throws IllegalStateException if the transaction is already committed
    * @throws IllegalStateException if the player does not have enough money

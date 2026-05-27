@@ -1,10 +1,13 @@
 package edu.ntnu.idi.idatt.millions.view.components;
 
-import edu.ntnu.idi.idatt.millions.model.ReadOnlyExchange;
+import edu.ntnu.idi.idatt.millions.model.market.ReadOnlyExchange;
 import edu.ntnu.idi.idatt.millions.observer.ExchangeObserver;
-import edu.ntnu.idi.idatt.millions.view.Page;
+import edu.ntnu.idi.idatt.millions.view.pages.Page;
 import edu.ntnu.idi.idatt.millions.view.util.Stylesheets;
 import edu.ntnu.idi.idatt.millions.view.util.ViewFormatter;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -12,26 +15,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-import javafx.beans.binding.Bindings;
-
 /**
- * <p>
- * Sidebar UI component that contains navigation buttons, a week indicator,
- * and an action to advance the week.
- * </p>
+ * Sidebar UI component that contains navigation buttons, a week indicator, and an action to advance
+ * the week.
  *
- * <p>
- * The component exposes callbacks for navigation and week-advance actions and
- * provides a method for updating the visible week label.
- * </p>
+ * <p>The component exposes callbacks for navigation and week-advance actions and provides a method
+ * for updating the visible week label.
  */
 public class SidebarComponent extends VBox implements ExchangeObserver {
 
@@ -39,30 +34,28 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   private Button portfolioBtn;
   private Button tradingBtn;
   private Label weekLabel;
+  private Label weeksLeftLabel;
+  private ProgressBar weekProgressBar;
 
   private Runnable onAdvanceWeek;
   private Runnable onRetire;
   private Consumer<Page> onNavigate;
 
-  /**
-   * <p>Constructs the sidebar and builds its initial layout.</p>
-   */
+  private int totalWeeks;
+
+  /** Constructs the sidebar and builds its initial layout. */
   public SidebarComponent() {
     getStyleClass().add("sidebar");
     setMinWidth(170);
     setSpacing(4);
     setPadding(new Insets(24, 16, 24, 16));
 
-    getChildren().addAll(
-            setLogo(),
-            buildSpacer(24),
-            buildNavSection(),
-            buildBottomSection()
-    );
+    getChildren()
+        .addAll(setLogo(), ViewWidgets.spacer(24), buildNavSection(), buildBottomSection());
   }
 
   /**
-   * <p>Builds the logo section shown at the top of the sidebar.</p>
+   * Builds the logo section shown at the top of the sidebar.
    *
    * @return the logo container
    */
@@ -82,12 +75,13 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Builds the navigation section containing page buttons.</p>
+   * Builds the navigation section containing page buttons.
    *
    * @return the navigation container
    */
   private VBox buildNavSection() {
-    dashboardBtn = buildNavButton("Dashboard", new FontIcon("fas-digital-tachograph"), Page.DASHBOARD);
+    dashboardBtn =
+        buildNavButton("Dashboard", new FontIcon("fas-digital-tachograph"), Page.DASHBOARD);
     portfolioBtn = buildNavButton("My Portfolio", new FontIcon("fas-id-card"), Page.PORTFOLIO);
     tradingBtn = buildNavButton("Trading", new FontIcon("fas-chart-line"), Page.TRADING);
 
@@ -95,7 +89,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Creates a navigation button with icon and click handler.</p>
+   * Creates a navigation button with icon and click handler.
    *
    * @param text the button label
    * @param icon the icon to display
@@ -107,15 +101,18 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     btn.setGraphic(icon);
     btn.getStyleClass().add("nav-btn");
     btn.setMaxWidth(Double.MAX_VALUE);
-    btn.setOnAction(e -> {
-      setActivePage(page);
-      if (onNavigate != null) onNavigate.accept(page);
-    });
+    btn.setOnAction(
+        _ -> {
+          setActivePage(page);
+          if (onNavigate != null) {
+            onNavigate.accept(page);
+          }
+        });
     return btn;
   }
 
   /**
-   * <p>Builds the bottom section containing the advance button and week box.</p>
+   * Builds the bottom section containing the advance button and week box.
    *
    * @return the bottom section container
    */
@@ -125,21 +122,23 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
     bottom.setAlignment(Pos.BOTTOM_CENTER);
 
     Button advanceBtn = new Button();
-    advanceBtn.textProperty().bind(
-        Bindings.when(widthProperty().lessThan(190))
-            .then("Advance")
-            .otherwise("Advance Week")
-    );
+    advanceBtn
+        .textProperty()
+        .bind(
+            Bindings.when(widthProperty().lessThan(190)).then("Advance").otherwise("Advance Week"));
     advanceBtn.getStyleClass().add("advance-btn");
     advanceBtn.setMaxWidth(Double.MAX_VALUE);
-    advanceBtn.setOnAction(e -> {
-      if (onAdvanceWeek != null) onAdvanceWeek.run();
-    });
+    advanceBtn.setOnAction(
+        _ -> {
+          if (onAdvanceWeek != null) {
+            onAdvanceWeek.run();
+          }
+        });
 
     Button retireBtn = new Button("Retire");
     retireBtn.getStyleClass().add("sell-all-btn");
     retireBtn.setMaxWidth(Double.MAX_VALUE);
-    retireBtn.setOnAction(e -> confirmAndRetire());
+    retireBtn.setOnAction(_ -> confirmAndRetire());
 
     HBox weekBox = buildWeekBox();
 
@@ -148,19 +147,19 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Shows a styled confirmation dialog before triggering retirement.</p>
+   * Shows a styled confirmation dialog before triggering retirement.
    *
-   * <p>If the user confirms, the registered retire handler is invoked, which
-   * causes the controller to liquidate the portfolio and end the game.</p>
+   * <p>If the user confirms, the registered retire handler is invoked, which causes the controller
+   * to liquidate the portfolio and end the game.
    */
   private void confirmAndRetire() {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.initOwner(getScene().getWindow());
     alert.setTitle("Confirm retirement");
     alert.setHeaderText("Are you sure you want to retire?");
     alert.setContentText("This will sell all your shares and end the game.");
 
-    alert.getDialogPane().getStylesheets()
-        .add(Stylesheets.load("/styles/main.css"));
+    alert.getDialogPane().getStylesheets().add(Stylesheets.load("/styles/main.css"));
     alert.getDialogPane().getStyleClass().add("retire-alert");
 
     ButtonType yes = new ButtonType("Retire", ButtonBar.ButtonData.OK_DONE);
@@ -174,7 +173,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Builds the week indicator box.</p>
+   * Builds the week indicator box.
    *
    * @return the week box container
    */
@@ -184,11 +183,19 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
 
     weekLabel = new Label(ViewFormatter.week(1));
     weekLabel.getStyleClass().add("week-box-value");
+    weekLabel.setMinWidth(Label.USE_PREF_SIZE);
+
+    weeksLeftLabel = new Label(weeksLeftText(1));
+    weeksLeftLabel.getStyleClass().add("week-box-subtitle");
+
+    weekProgressBar = new ProgressBar(0);
+    weekProgressBar.getStyleClass().add("week-progress");
+    weekProgressBar.setMaxWidth(Double.MAX_VALUE);
 
     FontIcon weekIcon = new FontIcon("fas-calendar-week");
     weekIcon.getStyleClass().add("week-box-icon");
 
-    VBox textBox = new VBox(2, currentWeekLabel, weekLabel);
+    VBox textBox = new VBox(2, currentWeekLabel, weekLabel, weeksLeftLabel, weekProgressBar);
 
     HBox weekBox = new HBox(10, weekIcon, textBox);
     weekBox.setAlignment(Pos.CENTER_LEFT);
@@ -199,7 +206,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Marks the active page by updating the button style classes.</p>
+   * Marks the active page by updating the button style classes.
    *
    * @param page the page that should be highlighted as active
    */
@@ -212,32 +219,50 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
       case DASHBOARD -> dashboardBtn.getStyleClass().add("nav-btn-active");
       case PORTFOLIO -> portfolioBtn.getStyleClass().add("nav-btn-active");
       case TRADING -> tradingBtn.getStyleClass().add("nav-btn-active");
+      default -> throw new AssertionError("Unhandled page: " + page);
     }
   }
 
   /**
-   * <p>Creates a spacer region with a fixed height.</p>
+   * Sets the total number of weeks in the game, used to display weeks remaining.
    *
-   * @param height the spacer height in pixels
-   * @return the spacer region
+   * @param totalWeeks the total number of weeks before the game ends
    */
-  private Region buildSpacer(double height) {
-    Region r = new Region();
-    r.setPrefHeight(height);
-    return r;
+  public void setTotalWeeks(int totalWeeks) {
+    this.totalWeeks = totalWeeks;
+    if (weeksLeftLabel != null) {
+      weeksLeftLabel.setText(weeksLeftText(1));
+    }
+    updateProgress(1);
+  }
+
+  private String weeksLeftText(int currentWeek) {
+    int left = totalWeeks - currentWeek;
+    return left + " weeks left";
   }
 
   /**
-   * <p>Updates the displayed week number in the sidebar.</p>
+   * Updates the displayed week number in the sidebar.
    *
    * @param week the current week number to display
    */
   private void setWeek(int week) {
     weekLabel.setText(ViewFormatter.week(week));
+    weeksLeftLabel.setText(weeksLeftText(week));
+    updateProgress(week);
+  }
+
+  private void updateProgress(int week) {
+    if (weekProgressBar == null || totalWeeks <= 0) {
+      return;
+    }
+    double raw = (double) week / totalWeeks;
+    double progress = Math.clamp(raw, 0.05, 1.0);
+    weekProgressBar.setProgress(progress);
   }
 
   /**
-   * <p>Registers a handler that runs when the "Advance Week" button is pressed.</p>
+   * Registers a handler that runs when the "Advance Week" button is pressed.
    *
    * @param handler the action to run on button press
    */
@@ -246,7 +271,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs when a navigation button is selected.</p>
+   * Registers a handler that runs when a navigation button is selected.
    *
    * @param handler the consumer that receives the selected page
    */
@@ -255,7 +280,7 @@ public class SidebarComponent extends VBox implements ExchangeObserver {
   }
 
   /**
-   * <p>Registers a handler that runs after the user confirms retirement.</p>
+   * Registers a handler that runs after the user confirms retirement.
    *
    * @param handler the action to run when retirement is confirmed
    */

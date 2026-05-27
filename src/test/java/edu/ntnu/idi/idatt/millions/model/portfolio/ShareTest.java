@@ -1,0 +1,214 @@
+package edu.ntnu.idi.idatt.millions.model.portfolio;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import edu.ntnu.idi.idatt.millions.model.market.Stock;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * Unit tests for {@link Share}.
+ *
+ * <p>The tests verify that {@code Share}:
+ *
+ * <ul>
+ *   <li>validates constructor and method arguments
+ *   <li>calculates investment, current value and gain/loss correctly
+ *   <li>implements value-based equality (scale-insensitive)
+ * </ul>
+ *
+ * <p>Both valid cases and exceptional cases are tested to ensure full branch coverage.
+ */
+class ShareTest {
+
+  private Stock stock;
+
+  /**
+   * Creates a reusable stock instance with a known current market price to simplify value
+   * calculations in tests.
+   */
+  @BeforeEach
+  void setup() {
+    stock = new Stock("AAPL", "Apple", new BigDecimal("200"));
+  }
+
+  /** Verifies that a valid construction stores and exposes fields correctly. */
+  @Test
+  void constructor_validInput_createsShare() {
+    Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
+
+    assertEquals(stock, share.getStock());
+    assertEquals(new BigDecimal("10"), share.getQuantity());
+    assertEquals(new BigDecimal("150"), share.getPurchasePrice());
+  }
+
+  /** Ensures the associated stock reference is mandatory. */
+  @Test
+  void constructor_nullStock_throwsException() {
+    assertThrows(NullPointerException.class, () -> new Share(null, BigDecimal.ONE, BigDecimal.ONE));
+  }
+
+  /** Ensures quantity is mandatory. */
+  @Test
+  void constructor_nullQuantity_throwsException() {
+    assertThrows(NullPointerException.class, () -> new Share(stock, null, BigDecimal.ONE));
+  }
+
+  /** Ensures quantity must be strictly positive. */
+  @Test
+  void constructor_zeroQuantity_throwsException() {
+    assertThrows(
+        IllegalArgumentException.class, () -> new Share(stock, BigDecimal.ZERO, BigDecimal.ONE));
+  }
+
+  /** Ensures negative quantity is rejected. */
+  @Test
+  void constructor_negativeQuantity_throwsException() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new Share(stock, new BigDecimal("-1"), BigDecimal.ONE));
+  }
+
+  /** Ensures purchase price is mandatory. */
+  @Test
+  void constructor_nullPrice_throwsException() {
+    assertThrows(NullPointerException.class, () -> new Share(stock, BigDecimal.ONE, null));
+  }
+
+  /** Ensures purchase price cannot be negative. */
+  @Test
+  void constructor_negativePrice_throwsException() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new Share(stock, BigDecimal.ONE, new BigDecimal("-1")));
+  }
+
+  /** Verifies total investment equals purchase price multiplied by quantity. */
+  @Test
+  void getTotalInvestment_returnsCorrectValue() {
+    Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
+
+    assertEquals(new BigDecimal("1500"), share.getTotalInvestment());
+  }
+
+  /** Verifies current value equals current stock price multiplied by quantity. */
+  @Test
+  void getCurrentValue_returnsCorrectValue() {
+    Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
+
+    assertEquals(new BigDecimal("2000"), share.getCurrentValue());
+  }
+
+  /** Verifies gain/loss equals current value minus original investment. */
+  @Test
+  void getGainOrLoss_returnsCorrectValue() {
+    Share share = new Share(stock, new BigDecimal("10"), new BigDecimal("150"));
+
+    assertEquals(new BigDecimal("500"), share.getGainOrLoss());
+  }
+
+  /**
+   * Verifies value equality is numeric (scale-insensitive) rather than based on {@link
+   * BigDecimal#equals(Object)} (which is scale-sensitive).
+   *
+   * <p>This guards against cases such as 10.0 and 10.00 being considered different when they
+   * represent the same numeric value.
+   */
+  @Test
+  void equals_sameValuesDifferentScale_returnsTrue() {
+    Share s1 = new Share(stock, new BigDecimal("10.0"), new BigDecimal("150.00"));
+
+    Share s2 = new Share(stock, new BigDecimal("10.00"), new BigDecimal("150.0"));
+
+    assertEquals(s1, s2);
+    assertEquals(s1.hashCode(), s2.hashCode());
+  }
+
+  /** Verifies equals returns true for the same instance. */
+  @Test
+  void equals_sameInstance_returnsTrue() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+
+    assertEquals(share, share);
+  }
+
+  /** Ensures equals returns false when quantity differs. */
+  @Test
+  void equals_differentQuantity_returnsFalse() {
+    Share s1 = new Share(stock, new BigDecimal("1"), BigDecimal.ONE);
+    Share s2 = new Share(stock, new BigDecimal("2"), BigDecimal.ONE);
+
+    assertNotEquals(s1, s2);
+  }
+
+  /** Ensures equals returns false when purchase price differs. */
+  @Test
+  void equals_differentPurchasePrice_returnsFalse() {
+    Share s1 = new Share(stock, BigDecimal.ONE, new BigDecimal("10"));
+    Share s2 = new Share(stock, BigDecimal.ONE, new BigDecimal("11"));
+
+    assertNotEquals(s1, s2);
+  }
+
+  /** Ensures equals safely handles null. */
+  @Test
+  void equals_null_returnsFalse() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+    assertFalse(share.equals(null));
+  }
+
+  /** Ensures equals returns false for unrelated types. */
+  @Test
+  void equals_differentType_returnsFalse() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+    assertFalse(share.equals("not share"));
+  }
+
+  /** Verifies hashCode is consistent with value equality. */
+  @Test
+  void hashCode_sameValuesDifferentScale_matches() {
+    Share s1 = new Share(stock, new BigDecimal("10.0"), new BigDecimal("150.00"));
+    Share s2 = new Share(stock, new BigDecimal("10.00"), new BigDecimal("150.0"));
+
+    assertEquals(s1.hashCode(), s2.hashCode());
+  }
+
+  /**
+   * Ensures two shares with different underlying stocks are not equal, even if the numeric fields
+   * match.
+   */
+  @Test
+  void equals_differentStock_returnsFalse() {
+    Stock other = new Stock("TSLA", "Tesla", BigDecimal.TEN);
+
+    Share s1 = new Share(stock, BigDecimal.ONE, BigDecimal.ONE);
+    Share s2 = new Share(other, BigDecimal.ONE, BigDecimal.ONE);
+
+    assertNotEquals(s1, s2);
+  }
+
+  /** Verifies that a zero purchase price is accepted (non-negative boundary). */
+  @Test
+  void constructor_zeroPurchasePrice_createsShare() {
+    Share share = new Share(stock, BigDecimal.ONE, BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, share.getPurchasePrice());
+  }
+
+  /** Verifies that total investment is zero when purchase price is zero. */
+  @Test
+  void getTotalInvestment_zeroPurchasePrice_returnsZero() {
+    Share share = new Share(stock, new BigDecimal("5"), BigDecimal.ZERO);
+
+    assertEquals(BigDecimal.ZERO, share.getTotalInvestment());
+  }
+
+  /** Verifies that gain or loss equals current value when purchase price is zero. */
+  @Test
+  void getGainOrLoss_zeroPurchasePrice_equalsCurrentValue() {
+    Share share = new Share(stock, new BigDecimal("5"), BigDecimal.ZERO);
+
+    assertEquals(share.getCurrentValue(), share.getGainOrLoss());
+  }
+}

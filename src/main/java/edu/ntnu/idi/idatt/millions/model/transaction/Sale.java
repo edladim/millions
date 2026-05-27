@@ -1,23 +1,23 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Player;
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.player.Player;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Represents a sale transaction.
  *
- * <p>A sale transaction sells a {@link Share} owned by a player. When
- * the transaction is committed, the following actions occur:</p>
+ * <p>A sale transaction sells a {@link Share} owned by a player. When the transaction is committed,
+ * the following actions occur:
  *
  * <ol>
- *   <li>The total sale value is added to the player's money</li>
- *   <li>The share is removed from the player's portfolio</li>
- *   <li>The transaction is stored in the player's transaction archive</li>
+ *   <li>The total sale value is added to the player's money
+ *   <li>The share is removed from the player's portfolio
+ *   <li>The transaction is stored in the player's transaction archive
  * </ol>
  *
- * <p>A sale can only be committed once.</p>
+ * <p>A sale can only be committed once.
  */
 public final class Sale extends Transaction {
 
@@ -31,15 +31,19 @@ public final class Sale extends Transaction {
     super(share, week, new SaleCalculator(share));
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public boolean isBuy() {
+    return false;
+  }
+
   /**
    * Commits the sale transaction.
    *
-   * <p>The sale is completed by adding the total sale value to the
-   * player's money, removing the share from the portfolio, and storing
-   * the transaction in the archive.</p>
+   * <p>The sale is completed by adding the total sale value to the player's money, removing the
+   * share from the portfolio, and storing the transaction in the archive.
    *
    * @param player the player performing the sale
-   *
    * @throws NullPointerException if {@code player} is null
    * @throws IllegalStateException if the transaction is already committed
    * @throws IllegalStateException if the player does not own the share
@@ -59,10 +63,9 @@ public final class Sale extends Transaction {
 
     BigDecimal totalValue = getCalculator().calculateTotal();
 
-    player.getTransactionArchive().add(this);
-    player.getPortfolio().removeShare(getShare());
-    player.addMoney(totalValue);
-
     committed = true;
+    player.addMoney(totalValue);
+    player.getPortfolio().removeShare(getShare());
+    player.getTransactionArchive().add(this);
   }
 }

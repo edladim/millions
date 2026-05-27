@@ -7,29 +7,24 @@ import java.util.Objects;
 /**
  * Stores completed financial transactions.
  *
- * <p>The transaction archive keeps track of all executed transactions
- * in the system. Transactions may represent purchases or sales and are
- * associated with a specific week.</p>
+ * <p>The transaction archive keeps track of all executed transactions in the system. Transactions
+ * may represent purchases or sales and are associated with a specific week.
  *
- * <p>The archive allows querying transactions by week and transaction
- * type, as well as determining how many weeks contain trading activity.</p>
+ * <p>The archive allows querying transactions by week and transaction type, as well as determining
+ * how many weeks contain trading activity.
  */
 public final class TransactionArchive {
 
   private final List<Transaction> transactions = new ArrayList<>();
 
-  /**
-   * Creates an empty transaction archive.
-   */
+  /** Creates an empty transaction archive. */
   public TransactionArchive() {}
 
   /**
    * Adds a transaction to the archive.
    *
    * @param transaction the transaction to add
-   *
    * @return {@code true} if the transaction was added
-   *
    * @throws NullPointerException if {@code transaction} is null
    */
   public boolean add(Transaction transaction) {
@@ -60,9 +55,7 @@ public final class TransactionArchive {
    * Returns all transactions performed in a given week.
    *
    * @param week the week number
-   *
    * @return a list of transactions from that week
-   *
    * @throws IllegalArgumentException if {@code week} is negative
    */
   public List<Transaction> getTransactions(int week) {
@@ -71,18 +64,14 @@ public final class TransactionArchive {
       throw new IllegalArgumentException("Week cannot be negative");
     }
 
-    return transactions.stream()
-        .filter(t -> t.getWeek() == week)
-        .toList();
+    return transactions.stream().filter(t -> t.getWeek() == week).toList();
   }
 
   /**
    * Returns all purchase transactions performed in a given week.
    *
    * @param week the week number
-   *
    * @return a list of purchase transactions
-   *
    * @throws IllegalArgumentException if {@code week} is negative
    */
   public List<Purchase> getPurchases(int week) {
@@ -102,9 +91,7 @@ public final class TransactionArchive {
    * Returns all sale transactions performed in a given week.
    *
    * @param week the week number
-   *
    * @return a list of sale transactions
-   *
    * @throws IllegalArgumentException if {@code week} is negative
    */
   public List<Sale> getSales(int week) {
@@ -123,15 +110,12 @@ public final class TransactionArchive {
   /**
    * Counts the number of distinct weeks with trading activity.
    *
-   * <p>A week is counted if at least one transaction occurred in that week.</p>
+   * <p>A week is counted if at least one transaction occurred in that week.
    *
    * @return number of distinct weeks containing transactions
    */
   public int countDistinctWeeks() {
 
-    return (int) transactions.stream()
-        .map(Transaction::getWeek)
-        .distinct()
-        .count();
+    return (int) transactions.stream().map(Transaction::getWeek).distinct().count();
   }
 }

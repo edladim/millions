@@ -1,38 +1,37 @@
 package edu.ntnu.idi.idatt.millions.model.transaction;
 
-import edu.ntnu.idi.idatt.millions.model.Share;
+import edu.ntnu.idi.idatt.millions.model.portfolio.Share;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * Performs financial calculations for sale transactions.
  *
- * <p>This calculator determines the financial values associated with
- * selling shares, including:</p>
+ * <p>This calculator determines the financial values associated with selling shares, including:
  *
  * <ul>
- *   <li>Gross sale value</li>
- *   <li>Broker commission</li>
- *   <li>Tax on profit</li>
- *   <li>Total amount received from the transaction</li>
+ *   <li>Gross sale value
+ *   <li>Broker commission
+ *   <li>Tax on profit
+ *   <li>Total amount received from the transaction
  * </ul>
  *
- * <p>The calculations follow these rules:</p>
+ * <p>The calculations follow these rules:
  *
  * <ul>
- *   <li>Gross = salesPrice × quantity</li>
- *   <li>Commission = 1% of gross</li>
- *   <li>Tax = 30% of profit (only if the transaction results in a profit, after commission)</li>
- *   <li>Total = gross − commission − tax</li>
+ *   <li>Gross = salesPrice × quantity
+ *   <li>Commission = 1% of gross
+ *   <li>Tax = 30% of profit (only if the transaction results in a profit, after commission)
+ *   <li>Total = gross − commission − tax
  * </ul>
  *
- * <p>The profit used for tax calculation is determined as:</p>
+ * <p>The profit used for tax calculation is determined as:
  *
  * <ul>
- *   <li>Profit = gross − commission − (purchasePrice × quantity)</li>
+ *   <li>Profit = gross − commission − (purchasePrice × quantity)
  * </ul>
  *
- * <p>If the calculated profit is zero or negative, no tax is applied.</p>
+ * <p>If the calculated profit is zero or negative, no tax is applied.
  */
 public final class SaleCalculator implements TransactionCalculator {
 
@@ -80,8 +79,7 @@ public final class SaleCalculator implements TransactionCalculator {
   /**
    * Calculates the tax on profit from the sale.
    *
-   * <p>Tax is only applied if the sale results in a profit.
-   * Losses are not taxed.</p>
+   * <p>Tax is only applied if the sale results in a profit. Losses are not taxed.
    *
    * @return the tax amount or zero if the sale produced no profit
    */
@@ -106,8 +104,6 @@ public final class SaleCalculator implements TransactionCalculator {
    */
   @Override
   public BigDecimal calculateTotal() {
-    return calculateGross()
-        .subtract(calculateCommission())
-        .subtract(calculateTax());
+    return calculateGross().subtract(calculateCommission()).subtract(calculateTax());
   }
 }

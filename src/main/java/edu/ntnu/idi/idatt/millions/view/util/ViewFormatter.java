@@ -1,28 +1,23 @@
 package edu.ntnu.idi.idatt.millions.view.util;
 
-import edu.ntnu.idi.idatt.millions.model.PlayerStatus;
+import edu.ntnu.idi.idatt.millions.model.player.PlayerStatus;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
 /**
- * <p>
- * Utility class for formatting {@link BigDecimal} model values into display strings
- * suitable for use in view classes.
- * </p>
+ * Utility class for formatting {@link BigDecimal} model values into display strings suitable for
+ * use in view classes.
  *
- * <p>
- * All methods scale values to two decimal places using
- * {@link RoundingMode#HALF_UP} before formatting. The class cannot be
- * instantiated; use the static methods directly.
- * </p>
+ * <p>All methods scale values to two decimal places using {@link RoundingMode#HALF_UP} before
+ * formatting. The class cannot be instantiated; use the static methods directly.
  */
 public final class ViewFormatter {
 
   private ViewFormatter() {}
 
   /**
-   * <p>Formats a value as a dollar price, e.g. {@code "$12.34"}.</p>
+   * Formats a value as a dollar price, e.g. {@code "$12.34"}.
    *
    * @param value the monetary value to format
    * @return the formatted price string
@@ -32,8 +27,7 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a signed dollar price, e.g. {@code "$+12.34"} or
-   * {@code "$-12.34"}.</p>
+   * Formats a value as a signed dollar price, e.g. {@code "$+12.34"} or {@code "$-12.34"}.
    *
    * @param value the monetary value to format
    * @return the formatted signed price string
@@ -44,8 +38,8 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a signed amount without a currency symbol,
-   * e.g. {@code "+12.34"} or {@code "-12.34"}.</p>
+   * Formats a value as a signed amount without a currency symbol, e.g. {@code "+12.34"} or {@code
+   * "-12.34"}.
    *
    * @param value the value to format
    * @return the formatted signed amount string
@@ -55,8 +49,7 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a signed percentage, e.g. {@code "+12.34%"} or
-   * {@code "-12.34%"}.</p>
+   * Formats a value as a signed percentage, e.g. {@code "+12.34%"} or {@code "-12.34%"}.
    *
    * @param value the percentage value to format (e.g. {@code 12.34} for 12.34%)
    * @return the formatted percentage string
@@ -66,8 +59,8 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a directional percentage change with an arrow indicator,
-   * e.g. {@code "↗ +12.34%"} or {@code "↘ -12.34%"}.</p>
+   * Formats a value as a directional percentage change with an arrow indicator, e.g. {@code "↗
+   * +12.34%"} or {@code "↘ -12.34%"}.
    *
    * @param value the percentage change value to format
    * @return the formatted directional change string
@@ -78,38 +71,28 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a directional price change with an arrow indicator but
-   * without a percentage sign, e.g. {@code "↗ +12.34"} or {@code "↘ -12.34"}.</p>
+   * Computes the percentage change from {@code currentPrice} and formats it with a directional
+   * arrow, e.g. {@code "↗ +5.42%"} or {@code "↘ -3.17%"}.
    *
-   * @param value the price change value to format
-   * @return the formatted directional price change string
-   */
-  public static String priceChangeArrow(BigDecimal value) {
-    boolean positive = value.compareTo(BigDecimal.ZERO) >= 0;
-    return (positive ? "↗ " : "↘ ") + signedAmount(value);
-  }
-
-  /**
-   * <p>Computes the percentage change from {@code currentPrice} and formats it
-   * with a directional arrow, e.g. {@code "↗ +5.42%"} or {@code "↘ -3.17%"}.</p>
+   * <p>Uses {@code change / (currentPrice - change) × 100} to derive the rate from the absolute
+   * delta and the current price.
    *
-   * <p>Uses {@code change / (currentPrice - change) × 100} to derive the rate
-   * from the absolute delta and the current price.</p>
-   *
-   * @param change       the absolute price change (latest minus previous)
+   * @param change the absolute price change (latest minus previous)
    * @param currentPrice the current (latest) price
    * @return the formatted percentage-change string with directional arrow
    */
   public static String changeArrowPercent(BigDecimal change, BigDecimal currentPrice) {
     BigDecimal prev = currentPrice.subtract(change);
-    BigDecimal pct = prev.signum() == 0 ? BigDecimal.ZERO
-        : change.divide(prev, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+    BigDecimal pct =
+        prev.signum() == 0
+            ? BigDecimal.ZERO
+            : change.divide(prev, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
     return changeArrow(pct);
   }
 
   /**
-   * <p>Converts a decimal return rate to a signed percentage string,
-   * e.g. {@code 0.20} becomes {@code "+20.00%"}.</p>
+   * Converts a decimal return rate to a signed percentage string, e.g. {@code 0.20} becomes {@code
+   * "+20.00%"}.
    *
    * @param rate the decimal rate (e.g. {@code 0.20} for 20%)
    * @return the formatted percentage string
@@ -119,8 +102,8 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a share quantity as a plain decimal string scaled to two
-   * decimal places, e.g. {@code "10.00"}.</p>
+   * Formats a share quantity as a plain decimal string scaled to two decimal places, e.g. {@code
+   * "10.00"}.
    *
    * @param quantity the share quantity to format
    * @return the formatted quantity string
@@ -130,8 +113,7 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a whole-dollar price with no decimals,
-   * e.g. {@code "$1234"}.</p>
+   * Formats a value as a whole-dollar price with no decimals, e.g. {@code "$1234"}.
    *
    * @param value the monetary value to format
    * @return the formatted whole-dollar string
@@ -141,9 +123,9 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a value as a signed whole-dollar price with no decimals,
-   * e.g. {@code "+$1234"} or {@code "-$1234"}. Used as a compact alternative
-   * to {@link #signedPrice(BigDecimal)} when display width is tight.</p>
+   * Formats a value as a signed whole-dollar price with no decimals, e.g. {@code "+$1234"} or
+   * {@code "-$1234"}. Used as a compact alternative to {@link #signedPrice(BigDecimal)} when
+   * display width is tight.
    *
    * @param value the monetary value to format
    * @return the formatted signed whole-dollar string
@@ -154,7 +136,7 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Formats a game week as a plain label, e.g. {@code "Week 53"}.</p>
+   * Formats a game week as a plain label, e.g. {@code "Week 53"}.
    *
    * @param week the total game week number (1-based)
    * @return the formatted week string
@@ -164,19 +146,18 @@ public final class ViewFormatter {
   }
 
   /** CSS classes that may be applied to a player-status label, in enum order. */
-  private static final List<String> PLAYER_STATUS_CSS = List.of(
-      "stat-card-value-status-worst",
-      "stat-card-value-status-bad",
-      "stat-card-value-status-average",
-      "stat-card-value-status-investor",
-      "stat-card-value-status-good",
-      "stat-card-value-status-excellent"
-  );
+  private static final List<String> PLAYER_STATUS_CSS =
+      List.of(
+          "stat-card-value-status-worst",
+          "stat-card-value-status-bad",
+          "stat-card-value-status-average",
+          "stat-card-value-status-investor",
+          "stat-card-value-status-good",
+          "stat-card-value-status-excellent");
 
   /**
-   * <p>Returns the CSS class to apply to a status label so its colour reflects
-   * the given {@link PlayerStatus}. The enum's declaration order maps directly
-   * to a worst-to-best colour ramp.</p>
+   * Returns the CSS class to apply to a status label so its colour reflects the given {@link
+   * PlayerStatus}. The enum's declaration order maps directly to a worst-to-best colour ramp.
    *
    * @param status the player status whose colour to look up
    * @return the CSS class name
@@ -186,9 +167,8 @@ public final class ViewFormatter {
   }
 
   /**
-   * <p>Returns every CSS class that {@link #playerStatusCss(PlayerStatus)} may
-   * produce. Useful for clearing previously applied status classes from a
-   * label before adding the current one.</p>
+   * Returns every CSS class that {@link #playerStatusCss(PlayerStatus)} may produce. Useful for
+   * clearing previously applied status classes from a label before adding the current one.
    *
    * @return all status CSS class names
    */

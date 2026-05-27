@@ -112,8 +112,33 @@
     -fx-text-fill: -primary;
 }
 
+.week-box-subtitle {
+    -fx-font-size: 10px;
+    -fx-text-fill: -text-muted;
+}
+
 .week-box-icon {
     -fx-font-size: 18px;
+}
+
+.week-progress {
+    -fx-pref-height: 14px;
+    -fx-min-height: 14px;
+    -fx-max-height: 14px;
+    -fx-padding: 6 0 0 0;
+}
+
+.week-progress > .track {
+    -fx-background-color: -border;
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+}
+
+.week-progress > .bar {
+    -fx-background-color: -primary;
+    -fx-background-radius: 7;
+    -fx-background-insets: 0;
+    -fx-padding: 7;
 }
 
 /* Page elements (shared) */
@@ -779,22 +804,22 @@
 
 /* Transaction notification */
 .notification-bar > .pane {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: -primary-bg;
     -fx-background-radius: 12;
     -fx-padding: 14;
     -fx-border-color: #4caf50;
-    -fx-border-width: 1;
+    -fx-border-width: 2;
     -fx-border-radius: 12;
 }
 
 .notification-bar > .pane .title {
-    -fx-text-fill: white;
+    -fx-text-fill: #1e293b;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
 }
 
 .notification-bar > .pane .content {
-    -fx-text-fill: #cfcfcf;
+    -fx-text-fill: #334155;
     -fx-font-size: 12px;
 }
 
@@ -1083,5 +1108,17 @@
 
 /* End game overlay */
 .endgame-overlay {
-    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-background-color: rgba(0, 0, 0, 0.65);
+}
+
+.endgame-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.endgame-stat-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text;
 }

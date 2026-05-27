@@ -12,6 +12,15 @@ Millions is a stock trading simulation game built in Java with JavaFX. The playe
 
 ---
 
+## Documentation
+
+| | Link |
+|-|------|
+| JavaDoc | [edladim.github.io/millions](https://edladim.github.io/millions/) |
+| Coverage report | [edladim.github.io/millions/jacoco](https://edladim.github.io/millions/jacoco/) |
+
+---
+
 ## Download & install
 
 Pre-built native installers are available below, no Java installation required.

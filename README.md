@@ -27,8 +27,8 @@ Pre-built native installers are available below, no Java installation required.
 
 | OS | Download | How to install |
 |----|----------|----------------|
-| **macOS** | [Millions-1.1.1.dmg](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.dmg) | Open the `.dmg`, drag **Millions.app** to Applications. First launch: right-click → Open to bypass Gatekeeper. |
-| **Windows** | [Millions-1.1.1.msi](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.msi) | Run the `.msi` installer and follow the wizard. |
+| **macOS** | [Millions-1.1.1.dmg](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.dmg) | Open the `.dmg`, drag **Millions.app** to Applications. First launch: go to **System Settings** → **Privacy & Security**, scroll down and click **Open Anyway**. |
+| **Windows** | [Millions-1.1.1.msi](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.msi) | Run the `.msi` installer and follow the wizard. If **SmartScreen** appears, click **More info** → **Run anyway**. |
 | **Linux** | [millions_1.1.1_amd64.deb](https://github.com/edladim/millions/releases/download/v1.1.1/millions_1.1.1_amd64.deb) | `sudo dpkg -i millions_1.1.1_amd64.deb` |
 
 

@@ -52,7 +52,7 @@ jobs:
           $bmp.Dispose()
 
       - name: Build with Maven (${{ matrix.profile }})
-        run: mvn -B -DskipTests -Dcheckstyle.skip -Dspotless.check.skip clean package -P${{ matrix.profile }}
+        run: mvn -B -DskipTests -Dcheckstyle.skip=true -Dspotless.check.skip=true clean package -P${{ matrix.profile }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

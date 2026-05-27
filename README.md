@@ -8,22 +8,20 @@
 
 ## Project description
 
-Millions is a stock trading simulation game built in Java with JavaFX. The player starts with a chosen capital and a stock exchange loaded from a CSV file. Each week, stock prices fluctuate and the player can buy and sell shares to grow their portfolio. The game tracks net worth, profit, and awards the player a status (Novice → Investor → Speculator) based on performance. High scores are saved to a persistent leaderboard between sessions.
+Millions is a stock trading simulation game built in Java with JavaFX. The player starts with a chosen capital and a stock exchange loaded from a CSV file. Each week, stock prices fluctuate and the player can buy and sell shares to grow their portfolio. The game tracks net worth, profit, and awards the player a status based on performance. High scores are saved to a persistent leaderboard between sessions.
 
 ---
 
 ## Download & install
 
-Pre-built native installers are available as artifacts from the latest GitHub Actions run, no Java installation required.
+Pre-built native installers are available below, no Java installation required.
 
-1. Go to the [Actions tab](https://github.com/edladim/millions/actions) and open the latest **Package native installers** run.
-2. Scroll to **Artifacts** and download the one matching your OS.
-
-| OS | Artifact | How to install |
+| OS | Download | How to install |
 |----|----------|----------------|
-| **macOS** | `Millions-macOS.zip` → `Millions-1.1.1.dmg` | Open the `.dmg`, drag **Millions.app** to Applications. First launch: right-click → Open to bypass Gatekeeper. |
-| **Windows** | `Millions-Windows.zip` → `Millions-1.1.1.msi` | Run the `.msi` installer and follow the wizard. |
-| **Linux** | `Millions-Linux.zip` → `millions_1.1.1_amd64.deb` | `sudo dpkg -i millions_1.1.1_amd64.deb` |
+| **macOS** | [Millions-1.1.1.dmg](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.dmg) | Open the `.dmg`, drag **Millions.app** to Applications. First launch: right-click → Open to bypass Gatekeeper. |
+| **Windows** | [Millions-1.1.1.msi](https://github.com/edladim/millions/releases/download/v1.1.1/Millions-1.1.1.msi) | Run the `.msi` installer and follow the wizard. |
+| **Linux** | [millions_1.1.1_amd64.deb](https://github.com/edladim/millions/releases/download/v1.1.1/millions_1.1.1_amd64.deb) | `sudo dpkg -i millions_1.1.1_amd64.deb` |
+
 
 ---
 
